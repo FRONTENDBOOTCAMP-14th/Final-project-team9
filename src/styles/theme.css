@@ -1,0 +1,19 @@
+@theme {
+  --color-primary: #2e4ff1;
+  --color-sub: #00c7ff;
+  --color-deep: #16296d;
+  --color-gray: #7989b9;
+
+  --text-1: 0.25rem; /* 4px */
+  --text-2: 0.5rem; /* 8px */
+  --text-3: 0.75rem; /* 12px */
+  --text-4: 1rem; /* 16px */
+  --text-5: 1.25rem; /* 20px */
+  --text-6: 1.5rem; /* 24px */
+  --text-7: 1.75rem; /* 28px */
+  --text-8: 2rem; /* 32px */
+  --text-9: 2.25rem; /* 36px */
+  --text-10: 2.5rem; /* 40px */
+  --text-11: 2.75rem; /* 44px */
+  --text-12: 3rem; /* 48px */
+}
