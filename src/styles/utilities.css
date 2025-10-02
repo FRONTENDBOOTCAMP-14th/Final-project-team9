@@ -1,7 +1,6 @@
 /* 호버 시 적용되는 그림자 스타일 */
-@utilities {
+@layer utilities {
   .shadow-hover {
-    @apply transition-shadow duration-300 ease-in-out;
-    @apply hover:shadow-[inset_4px_4px_8px_0px_rgb(255_255_255_/_0.8),_4px_4px_3px_0px_rgb(0_0_0_/_0.5)];
+    @apply hover:shadow-[inset_2px_2px_8px_0px_rgb(255_255_255_/_0.8),_2px_2px_3px_0px_rgb(0_0_0_/_0.5)];
   }
 }

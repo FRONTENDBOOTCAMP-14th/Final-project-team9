@@ -11,5 +11,5 @@ export default function Loading() {
       <h2 className="mt-4 text-lg font-medium text-slate-700">로딩 중...</h2>
       <p className="text-sm text-slate-500">잠시만 기다려주세요</p>
     </div>
-  )
+  );
 }
