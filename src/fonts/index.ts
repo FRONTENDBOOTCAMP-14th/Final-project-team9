@@ -1,4 +1,4 @@
-import localFont from 'next/font/local'
+import localFont from "next/font/local";
 
 // --------------------------------------------------------------------------
 // Local Fonts
@@ -6,25 +6,25 @@ import localFont from 'next/font/local'
 // 여기어때 잘난체
 
 export const jalnan = localFont({
-  src: '/Jalnan2TTF.ttf',
-  weight: '700',
-  display: 'swap',
-  style: 'normal',
-})
+  src: "/Jalnan2TTF.ttf",
+  weight: "700",
+  display: "swap",
+  style: "normal",
+});
 
 // Min Sans
 
 export const minSans = localFont({
-  variable: '--min-sans',
+  variable: "--min-sans",
   src: [
     {
-      path: '/MinSansVF.ttf',
-      weight: '100 900',
-      style: 'normal',
+      path: "/MinSansVF.ttf",
+      weight: "100 900",
+      style: "normal",
     },
   ],
-  display: 'swap',
-})
+  display: "swap",
+});
 
 // --------------------------------------------------------------------------
 // Fonts Module
@@ -32,6 +32,6 @@ export const minSans = localFont({
 const fonts = {
   jalnan,
   minSans,
-}
+};
 
-export default fonts
+export default fonts;
