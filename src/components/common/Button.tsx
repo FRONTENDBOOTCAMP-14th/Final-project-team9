@@ -28,8 +28,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles =
       "inline-flex items-center justify-center font-semibold rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:cursor-not-allowed";
     const variantStyles = {
-      primary: "bg-blue-600 text-white hover:bg-blue-700",
-      secondary: "bg-gray-200 text-gray-800 hover:bg-gray-300",
+      primary: "bg-gradient-to-r from-primary to-sub text-white shadow-hover",
+      secondary: "bg-white border border-gray text-black shadow-hover",
       icon: "bg-transparent rounded-full hover:bg-gray-200",
     };
 
