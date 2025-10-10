@@ -49,16 +49,20 @@ export default function Dropdown({ options, placeholder }: DropdownProps) {
   ) => {
     const listLength = options.length;
 
-    if (e.key === "Tab") {
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
+      handleSelect(options[index]);
+      return;
+    }
 
-      if (e.shiftKey) {
-        const prevIndex = (index - 1 + listLength) % listLength;
-        optionRefs.current[prevIndex]?.focus();
-      } else {
-        const nextIndex = (index + 1) % listLength;
-        optionRefs.current[nextIndex]?.focus();
-      }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const prevIndex = (index - 1 + listLength) % listLength;
+      optionRefs.current[prevIndex]?.focus();
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const nextIndex = (index + 1) % listLength;
+      optionRefs.current[nextIndex]?.focus();
     }
   };
 
@@ -67,6 +71,7 @@ export default function Dropdown({ options, placeholder }: DropdownProps) {
       <button
         aria-label="드롭다운 열기"
         aria-expanded={isOpen}
+        aria-haspopup="listbox"
         onClick={() => setIsOpen((prev) => !prev)}
         className={tw(
           `flex items-center justify-between
