@@ -1,6 +1,6 @@
 import Button from '@/components/common/Button'
 import Dropdown from '@/components/common/input/Dropdown'
-import ResetFilterButton from '@/components/common/reset-filter-button/ReastFilterButton'
+import ResetFilterButton from '@/components/common/reset-filter-button/ResetFilterButton'
 import SearchBar from '@/components/common/search-bar/SearchBar'
 import DropdownWithTag from '@/components/common/tag/DropdownWithTag'
 import { jalnan } from '@/fonts'
