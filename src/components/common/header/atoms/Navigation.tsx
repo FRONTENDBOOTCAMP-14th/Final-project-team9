@@ -25,7 +25,7 @@ export default function Navigation() {
       aria-label="주요 네비게이션"
       className="flex items-center gap-[120px]"
     >
-      <NavLink href="/projects">프로젝트 찾기</NavLink>
+      <NavLink href="/find-project">프로젝트 찾기</NavLink>
       <NavLink href="/register-project">프로젝트 등록</NavLink>
     </nav>
   );
