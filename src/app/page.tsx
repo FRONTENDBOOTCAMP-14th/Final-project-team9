@@ -1,4 +1,5 @@
 import Dropdown from '@/components/common/input/Dropdown'
+import SearchBar from '@/components/common/search-bar/SearchBar'
 import ProjectCard from '@/components/common/project-card/ProjectCard'
 
 export default function Home() {
@@ -22,6 +23,7 @@ export default function Home() {
         remain={2}
         category="웹 개발"
       />
+      <SearchBar />
     </main>
   )
 }
