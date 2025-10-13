@@ -48,9 +48,8 @@ export default function MainPageButton() {
           href={button.href}
           className={`${jalnan.className} ${buttonBaseStyles}`}
           aria-label={button.ariaLabel}
-          tabIndex={0}
         >
-          <span aria-hidden="false">{button.text}</span>
+          <span>{button.text}</span>
         </Link>
       ))}
     </section>
