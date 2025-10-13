@@ -9,7 +9,7 @@ interface ButtonData {
 
 const buttonData: ButtonData[] = [
   {
-    href: "/projects",
+    href: "/find-projects",
     text: "프로젝트 찾기",
     ariaLabel: "프로젝트 찾기 페이지로 이동",
   },
