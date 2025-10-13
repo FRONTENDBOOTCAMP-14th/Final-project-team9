@@ -27,9 +27,9 @@ const buttonBaseStyles = `
   rounded-xl
   text-[length:var(--text-7)] font-bold
   border-2 border-transparent
-  hover:bg-blue-700 hover:border-blue-300 hover:scale-105
-  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-  focus-visible:ring-4 focus-visible:ring-blue-300
+  hover:bg-primary/90 hover:border-primary/30 hover:scale-105
+  focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2
+  focus-visible:ring-4 focus-visible:ring-primary/30
   active:scale-95
   transition-all duration-300 ease-in-out
   disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
@@ -42,9 +42,9 @@ export default function MainPageButton() {
       role="navigation"
       aria-label="주요 액션 버튼"
     >
-      {buttonData.map((button, index) => (
+      {buttonData.map((button) => (
         <Link
-          key={`main-button-${index}`}
+          key={button.href}
           href={button.href}
           className={`${jalnan.className} ${buttonBaseStyles}`}
           aria-label={button.ariaLabel}
