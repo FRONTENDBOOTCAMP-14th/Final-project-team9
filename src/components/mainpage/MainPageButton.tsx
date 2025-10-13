@@ -25,7 +25,7 @@ const buttonBaseStyles = `
   w-60 h-16
   bg-primary text-white
   rounded-xl
-  text-[length:var(--text-7)] font-bold
+  text-7 font-bold
   border-2 border-transparent
   hover:bg-primary/90 hover:border-primary/30 hover:scale-105
   focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2
