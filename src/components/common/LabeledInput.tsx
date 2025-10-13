@@ -35,12 +35,12 @@ const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(
     );
 
     const labelStyles = twMerge(
-      "absolute left-[30px] text-gray-400 transition-all duration-200 ease-in-out pointer-events-none",
+      "absolute left-[30px] text-[#DBDBDB] transition-all duration-200 ease-in-out pointer-events-none",
       // 기본 위치를 정가운데(h-80px 기준)로 맞췄습니다.
       "top-[24px] text-[24px]",
       // 활성 상태일 때의 위치
-      "peer-focus:top-[12px] peer-focus:text-[16px] peer-focus:text-gray-500",
-      "peer-[:not(:placeholder-shown)]:top-[12px] peer-[:not(:placeholder-shown)]:text-[16px] peer-[:not(:placeholder-shown)]:text-gray-500"
+      "peer-focus:top-[12px] peer-focus:text-[16px] peer-focus:text-black",
+      "peer-[:not(:placeholder-shown)]:top-[12px] peer-[:not(:placeholder-shown)]:text-[16px] peer-[:not(:placeholder-shown)]:text-black"
     );
 
     return (
