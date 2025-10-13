@@ -1,6 +1,6 @@
 // src/components/common/LabeledInput.tsx
 
-import React, { forwardRef } from "react";
+import React, { forwardRef } from "react"; // [수정됨] forwardRef를 {} 안에 넣어서 제대로 import 했습니다.
 import { twMerge } from "tailwind-merge";
 import { clsx } from "clsx";
 
@@ -14,13 +14,11 @@ export interface LabeledInputProps
 
 const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(
   ({ label, error, icon, className, containerClassName, ...props }, ref) => {
-    const formFieldContainerStyles = twMerge(
-      "relative w-[615px]",
-      containerClassName
-    );
+    // 이 컴포넌트의 너비와 높이는 사용하는 곳(LoginForm 등)에서 결정합니다.
+    const formFieldContainerStyles = twMerge("relative", containerClassName);
 
     const inputBoxStyles = twMerge(
-      "relative h-[80px] w-full rounded-[10px] border-[1px] border-white bg-white transition-colors",
+      "relative w-full h-full rounded-[10px] border-[1px] border-white bg-white transition-colors",
       clsx({
         "border-red-500": error,
         "focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600":
@@ -28,7 +26,6 @@ const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(
       })
     );
 
-    // 입력되는 텍스트의 위치는 활성 상태를 기준으로 고정합니다.
     const inputElementStyles = twMerge(
       "peer h-full w-full bg-transparent px-[30px] pt-[36px] pb-[12px] text-[24px] text-black placeholder:text-transparent focus:outline-none",
       clsx({
@@ -37,12 +34,11 @@ const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(
       className
     );
 
-    // [수정됨] 라벨의 '기본' top 위치만 원래대로 되돌렸습니다.
     const labelStyles = twMerge(
       "absolute left-[30px] text-gray-400 transition-all duration-200 ease-in-out pointer-events-none",
-      // 기본 상태 (placeholder 위치): 원래대로 top-[24px]
+      // 기본 위치를 정가운데(h-80px 기준)로 맞췄습니다.
       "top-[24px] text-[24px]",
-      // 활성 상태 (위로 올라간 라벨 위치): top-[12px]
+      // 활성 상태일 때의 위치
       "peer-focus:top-[12px] peer-focus:text-[16px] peer-focus:text-gray-500",
       "peer-[:not(:placeholder-shown)]:top-[12px] peer-[:not(:placeholder-shown)]:text-[16px] peer-[:not(:placeholder-shown)]:text-gray-500"
     );
@@ -59,14 +55,12 @@ const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(
           <label htmlFor={props.id} className={labelStyles}>
             {label}
           </label>
-
           {icon && (
             <div className="absolute right-[30px] top-1/2 -translate-y-1/2">
               {icon}
             </div>
           )}
         </div>
-
         {error && (
           <p className="mt-[10px] text-[20px] text-[#FF0606]">{error}</p>
         )}
@@ -76,5 +70,4 @@ const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(
 );
 
 LabeledInput.displayName = "LabeledInput";
-
 export default LabeledInput;
