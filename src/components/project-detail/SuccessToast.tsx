@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { FORM_CONSTANTS } from "./constants";
 import type { SuccessToastProps } from "./types";
 
 export default function SuccessToast({
@@ -10,7 +11,7 @@ export default function SuccessToast({
 }: SuccessToastProps) {
   useEffect(() => {
     if (isVisible) {
-      const timer = setTimeout(onClose, 5000);
+      const timer = setTimeout(onClose, FORM_CONSTANTS.TOAST_DURATION);
       return () => clearTimeout(timer);
     }
   }, [isVisible, onClose]);
