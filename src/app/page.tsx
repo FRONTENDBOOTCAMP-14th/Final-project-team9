@@ -1,14 +1,16 @@
-import Footer from "@/components/common/footer/Footer";
-import Dropdown from "@/components/common/input/Dropdown";
-import ProjectCard from "@/components/common/project-card/ProjectCard";
-import SearchBar from "@/components/common/search-bar/SearchBar";
+import Footer from '@/components/common/footer/Footer'
+import Dropdown from '@/components/common/input/Dropdown'
+import ProjectCard from '@/components/common/project-card/ProjectCard'
+import SearchBar from '@/components/common/search-bar/SearchBar'
+import FetchUsers from '@/components/test-supabase/test'
 
 export default function Home() {
   return (
     <main>
       <div>9in구직 화이팅</div>
+      <FetchUsers />
       <Dropdown
-        options={["앱 개발", "웹 개발", "백엔드", "디자인", "기획"]}
+        options={['앱 개발', '웹 개발', '백엔드', '디자인', '기획']}
         placeholder="분야"
       />
       <ProjectCard
@@ -20,7 +22,7 @@ export default function Home() {
         members={4}
         period="1.1~3.1"
         duration="2개월"
-        skills={["react", "Next", "JS", "tw", "spring"]}
+        skills={['react', 'Next', 'JS', 'tw', 'spring']}
         remain={2}
         category="웹 개발"
       />
@@ -29,5 +31,5 @@ export default function Home() {
       {/* 푸터 컴포넌트 */}
       <Footer />
     </main>
-  );
+  )
 }
