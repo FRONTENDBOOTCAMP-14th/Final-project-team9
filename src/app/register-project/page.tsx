@@ -1,9 +1,14 @@
+import Footer from "@/components/common/footer/Footer";
+import GoTopButton from "@/components/common/GoTopButton";
+import Header from "@/components/common/header/Header";
 import RegisterProjectClient from "@/components/register-project/RegisterProjectClient";
 import { jalnan } from "@/fonts";
 
 export default function RegisterProjectPage() {
   return (
     <div className="min-h-screen bg-[#e9fafe]">
+      <Header variant="white" />
+
       {/* 상단 헤더 영역 */}
       <div className="pt-20 pb-16 text-center">
         {/* 메인 제목 */}
@@ -20,6 +25,9 @@ export default function RegisterProjectPage() {
       </div>
 
       <RegisterProjectClient />
+
+      <Footer />
+      <GoTopButton />
     </div>
   );
 }

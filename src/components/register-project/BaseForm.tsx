@@ -22,14 +22,15 @@ const BaseForm = forwardRef<BaseFormRef, BaseFormProps>(({ onSubmit }, ref) => {
   const { formData, errors, updateField, validateForm } =
     useRegisterProjectStore();
 
-  const { selected } = useDropdownStore();
+  const { selectedValues } = useDropdownStore();
 
   // Dropdown 선택 값을 formData와 동기화
   useEffect(() => {
-    if (selected) {
-      updateField("category", selected);
+    const categoryValue = selectedValues["분야"];
+    if (categoryValue) {
+      updateField("category", categoryValue);
     }
-  }, [selected, updateField]);
+  }, [selectedValues, updateField]);
 
   // ref를 통해 외부에서 접근할 수 있는 함수들 노출
   useImperativeHandle(ref, () => ({

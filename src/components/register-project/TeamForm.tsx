@@ -1,9 +1,10 @@
 "use client";
 
 import React, { forwardRef, useImperativeHandle, useEffect } from "react";
-import Image from "next/image";
+import Dropdown from "@/components/common/input/Dropdown";
+import TechStackSearchBar from "@/components/common/search-bar/TechStackSearchBar";
+import { useDropdownStore } from "@/store/dropdown-store";
 import { useTeamFormStore, type TeamData } from "@/store/team-form-store";
-import CustomDropdown from "./CustomDropdown";
 import FormCard from "./FormCard";
 
 interface TeamFormProps {
@@ -23,20 +24,20 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
       techStackInput,
       preferencesInput,
       errors,
-      domainDropdownOpen,
-      scheduleDropdownOpen,
-      positionDropdownOpen,
+      domainDropdownOpen: _domainDropdownOpen,
+      scheduleDropdownOpen: _scheduleDropdownOpen,
+      positionDropdownOpen: _positionDropdownOpen,
 
       // 액션들
       updateTeamData,
       setTechStackInput,
       setPreferencesInput,
       setError,
-      clearError,
+      clearError: _clearError,
       clearAllErrors,
-      setDomainDropdownOpen,
-      setScheduleDropdownOpen,
-      setPositionDropdownOpen,
+      setDomainDropdownOpen: _setDomainDropdownOpen,
+      setScheduleDropdownOpen: _setScheduleDropdownOpen,
+      setPositionDropdownOpen: _setPositionDropdownOpen,
       addTechStack,
       removeTechStack,
       addPosition,
@@ -48,6 +49,36 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
       addPreference,
       removePreference,
     } = useTeamFormStore();
+
+    const { selectedValues } = useDropdownStore();
+
+    // Dropdown 선택 값을 teamData와 동기화
+    useEffect(() => {
+      const domainValue = selectedValues["도메인을 선택해주세요"];
+      const scheduleValue = selectedValues["예상 일정을 선택해주세요"];
+
+      if (domainValue && domainValue !== teamData.domain) {
+        updateTeamData("domain", domainValue);
+      }
+      if (scheduleValue && scheduleValue !== teamData.schedule) {
+        updateTeamData("schedule", scheduleValue);
+      }
+
+      // 포지션 드롭다운 값들 동기화
+      teamData.positions.forEach((position, index) => {
+        const positionValue = selectedValues[`포지션을 선택해주세요`];
+        if (positionValue && positionValue !== position.role) {
+          updatePositionRole(index, positionValue);
+        }
+      });
+
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+      selectedValues,
+      teamData.domain,
+      teamData.schedule,
+      teamData.positions,
+    ]);
 
     const validateForm = (): boolean => {
       // 모든 에러 초기화
@@ -90,11 +121,6 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
       return isValid;
     };
 
-    // 포지션 배열 길이에 맞춰 드롭다운 상태 초기화
-    useEffect(() => {
-      setPositionDropdownOpen(new Array(teamData.positions.length).fill(false));
-    }, [teamData.positions.length, setPositionDropdownOpen]);
-
     useImperativeHandle(ref, () => ({
       validate: validateForm,
       getData: () => teamData,
@@ -114,7 +140,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
             helpMessage="가장 가까운 분야를 선택해주세요"
           >
             <div className="w-[571px] h-[90px] ml-[50px] mt-[30px]">
-              <CustomDropdown
+              <Dropdown
                 options={[
                   "이커머스",
                   "sns",
@@ -124,13 +150,8 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
                   "기타",
                 ]}
                 placeholder="도메인을 선택해주세요"
-                value={teamData.domain}
-                onSelect={(value) => {
-                  updateTeamData("domain", value);
-                  clearError("domain");
-                }}
-                isOpen={domainDropdownOpen}
-                setIsOpen={setDomainDropdownOpen}
+                width="571px"
+                height="90px"
               />
             </div>
           </FormCard>
@@ -142,16 +163,11 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
             helpMessage="충분한 시간을 두고 정해주세요"
           >
             <div className="w-[571px] h-[90px] ml-[50px] mt-[30px]">
-              <CustomDropdown
+              <Dropdown
                 options={["1개월", "3개월", "6개월", "1년", "1년 이상"]}
                 placeholder="예상 일정을 선택해주세요"
-                value={teamData.schedule}
-                onSelect={(value) => {
-                  updateTeamData("schedule", value);
-                  clearError("schedule");
-                }}
-                isOpen={scheduleDropdownOpen}
-                setIsOpen={setScheduleDropdownOpen}
+                width="571px"
+                height="90px"
               />
             </div>
           </FormCard>
@@ -169,52 +185,21 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
             height="351px"
           >
             <div className="w-[1373px] ml-[50px] mt-[30px]">
-              <div className="relative">
-                {teamData.techStack.length === 0 ? (
-                  <input
-                    type="text"
-                    value={techStackInput}
-                    onChange={(e) => setTechStackInput(e.target.value)}
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        addTechStack(techStackInput);
-                      }
-                    }}
-                    placeholder="최대 10개까지 선택 가능합니다"
-                    className="w-[1335px] h-[90px] border border-gray-200 rounded-lg pl-[70px] pr-[30px] focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    style={{
-                      fontSize: "var(--text-7)",
-                      color: "var(--color-gray)",
-                    }}
-                  />
-                ) : (
-                  <input
-                    type="text"
-                    value={techStackInput}
-                    onChange={(e) => setTechStackInput(e.target.value)}
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        addTechStack(techStackInput);
-                      }
-                    }}
-                    className="w-[1335px] h-[90px] border border-gray-200 rounded-lg pl-[70px] pr-[30px] focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    style={{
-                      fontSize: "var(--text-7)",
-                      color: "var(--color-gray)",
-                    }}
-                  />
-                )}
-                <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                  <Image
-                    src="/assets/step2.svg"
-                    alt="검색"
-                    width={40}
-                    height={40}
-                  />
-                </div>
-              </div>
+              <TechStackSearchBar
+                value={techStackInput}
+                onChange={setTechStackInput}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addTechStack(techStackInput);
+                  }
+                }}
+                placeholder={
+                  teamData.techStack.length === 0
+                    ? "최대 10개까지 선택 가능합니다"
+                    : undefined
+                }
+              />
               <div
                 className="flex flex-wrap mt-3"
                 style={{ marginLeft: "10px" }}
@@ -263,7 +248,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
               {teamData.positions.map((position, index) => (
                 <div key={index} className="flex items-center gap-[44px]">
                   <div className="w-[848px]">
-                    <CustomDropdown
+                    <Dropdown
                       options={[
                         "프론트엔드",
                         "백엔드",
@@ -272,14 +257,6 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
                         "기획자",
                       ]}
                       placeholder="포지션을 선택해주세요"
-                      value={position.role}
-                      onSelect={(value) => updatePositionRole(index, value)}
-                      isOpen={positionDropdownOpen[index] || false}
-                      setIsOpen={(open) => {
-                        const newState = [...positionDropdownOpen];
-                        newState[index] = open;
-                        setPositionDropdownOpen(newState);
-                      }}
                       width="848px"
                       height="90px"
                     />
@@ -437,7 +414,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
         </div>
       </form>
     );
-  },
+  }
 );
 
 TeamForm.displayName = "TeamForm";
