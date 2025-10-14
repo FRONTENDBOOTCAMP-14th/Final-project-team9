@@ -74,12 +74,15 @@ export default function GuideSection() {
                 {step.title}
               </h3>
               <p className="text-center text-[length:var(--text-6)] text-[color:var(--color-deep)] leading-relaxed break-keep">
-                {step.description.split("\n").map((line, index) => (
-                  <span key={index}>
-                    {line}
-                    {index < step.description.split("\n").length - 1 && <br />}
-                  </span>
-                ))}
+                {(() => {
+                  const lines = step.description.split("\n");
+                  return lines.map((line, index) => (
+                    <span key={index}>
+                      {line}
+                      {index < lines.length - 1 && <br />}
+                    </span>
+                  ));
+                })()}
               </p>
             </article>
           ))}
