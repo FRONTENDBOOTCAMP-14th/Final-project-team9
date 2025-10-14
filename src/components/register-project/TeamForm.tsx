@@ -66,7 +66,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
 
       // 포지션 드롭다운 값들 동기화
       teamData.positions.forEach((position, index) => {
-        const positionValue = selectedValues[`포지션을 선택해주세요_${index}`];
+        const positionValue = selectedValues[`포지션을 선택해주세요`];
         if (positionValue && positionValue !== position.role) {
           updatePositionRole(index, positionValue);
         }
@@ -287,7 +287,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
                         "디자이너",
                         "기획자",
                       ]}
-                      placeholder={`포지션을 선택해주세요_${index}`}
+                      placeholder="포지션을 선택해주세요"
                       width="848px"
                       height="90px"
                     />
@@ -445,10 +445,9 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
         </div>
       </form>
     );
-  }
+  },
 );
 
 TeamForm.displayName = "TeamForm";
 
 export default TeamForm;
-
