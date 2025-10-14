@@ -9,6 +9,7 @@ interface DropdownProps {
   placeholder?: string;
   width?: string;
   height?: string;
+  className?: string; // [수정 1] className prop을 선택적으로 받을 수 있도록 추가
 }
 
 export default function Dropdown({
@@ -16,6 +17,7 @@ export default function Dropdown({
   placeholder,
   width = "396px",
   height = "96px",
+  className, // [수정 2] className을 props로 받음
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -90,7 +92,8 @@ export default function Dropdown({
            hover:border-primary`,
           isOpen
             ? `rounded-t-[10px] border-b-2 border-b-[#9c9c9c]`
-            : `rounded-[10px]`
+            : `rounded-[10px]`,
+          className // [수정 3] 외부에서 받은 className을 여기에 적용
         )}
       >
         {selected ? (
