@@ -36,7 +36,7 @@ const ProfileForm = () => {
 
   return (
     <div className="w-full max-w-[615px]">
-      <div className="flex justify-center mb-8">
+      <div className="flex justify-center mb-[50px]">
         {/* 프로필 사진 업로드 부분 */}
         <button className="relative w-[200px] h-[200px] rounded-full bg-gray-200 flex items-center justify-center">
           <Image
@@ -73,6 +73,7 @@ const ProfileForm = () => {
         <LabeledInput
           id="profile-nickname"
           label="닉네임"
+          required
           type="text"
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
@@ -80,12 +81,13 @@ const ProfileForm = () => {
         />
 
         {/* 팀원의 드롭다운 컴포넌트 사용 */}
-        {/* className 수정 제안 */}
         <Dropdown
           placeholder="포지션"
           options={positionOptions}
           width="100%"
           height="80px"
+          required
+          className="border-[1px] border-white text-[24px] text-[#16296D]"
         />
 
         <Dropdown
@@ -93,6 +95,8 @@ const ProfileForm = () => {
           options={experienceOptions}
           width="100%"
           height="80px"
+          required
+          className="border-[1px] border-white text-[24px] text-[#16296D]"
         />
 
         <LabeledInput

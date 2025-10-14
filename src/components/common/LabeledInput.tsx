@@ -1,6 +1,6 @@
 // src/components/common/LabeledInput.tsx
 
-import React, { forwardRef } from "react"; // [수정됨] forwardRef를 {} 안에 넣어서 제대로 import 했습니다.
+import React, { forwardRef } from "react";
 import { twMerge } from "tailwind-merge";
 import { clsx } from "clsx";
 
@@ -10,10 +10,14 @@ export interface LabeledInputProps
   error?: string;
   icon?: React.ReactNode;
   containerClassName?: string;
+  required?: boolean;
 }
 
 const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(
-  ({ label, error, icon, className, containerClassName, ...props }, ref) => {
+  (
+    { label, error, icon, className, containerClassName, required, ...props },
+    ref
+  ) => {
     // 이 컴포넌트의 너비와 높이는 사용하는 곳(LoginForm 등)에서 결정합니다.
     const formFieldContainerStyles = twMerge("relative", containerClassName);
 
@@ -36,9 +40,7 @@ const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(
 
     const labelStyles = twMerge(
       "absolute left-[30px] text-[#DBDBDB] transition-all duration-200 ease-in-out pointer-events-none",
-      // 기본 위치를 정가운데(h-80px 기준)로 맞췄습니다.
       "top-[24px] text-[24px]",
-      // 활성 상태일 때의 위치
       "peer-focus:top-[12px] peer-focus:text-[16px] peer-focus:text-[#DBDBDB]",
       "peer-[:not(:placeholder-shown)]:top-[12px] peer-[:not(:placeholder-shown)]:text-[16px] peer-[:not(:placeholder-shown)]:text-[#DBDBDB]"
     );
@@ -46,6 +48,13 @@ const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(
     return (
       <div className={formFieldContainerStyles}>
         <div className={inputBoxStyles}>
+          {/* required가 true일 때, 고정된 위치에 별표를 렌더링합니다. */}
+          {required && (
+            <span className="absolute left-[12px] top-[8px] text-red-500">
+              *
+            </span>
+          )}
+
           <input
             ref={ref}
             className={inputElementStyles}
