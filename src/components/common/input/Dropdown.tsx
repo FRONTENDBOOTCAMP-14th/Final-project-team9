@@ -1,3 +1,5 @@
+// Dropdown.tsx
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -9,7 +11,8 @@ interface DropdownProps {
   placeholder?: string;
   width?: string;
   height?: string;
-  className?: string; // [수정 1] className prop을 선택적으로 받을 수 있도록 추가
+  className?: string;
+  required?: boolean;
 }
 
 export default function Dropdown({
@@ -17,7 +20,8 @@ export default function Dropdown({
   placeholder,
   width = "396px",
   height = "96px",
-  className, // [수정 2] className을 props로 받음
+  className,
+  required,
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -78,6 +82,12 @@ export default function Dropdown({
 
   return (
     <div ref={dropdownRef} className="relative" style={{ width }}>
+      {required && (
+        <span className="absolute left-[12px] top-[8px] text-red-500 z-10">
+          *
+        </span>
+      )}
+
       <button
         type="button"
         aria-label="드롭다운 열기"
@@ -93,7 +103,7 @@ export default function Dropdown({
           isOpen
             ? `rounded-t-[10px] border-b-2 border-b-[#9c9c9c]`
             : `rounded-[10px]`,
-          className // [수정 3] 외부에서 받은 className을 여기에 적용
+          className
         )}
       >
         {selected ? (
@@ -111,7 +121,8 @@ export default function Dropdown({
           className={tw(
             `absolute w-full
              rounded-b-[10px] border border-gray border-t-0
-             text-gray bg-white z-10`
+             text-gray bg-white`,
+            "z-20" // [수정] z-index 값을 10에서 20으로 높여서 별표보다 위에 오도록 합니다.
           )}
         >
           {options.map((option, index) => (
