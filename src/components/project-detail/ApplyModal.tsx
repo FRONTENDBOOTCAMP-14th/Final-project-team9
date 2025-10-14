@@ -32,18 +32,13 @@ export default function ApplyModal({
   } = useApplyForm(isOpen);
 
   const modalRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
-  // 모달 열릴 때 포커스 관리
+  // 모달 닫힐 때 포커스 복원
   useEffect(() => {
     if (isOpen) {
       // 현재 포커스된 요소 저장
       previousActiveElement.current = document.activeElement as HTMLElement;
-      // 텍스트 영역에 포커스
-      setTimeout(() => {
-        textareaRef.current?.focus();
-      }, 100);
     } else {
       // 모달 닫힐 때 이전 포커스 복원
       previousActiveElement.current?.focus();
@@ -71,7 +66,7 @@ export default function ApplyModal({
       if (e.key !== "Tab" || !modalRef.current) return;
 
       const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       );
 
       const firstElement = focusableElements[0];
@@ -138,13 +133,14 @@ export default function ApplyModal({
           {/* 모달 컨텐츠 */}
           <div
             ref={modalRef}
-            className="bg-white rounded-2xl w-[495px] h-[671px] max-w-[90vw] max-h-[90vh] overflow-y-auto relative z-10 pt-[50px] pl-[50px] pr-[50px]"
+            className="bg-[#f5f5f5] rounded-2xl w-[495px] h-[671px] max-w-[90vw] max-h-[90vh] overflow-y-auto relative z-10 pt-[50px] pl-[50px] pr-[50px]"
+            style={{ boxShadow: "4px 4px 7px rgba(170, 170, 170, 1)" }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* 제목 */}
             <h2
               id="modal-title"
-              className="font-bold mb-[20px] text-8 text-[color:var(--color-deep)]"
+              className="font-bold mb-[20px] text-[length:var(--text-8)] text-[color:var(--color-deep)]"
             >
               지원하기
             </h2>
@@ -153,7 +149,7 @@ export default function ApplyModal({
             <div className="mb-[30px]">
               <label
                 htmlFor="position-select"
-                className="block mb-[10px] text-7 text-[color:var(--color-gray)]"
+                className="block mb-[10px] text-[length:var(--text-7)] text-[color:var(--color-gray)]"
               >
                 지원 포지션
               </label>
@@ -165,7 +161,7 @@ export default function ApplyModal({
               />
               {errors.position && (
                 <p
-                  className="mt-[10px] text-5 text-red-500"
+                  className="mt-[10px] text-[length:var(--text-5)] text-red-500"
                   role="alert"
                   aria-live="polite"
                 >
@@ -178,24 +174,23 @@ export default function ApplyModal({
             <div className="mb-[30px]">
               <label
                 htmlFor="reason-textarea"
-                className="block mb-[10px] text-7 text-[color:var(--color-gray)]"
+                className="block mb-[10px] text-[length:var(--text-7)] text-[color:var(--color-gray)]"
               >
                 지원 사유
               </label>
               <textarea
                 id="reason-textarea"
-                ref={textareaRef}
                 value={reason}
                 onChange={(e) => handleReasonChange(e.target.value)}
                 placeholder={PLACEHOLDER_TEXT.REASON}
                 maxLength={maxLength}
                 aria-describedby="reason-info"
                 aria-invalid={!!errors.reason}
-                className="w-[396px] h-[171px] p-6 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-6"
+                className="w-[396px] h-[171px] p-6 bg-white border border-[color:var(--color-gray)] rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-[length:var(--text-6)]"
               />
               <div
                 id="reason-info"
-                className="flex justify-between mt-[10px] w-[396px] text-5 text-[color:#dbdbdb]"
+                className="flex justify-between mt-[10px] w-[396px] text-[length:var(--text-5)] text-[#dbdbdb]"
               >
                 <span>최대 {maxLength}자 까지 가능합니다</span>
                 <span aria-live="polite">
@@ -204,7 +199,7 @@ export default function ApplyModal({
               </div>
               {errors.reason && (
                 <p
-                  className="mt-[10px] text-5 text-red-500"
+                  className="mt-[10px] text-[length:var(--text-5)] text-red-500"
                   role="alert"
                   aria-live="polite"
                 >
@@ -218,7 +213,7 @@ export default function ApplyModal({
               <Button
                 onClick={handleCancel}
                 variant="secondary"
-                className="w-[183px] h-[56px] text-6"
+                className="w-[183px] h-[56px] text-[length:var(--text-6)]"
                 aria-label="지원 취소"
               >
                 취소하기
@@ -226,7 +221,7 @@ export default function ApplyModal({
               <Button
                 onClick={handleSubmit}
                 variant="primary"
-                className="w-[183px] h-[56px] text-6 !text-white"
+                className="w-[183px] h-[56px] text-[length:var(--text-6)] !text-white"
                 aria-label="지원 제출"
               >
                 지원하기

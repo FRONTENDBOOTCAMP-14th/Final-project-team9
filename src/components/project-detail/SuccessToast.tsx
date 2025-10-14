@@ -1,3 +1,4 @@
+//이메일 복사 성공 메세지에 재사용 가능
 "use client";
 
 import { useEffect } from "react";
@@ -21,44 +22,16 @@ export default function SuccessToast({
       role="alert"
       aria-live="polite"
       aria-atomic="true"
-      style={{
-        position: "fixed",
-        top: "24px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        zIndex: 9999,
-      }}
+      className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999]"
     >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "415px",
-          height: "48px",
-          padding: "0 24px",
-          backgroundColor: "#d9d9d9",
-          borderRadius: "999px",
-          boxShadow: "none",
-        }}
-      >
+      <div className="flex items-center justify-center w-[415px] h-12 px-6 bg-[#d9d9d9] rounded-full shadow-none">
         <div
           aria-hidden="true"
-          style={{
-            width: "28px",
-            height: "28px",
-            backgroundColor: "#7ED957",
-            borderRadius: "50%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginRight: "12px",
-            flexShrink: 0,
-          }}
+          className="w-[30px] h-[30px] bg-[#3de400] rounded-full flex items-center justify-center mr-3 shrink-0"
         >
           <svg
-            width="16"
-            height="16"
+            width="18"
+            height="18"
             viewBox="0 0 20 20"
             fill="white"
             xmlns="http://www.w3.org/2000/svg"
@@ -71,16 +44,7 @@ export default function SuccessToast({
             />
           </svg>
         </div>
-        <span
-          style={{
-            fontSize: "20px",
-            color: "#000000",
-            fontWeight: "normal",
-            lineHeight: "1",
-            textAlign: "center",
-            flex: 1,
-          }}
-        >
+        <span className="text-[length:var(--text-5)] text-black font-normal leading-none text-center flex-1">
           지원 완료 되었습니다.
         </span>
       </div>
