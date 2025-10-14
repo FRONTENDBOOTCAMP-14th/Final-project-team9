@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Footer from "@/components/common/footer/Footer";
+import GoTopButton from "@/components/common/GoTopButton";
 import Header from "@/components/common/header/Header";
 import MainPageProjectCard from "@/components/common/project-card/MainPageProjectCard";
 import MainPageButton from "@/components/mainpage/MainPageButton";
@@ -43,7 +45,8 @@ const projectsData = [
     duration: "2개월",
     skills: ["Node.js", "Python", "Django"],
     remain: 1,
-    category: "백엔드",
+    category: "웹 개발",
+    status: "모집완료",
   },
   {
     id: 4,
@@ -56,7 +59,8 @@ const projectsData = [
     duration: "3개월",
     skills: ["Vue.js", "Figma", "UI/UX"],
     remain: 2,
-    category: "프론트엔드",
+    category: "웹 개발",
+    status: "모집완료",
   },
 ];
 
@@ -108,7 +112,7 @@ export default function HomePage() {
       </section>
 
       {/* 통계 섹션 */}
-      <section className="bg-[#E8F4F8] py-[100px]">
+      <section className="bg-[#E9fbff] py-[100px]">
         <div className="max-w-[1920px] mx-auto px-8">
           <h2
             className={`text-center text-[48px] font-bold text-primary mb-[30px] ${jalnan.className}`}
@@ -120,9 +124,9 @@ export default function HomePage() {
           </p>
 
           {/* 통계 카드 */}
-          <div className="flex justify-center gap-[50px] mb-[100px]">
+          <div className="flex justify-center gap-[180px] mb-[57px]">
             {/* 사용자 수 */}
-            <div className="bg-white rounded-[20px] shadow-lg w-[300px] h-[200px] flex flex-col items-center pt-[27px]">
+            <div className="bg-white rounded-[20px] w-[300px] h-[200px] flex flex-col items-center pt-[27px]">
               <Image
                 src="/assets/user.svg"
                 alt="사용자"
@@ -135,7 +139,7 @@ export default function HomePage() {
             </div>
 
             {/* 진행중인 프로젝트 */}
-            <div className="bg-white rounded-[20px] shadow-lg w-[300px] h-[200px] flex flex-col items-center pt-[27px]">
+            <div className="bg-white rounded-[20px] w-[300px] h-[200px] flex flex-col items-center pt-[27px]">
               <Image
                 src="/assets/pencil.svg"
                 alt="프로젝트"
@@ -148,7 +152,7 @@ export default function HomePage() {
             </div>
 
             {/* 완성된 프로젝트 */}
-            <div className="bg-white rounded-[20px] shadow-lg w-[300px] h-[200px] flex flex-col items-center pt-[27px]">
+            <div className="bg-white rounded-[20px] w-[300px] h-[200px] flex flex-col items-center pt-[27px]">
               <div className="flex items-center justify-center w-[43px] h-[43px] mb-[16px]">
                 <Image
                   src="/assets/medal.svg"
@@ -164,13 +168,153 @@ export default function HomePage() {
           </div>
 
           {/* 프로젝트 카드 그리드 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-[30px] justify-items-center max-w-[2100px] mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-[30px] gap-y-[30px] max-w-[2100px] mx-auto">
             {projectsData.map((project) => (
               <MainPageProjectCard key={project.id} {...project} />
             ))}
           </div>
         </div>
       </section>
+
+      {/* 시작 가이드 섹션 */}
+      <section className="bg-[#E9fbff] pt-[300px] pb-[100px]">
+        <div className="max-w-[1920px] mx-auto px-8">
+          <h2
+            className={`text-center text-[48px] font-bold text-primary mb-[24px] ${jalnan.className}`}
+          >
+            어떻게 시작 하나요?
+          </h2>
+          <p className="text-center text-[24px] text-deep mb-[90px]">
+            간단한 준비 단계를 거쳐 프로젝트를 진행해보세요!
+          </p>
+
+          {/* STEP 카드 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-[30px] xl:gap-[183px] justify-items-center max-w-[1920px] mx-auto">
+            {/* STEP 1 */}
+            <div
+              className="bg-white rounded-[20px] w-full max-w-[418px] h-[584px] flex flex-col items-center pt-[40px] px-[30px]"
+              style={{ boxShadow: "4px 4px 7px #aaaaaa" }}
+            >
+              <span className="bg-primary text-white text-[24px] px-[24px] py-[8px] rounded-[10px] mb-[60px] whitespace-nowrap">
+                STEP 1
+              </span>
+              <Image
+                src="/assets/step1.svg"
+                alt="프로젝트 등록"
+                width={120}
+                height={120}
+                className="mb-[40px] flex-shrink-0"
+              />
+              <h3
+                className={`text-[28px] font-bold text-primary mb-[51px] whitespace-nowrap ${jalnan.className}`}
+              >
+                프로젝트 등록
+              </h3>
+              <p className="text-center text-[24px] text-deep leading-relaxed break-keep">
+                아이디어와 함께 제작할 팀원을
+                <br />
+                찾는 프로젝트를 등록하거나
+                <br />
+                조건에 맞는 프로젝트를 찾아보세요
+              </p>
+            </div>
+
+            {/* STEP 2 */}
+            <div
+              className="bg-white rounded-[20px] w-full max-w-[418px] h-[584px] flex flex-col items-center pt-[40px] px-[30px]"
+              style={{ boxShadow: "4px 4px 7px #aaaaaa" }}
+            >
+              <span className="bg-primary text-white text-[24px] px-[24px] py-[8px] rounded-[10px] mb-[60px] whitespace-nowrap">
+                STEP 2
+              </span>
+              <Image
+                src="/assets/step2.svg"
+                alt="팀원 모집"
+                width={120}
+                height={120}
+                className="mb-[40px] flex-shrink-0"
+              />
+              <h3
+                className={`text-[28px] font-bold text-primary mb-[51px] whitespace-nowrap ${jalnan.className}`}
+              >
+                팀원 모집
+              </h3>
+              <p className="text-center text-[24px] text-deep leading-relaxed break-keep">
+                해당 아이디어에 관심있는
+                <br />
+                사용자들이 프로젝트에 지원합니다
+              </p>
+            </div>
+
+            {/* STEP 3 */}
+            <div
+              className="bg-white rounded-[20px] w-full max-w-[418px] h-[584px] flex flex-col items-center pt-[40px] px-[30px]"
+              style={{ boxShadow: "4px 4px 7px #aaaaaa" }}
+            >
+              <span className="bg-primary text-white text-[24px] px-[24px] py-[8px] rounded-[10px] mb-[60px] whitespace-nowrap">
+                STEP 3
+              </span>
+              <Image
+                src="/assets/step3.svg"
+                alt="프로젝트 진행"
+                width={120}
+                height={120}
+                className="mb-[40px] flex-shrink-0"
+              />
+              <h3
+                className={`text-[28px] font-bold text-primary mb-[51px] whitespace-nowrap ${jalnan.className}`}
+              >
+                프로젝트 진행
+              </h3>
+              <p className="text-center text-[24px] text-deep leading-relaxed break-keep">
+                팀 구성을 완료하고
+                <br />
+                함께 프로젝트를 진행하세요
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA 섹션 */}
+      <section className="relative bg-deep py-[150px]">
+        {/* 중앙 배경 이미지 */}
+        <div
+          className="flex items-center justify-center pointer-events-none"
+          style={{ filter: "drop-shadow(6px 6px 30px #ffffff)" }}
+        >
+          <Image
+            src="/assets/joyin-bg.png"
+            alt="CTA Background"
+            width={1620}
+            height={780}
+            className="rounded-[40px]"
+            quality={100}
+          />
+        </div>
+
+        {/* 컨텐츠 */}
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <div className="max-w-[1920px] mx-auto px-8 text-center">
+            <h2
+              className={`text-white text-[80px] mb-[50px] ${jalnan.className}`}
+            >
+              지금 바로 시작해보세요!
+            </h2>
+            <p className="text-deep text-[28px] leading-relaxed">
+              상상하고 있는 아이디어를 사람들과 함께 제작하거나,
+              <br />
+              흥미로운 주제의 프로젝트에 참여해보세요!
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 푸터 */}
+      <Footer />
+
+      {/* GoTop 버튼 */}
+      <GoTopButton />
     </div>
   );
 }
