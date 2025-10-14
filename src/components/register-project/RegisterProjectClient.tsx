@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Button from "@/components/common/Button";
 import BaseForm, {
   type BaseFormRef,
 } from "@/components/register-project/BaseForm";
@@ -64,17 +65,32 @@ export default function RegisterProjectClient() {
 
         {/* 다음 버튼 */}
         <div className="flex justify-center mt-[130px]">
-          <button
+          <Button
             onClick={handleNext}
             disabled={currentStep === 3}
-            className={`px-6 py-2 rounded-lg ${
-              currentStep === 3
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-blue-600 text-white hover:bg-blue-700"
-            }`}
+            variant="primary"
+            size="lg"
+            className="w-[270px] h-[90px] text-[length:var(--text-7)] gap-3"
           >
-            {currentStep === 3 ? "완료" : "다음"}
-          </button>
+            <span>{currentStep === 3 ? "완료" : "다음 단계"}</span>
+            {currentStep !== 3 && (
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.91 19.92L15.43 13.4C16.2 12.63 16.2 11.37 15.43 10.6L8.91 4.08"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            )}
+          </Button>
         </div>
       </div>
     </>
