@@ -1,8 +1,8 @@
 "use client";
 
 import React, { forwardRef, useImperativeHandle, useEffect } from "react";
-import Image from "next/image";
 import Dropdown from "@/components/common/input/Dropdown";
+import TechStackSearchBar from "@/components/common/search-bar/TechStackSearchBar";
 import { useDropdownStore } from "@/store/dropdown-store";
 import { useTeamFormStore, type TeamData } from "@/store/team-form-store";
 import FormCard from "./FormCard";
@@ -185,52 +185,21 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
             height="351px"
           >
             <div className="w-[1373px] ml-[50px] mt-[30px]">
-              <div className="relative">
-                {teamData.techStack.length === 0 ? (
-                  <input
-                    type="text"
-                    value={techStackInput}
-                    onChange={(e) => setTechStackInput(e.target.value)}
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        addTechStack(techStackInput);
-                      }
-                    }}
-                    placeholder="최대 10개까지 선택 가능합니다"
-                    className="w-[1335px] h-[90px] border border-gray-200 rounded-lg pl-[70px] pr-[30px] focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    style={{
-                      fontSize: "var(--text-7)",
-                      color: "var(--color-gray)",
-                    }}
-                  />
-                ) : (
-                  <input
-                    type="text"
-                    value={techStackInput}
-                    onChange={(e) => setTechStackInput(e.target.value)}
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        addTechStack(techStackInput);
-                      }
-                    }}
-                    className="w-[1335px] h-[90px] border border-gray-200 rounded-lg pl-[70px] pr-[30px] focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    style={{
-                      fontSize: "var(--text-7)",
-                      color: "var(--color-gray)",
-                    }}
-                  />
-                )}
-                <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                  <Image
-                    src="/assets/step2.svg"
-                    alt="검색"
-                    width={40}
-                    height={40}
-                  />
-                </div>
-              </div>
+              <TechStackSearchBar
+                value={techStackInput}
+                onChange={setTechStackInput}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addTechStack(techStackInput);
+                  }
+                }}
+                placeholder={
+                  teamData.techStack.length === 0
+                    ? "최대 10개까지 선택 가능합니다"
+                    : undefined
+                }
+              />
               <div
                 className="flex flex-wrap mt-3"
                 style={{ marginLeft: "10px" }}
@@ -445,7 +414,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
         </div>
       </form>
     );
-  },
+  }
 );
 
 TeamForm.displayName = "TeamForm";
