@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import BaseForm, {
   type BaseFormRef,
@@ -15,6 +16,7 @@ import TeamForm, {
 
 export default function RegisterProjectClient() {
   const [currentStep, setCurrentStep] = useState(1);
+  const router = useRouter();
   const baseFormRef = useRef<BaseFormRef>(null);
   const teamFormRef = useRef<TeamFormRef>(null);
   const detailFormRef = useRef<DetailFormRef>(null);
@@ -31,6 +33,11 @@ export default function RegisterProjectClient() {
         break;
       case 3:
         canProceed = detailFormRef.current?.validate() ?? false;
+        // 마지막 단계에서 등록 완료 시 완료 페이지로 이동
+        if (canProceed) {
+          router.push("/register-project/complete");
+          return;
+        }
         break;
     }
 
@@ -67,12 +74,11 @@ export default function RegisterProjectClient() {
         <div className="flex justify-center mt-[130px]">
           <Button
             onClick={handleNext}
-            disabled={currentStep === 3}
             variant="primary"
             size="lg"
             className="w-[270px] h-[90px] text-[length:var(--text-7)] gap-3"
           >
-            <span>{currentStep === 3 ? "완료" : "다음 단계"}</span>
+            <span>{currentStep === 3 ? "등록" : "다음 단계"}</span>
             {currentStep !== 3 && (
               <svg
                 width="24"
