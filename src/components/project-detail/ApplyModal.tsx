@@ -1,43 +1,100 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Button from "@/components/common/Button";
 import Dropdown from "@/components/common/input/Dropdown";
-import { useDropdownStore } from "@/store/dropdown-store";
-
-interface ApplyModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (data: { position: string; reason: string }) => void;
-}
+import { useApplyForm } from "@/hooks/useApplyForm";
+import {
+  POSITION_OPTIONS,
+  FORM_CONSTANTS,
+  PLACEHOLDER_TEXT,
+} from "./constants";
+import SuccessToast from "./SuccessToast";
+import type { ApplyModalProps } from "./types";
 
 export default function ApplyModal({
   isOpen,
   onClose,
   onSubmit,
 }: ApplyModalProps) {
-  const [reason, setReason] = useState("");
-  const { selectedValues, setSelected } = useDropdownStore();
+  const {
+    reason,
+    errors,
+    selectedPosition,
+    showSuccessToast,
+    currentLength,
+    maxLength,
+    setErrors,
+    setShowSuccessToast,
+    validateForm,
+    resetForm,
+    handleReasonChange,
+  } = useApplyForm(isOpen);
 
-  const maxLength = 100;
-  const currentLength = reason.length;
-  const selectedPosition = selectedValues["포지션"] || "";
+  const modalRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
 
-  // 모달이 닫힐 때 상태 초기화
+  // 모달 열릴 때 포커스 관리
   useEffect(() => {
-    if (!isOpen) {
-      setReason("");
-      setSelected("포지션", "");
+    if (isOpen) {
+      // 현재 포커스된 요소 저장
+      previousActiveElement.current = document.activeElement as HTMLElement;
+      // 텍스트 영역에 포커스
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 100);
+    } else {
+      // 모달 닫힐 때 이전 포커스 복원
+      previousActiveElement.current?.focus();
     }
-  }, [isOpen, setSelected]);
+  }, [isOpen]);
+
+  // ESC 키로 모달 닫기
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        handleCancel();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
+  // 포커스 트랩
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key !== "Tab" || !modalRef.current) return;
+
+      const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (e.shiftKey && document.activeElement === firstElement) {
+        lastElement?.focus();
+        e.preventDefault();
+      } else if (!e.shiftKey && document.activeElement === lastElement) {
+        firstElement?.focus();
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener("keydown", handleTabKey);
+    return () => document.removeEventListener("keydown", handleTabKey);
+  }, [isOpen]);
 
   const handleSubmit = () => {
-    if (!selectedPosition) {
-      alert("포지션을 선택해주세요.");
-      return;
-    }
-    if (reason.trim().length === 0) {
-      alert("지원 사유를 입력해주세요.");
+    const validationErrors = validateForm();
+
+    if (validationErrors.position || validationErrors.reason) {
+      setErrors(validationErrors);
       return;
     }
 
@@ -46,117 +103,144 @@ export default function ApplyModal({
       reason: reason.trim(),
     });
 
-    // 제출 후 상태 초기화
-    setReason("");
-    setSelected("포지션", "");
-    onClose();
+    resetForm();
+    setShowSuccessToast(true);
+
+    setTimeout(() => {
+      onClose();
+    }, FORM_CONSTANTS.MODAL_CLOSE_DELAY);
   };
 
   const handleCancel = () => {
-    setReason("");
-    setSelected("포지션", "");
+    resetForm();
+    setShowSuccessToast(false);
     onClose();
   };
 
-  if (!isOpen) return null;
+  if (!isOpen && !showSuccessToast) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      {/* 배경 오버레이 */}
-      <div className="fixed inset-0 backdrop-blur-sm" onClick={handleCancel} />
-
-      {/* 모달 컨텐츠 */}
-      <div
-        className="bg-white rounded-2xl p-8 w-[495px] h-[671px] max-w-[90vw] max-h-[90vh] overflow-y-auto relative z-10"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* 제목 */}
-        <h2
-          className="font-bold mb-8"
-          style={{
-            fontSize: "var(--text-8)",
-            color: "var(--color-deep)",
-          }}
+    <>
+      {isOpen && (
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
         >
-          지원하기
-        </h2>
-
-        {/* 지원 포지션 */}
-        <div className="mb-6">
-          <label
-            className="block mb-4"
-            style={{
-              fontSize: "var(--text-6)",
-              color: "var(--color-gray)",
-            }}
-          >
-            지원 포지션
-          </label>
-          <Dropdown
-            options={["프론트엔드", "백엔드", "풀스택", "디자이너", "기획자"]}
-            placeholder="포지션"
-            width="100%"
-            height="90px"
-          />
-        </div>
-
-        {/* 지원 사유 */}
-        <div className="mb-8">
-          <label
-            className="block mb-4"
-            style={{
-              fontSize: "var(--text-6)",
-              color: "var(--color-gray)",
-            }}
-          >
-            지원 사유
-          </label>
-          <textarea
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="함께 하는게 맞아요. 시켜만 주시면 열심히 하겠습니다."
-            maxLength={maxLength}
-            className="w-full h-[200px] p-6 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            style={{
-              fontSize: "var(--text-6)",
-            }}
-          />
+          {/* 배경 오버레이 */}
           <div
-            className="text-right mt-2"
-            style={{
-              fontSize: "var(--text-5)",
-              color:
-                currentLength > 0 ? "var(--color-deep)" : "var(--color-gray)",
-            }}
+            className="fixed inset-0 backdrop-blur-sm"
+            onClick={handleCancel}
+            aria-hidden="true"
+          />
+
+          {/* 모달 컨텐츠 */}
+          <div
+            ref={modalRef}
+            className="bg-white rounded-2xl w-[495px] h-[671px] max-w-[90vw] max-h-[90vh] overflow-y-auto relative z-10 pt-[50px] pl-[50px] pr-[50px]"
+            onClick={(e) => e.stopPropagation()}
           >
-            최대 100자 까지 가능합니다 {currentLength}/{maxLength}
+            {/* 제목 */}
+            <h2
+              id="modal-title"
+              className="font-bold mb-[20px] text-8 text-[color:var(--color-deep)]"
+            >
+              지원하기
+            </h2>
+
+            {/* 지원 포지션 */}
+            <div className="mb-[30px]">
+              <label
+                htmlFor="position-select"
+                className="block mb-[10px] text-7 text-[color:var(--color-gray)]"
+              >
+                지원 포지션
+              </label>
+              <Dropdown
+                options={[...POSITION_OPTIONS]}
+                placeholder="포지션"
+                width="396px"
+                height="90px"
+              />
+              {errors.position && (
+                <p
+                  className="mt-[10px] text-5 text-red-500"
+                  role="alert"
+                  aria-live="polite"
+                >
+                  {errors.position}
+                </p>
+              )}
+            </div>
+
+            {/* 지원 사유 */}
+            <div className="mb-[30px]">
+              <label
+                htmlFor="reason-textarea"
+                className="block mb-[10px] text-7 text-[color:var(--color-gray)]"
+              >
+                지원 사유
+              </label>
+              <textarea
+                id="reason-textarea"
+                ref={textareaRef}
+                value={reason}
+                onChange={(e) => handleReasonChange(e.target.value)}
+                placeholder={PLACEHOLDER_TEXT.REASON}
+                maxLength={maxLength}
+                aria-describedby="reason-info"
+                aria-invalid={!!errors.reason}
+                className="w-[396px] h-[171px] p-6 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-6"
+              />
+              <div
+                id="reason-info"
+                className="flex justify-between mt-[10px] w-[396px] text-5 text-[color:#dbdbdb]"
+              >
+                <span>최대 {maxLength}자 까지 가능합니다</span>
+                <span aria-live="polite">
+                  {currentLength}/{maxLength}
+                </span>
+              </div>
+              {errors.reason && (
+                <p
+                  className="mt-[10px] text-5 text-red-500"
+                  role="alert"
+                  aria-live="polite"
+                >
+                  {errors.reason}
+                </p>
+              )}
+            </div>
+
+            {/* 버튼 영역 */}
+            <div className="flex gap-7.5">
+              <Button
+                onClick={handleCancel}
+                variant="secondary"
+                className="w-[183px] h-[56px] text-6"
+                aria-label="지원 취소"
+              >
+                취소하기
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                variant="primary"
+                className="w-[183px] h-[56px] text-6 !text-white"
+                aria-label="지원 제출"
+              >
+                지원하기
+              </Button>
+            </div>
           </div>
         </div>
+      )}
 
-        {/* 버튼 영역 */}
-        <div className="flex gap-4">
-          <Button
-            onClick={handleCancel}
-            variant="secondary"
-            className="flex-1 h-[60px]"
-            style={{
-              fontSize: "var(--text-6)",
-            }}
-          >
-            취소하기
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            variant="primary"
-            className="flex-1 h-[60px]"
-            style={{
-              fontSize: "var(--text-6)",
-            }}
-          >
-            지원하기
-          </Button>
-        </div>
-      </div>
-    </div>
+      {/* 성공 토스트 */}
+      <SuccessToast
+        isVisible={!isOpen && showSuccessToast}
+        onClose={() => setShowSuccessToast(false)}
+      />
+    </>
   );
 }
