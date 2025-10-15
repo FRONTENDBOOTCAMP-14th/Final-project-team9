@@ -2,8 +2,8 @@
 "use client";
 
 import { useEffect } from "react";
+import type { SuccessToastProps } from "@/types/project-detail";
 import { FORM_CONSTANTS } from "./constants";
-import type { SuccessToastProps } from "./types";
 
 export default function SuccessToast({
   isVisible,
