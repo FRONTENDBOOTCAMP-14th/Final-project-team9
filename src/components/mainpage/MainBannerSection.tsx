@@ -25,7 +25,7 @@ export default function MainBannerSection() {
       <Header variant="transparent" />
 
       {/* 메인 컨텐츠 */}
-      <div className="flex flex-col items-center justify-center min-h-screen px-8">
+      <div className="flex flex-col items-center justify-center min-h-screen px-8 pt-60 pb-20">
         <div className="flex flex-col items-center">
           <h1
             id="main-banner-heading"

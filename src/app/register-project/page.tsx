@@ -10,7 +10,7 @@ export default function RegisterProjectPage() {
       <Header variant="white" />
 
       {/* 상단 헤더 영역 */}
-      <div className="pt-20 pb-16 text-center">
+      <div className="pt-71 pb-16 text-center">
         {/* 메인 제목 */}
         <h1
           className={`${jalnan.className} mb-6 text-[length:var(--text-12)] text-[color:var(--color-primary)]`}
