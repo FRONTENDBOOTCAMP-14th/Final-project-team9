@@ -3,10 +3,10 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
-import LabeledInput from "@/components/common/LabeledInput";
+import Link from "next/link";
 import Button from "@/components/common/Button";
+import LabeledInput from "@/components/common/LabeledInput";
 
 const LoginForm = () => {
   const [id, setId] = useState("");

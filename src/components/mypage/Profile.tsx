@@ -1,0 +1,148 @@
+"use client";
+import React, { useState } from "react";
+import ProfileEditModal from "./ProfileModal";
+
+// SVG 아이콘 컴포넌트들
+const SettingsIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="w-6 h-6"
+  >
+    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+// Props 타입 정의
+export interface ProjectCounts {
+  myProjects: number;
+  interestedProjects: number;
+  supportedProjects: number;
+  completedProjects: number;
+}
+
+export interface UserProfileCardProps {
+  profileImageUrl: string;
+  name: string;
+  email: string;
+  introduction: string;
+  field: string;
+  experience: string;
+  skills: string[];
+  projectCounts: ProjectCounts;
+}
+
+export default function UserProfileCard(props: UserProfileCardProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  // 프로필 데이터를 state로 관리하여 수정 가능하게 합니다.
+  const [userData, setUserData] = useState({ ...props });
+
+  const handleSettingsClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleSaveProfile = (
+    updatedUser: Omit<UserProfileCardProps, "projectCounts">,
+  ) => {
+    // 실제 애플리케이션에서는 여기서 API 호출 등을 통해 서버에 데이터를 저장합니다.
+    console.log("저장될 데이터:", updatedUser);
+    setUserData((prev) => ({ ...prev, ...updatedUser }));
+    setIsModalOpen(false);
+  };
+
+  return (
+    <>
+      <div className="w-[1620px] h-[400px] bg-white rounded-4xl py-9 px-20 shadow-lg flex flex-col justify-between relative mx-auto box-border">
+        <div className="flex items-center">
+          <img
+            src={
+              userData.profileImageUrl ||
+              `https://placehold.co/140x140/E9FAFE/333333?text=${userData.name.charAt(0)}`
+            }
+            alt={`${userData.name}'s profile`}
+            className="w-[167px] h-[167px] rounded-full object-cover mr-8 bg-gray-300"
+          />
+          <div className="flex flex-col gap-2 flex-grow">
+            <div className="flex items-center gap-4">
+              <h2 className="text-8 text-deep font-extrabold">
+                {userData.name}
+              </h2>
+              <span className="text-5 text-gray">{userData.email}</span>
+            </div>
+            <p className="text-5 text-deep font-bold">
+              {userData.introduction}
+            </p>
+            <div className="flex gap-3 text-5 text-gray-600">
+              <span>{userData.field}</span>
+              <span>{userData.experience}</span>
+            </div>
+          </div>
+          <button
+            onClick={handleSettingsClick}
+            aria-label="프로필 수정"
+            className="absolute top-10 right-10 text-gray-500 hover:text-gray-800"
+          >
+            <SettingsIcon />
+          </button>
+        </div>
+
+        <div className="flex justify-end gap-5">
+          {Object.entries({
+            "나의 프로젝트": userData.projectCounts.myProjects,
+            "관심 프로젝트": userData.projectCounts.interestedProjects,
+            "지원한 프로젝트": userData.projectCounts.supportedProjects,
+            "종료된 프로젝트": userData.projectCounts.completedProjects,
+          }).map(([label, count]) => (
+            <button
+              key={label}
+              className="bg-white border-1 rounded-[10px] text-gray text-5 font-bold py-1 px-5"
+            >
+              {label} {count}
+            </button>
+          ))}
+        </div>
+
+        <hr className="border-t-2 border-zinc-300" />
+
+        <div className="flex items-center gap-3">
+          {userData.skills.map((skill) => (
+            <span
+              key={skill}
+              className="bg-primary text-white text-6 font-bold py-1 px-5 rounded-full"
+            >
+              {skill}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {isModalOpen && (
+        <ProfileEditModal
+          user={{
+            profileImageUrl: userData.profileImageUrl,
+            name: userData.name,
+            email: userData.email,
+            introduction: userData.introduction,
+            field: userData.field,
+            experience: userData.experience,
+            skills: userData.skills,
+          }}
+          onClose={handleCloseModal}
+          onSave={handleSaveProfile}
+        />
+      )}
+    </>
+  );
+}

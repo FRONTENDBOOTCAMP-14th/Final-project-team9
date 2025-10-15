@@ -59,7 +59,7 @@ export default function Dropdown({
 
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLLIElement>,
-    index: number
+    index: number,
   ) => {
     const listLength = options.length;
 
@@ -103,7 +103,7 @@ export default function Dropdown({
           isOpen
             ? `rounded-t-[10px] border-b-2 border-b-[#9c9c9c]`
             : `rounded-[10px]`,
-          className
+          className,
         )}
       >
         {selected ? (
@@ -122,7 +122,7 @@ export default function Dropdown({
             `absolute w-full
              rounded-b-[10px] border border-gray border-t-0
              text-gray bg-white`,
-            "z-20" // [수정] z-index 값을 10에서 20으로 높여서 별표보다 위에 오도록 합니다.
+            "z-20", // [수정] z-index 값을 10에서 20으로 높여서 별표보다 위에 오도록 합니다.
           )}
         >
           {options.map((option, index) => (
@@ -139,7 +139,7 @@ export default function Dropdown({
               className={tw(
                 `px-[30px] py-5 border-b border-[#eeeeee]
                  text-5 cursor-pointer
-                 hover:text-deep focus:text-deep`
+                 hover:text-deep focus:text-deep`,
               )}
             >
               {option}

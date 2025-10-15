@@ -414,7 +414,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
         </div>
       </form>
     );
-  }
+  },
 );
 
 TeamForm.displayName = "TeamForm";

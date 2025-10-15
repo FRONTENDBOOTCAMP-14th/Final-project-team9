@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import { useDropdownStore } from '@/store/dropdown-store'
-import Tag from './Tag'
+import { useDropdownStore } from "@/store/dropdown-store";
+import Tag from "./Tag";
 
 export default function TagList() {
-  const { selectedValues, setSelected } = useDropdownStore()
+  const { selectedValues, setSelected } = useDropdownStore();
 
   const handleRemove = (key: string) => {
-    setSelected(key, '')
-  }
+    setSelected(key, "");
+  };
 
   return (
     <div className="flex flex-wrap gap-2 mt-4">
@@ -18,5 +18,5 @@ export default function TagList() {
           <Tag key={key} label={value} onRemove={() => handleRemove(key)} />
         ))}
     </div>
-  )
+  );
 }

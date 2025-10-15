@@ -4,9 +4,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import LabeledInput from "@/components/common/LabeledInput";
 import Button from "@/components/common/Button";
 import Dropdown from "@/components/common/input/Dropdown"; // 팀원의 드롭다운 컴포넌트 경로
+import LabeledInput from "@/components/common/LabeledInput";
 
 const ProfileForm = () => {
   // 1. 프로필 폼에 필요한 값들을 state로 관리합니다.

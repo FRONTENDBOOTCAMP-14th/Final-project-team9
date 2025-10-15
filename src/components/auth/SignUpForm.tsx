@@ -4,8 +4,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import LabeledInput from "@/components/common/LabeledInput";
 import Button from "@/components/common/Button";
+import LabeledInput from "@/components/common/LabeledInput";
 
 const SignUpForm = () => {
   // 1. 회원가입에 필요한 모든 입력 값을 state로 관리합니다.

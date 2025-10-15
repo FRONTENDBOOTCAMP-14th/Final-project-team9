@@ -1,26 +1,26 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function FetchUsers() {
-  const [users, setUsers] = useState<any[]>([])
+  const [users, setUsers] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
       const { data, error } = await supabase
-        .from('users')
-        .select('id, email, nickname, positions(name), careers(name)')
+        .from("users")
+        .select("id, email, nickname, positions(name), careers(name)");
 
       if (error) {
-        console.error('테이터 블러오기 오류', error)
+        console.error("테이터 블러오기 오류", error);
       } else {
-        console.log('데이터 블러오기', data)
-        setUsers(data)
+        console.log("데이터 블러오기", data);
+        setUsers(data);
       }
-    }
-    fetchUsers()
-  }, [])
+    };
+    fetchUsers();
+  }, []);
 
   return (
     <main className="flex flex-col gap-5 bg-pink-200">
@@ -48,5 +48,5 @@ export default function FetchUsers() {
         <p>불러올 유저 데이터가 없습니다.</p>
       )}
     </main>
-  )
+  );
 }
