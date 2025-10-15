@@ -1,6 +1,11 @@
 "use client";
 
 import { Calendar, Clock, Heart, UsersRound } from "lucide-react";
+import {
+  PROJECT_STATUS_LABEL,
+  PROJECT_STATUS_COLOR,
+  type ProjectStatus,
+} from "@/constants/project";
 import { useFavoriteStore } from "@/store/favorite-store";
 
 interface ProjectCardProps {
@@ -15,6 +20,7 @@ interface ProjectCardProps {
   skills: string[];
   remain: number;
   category: string;
+  status?: ProjectStatus;
 }
 
 export default function ProjectCard({
@@ -29,6 +35,7 @@ export default function ProjectCard({
   skills,
   remain,
   category,
+  status = "recruiting",
 }: ProjectCardProps) {
   const { favorites, toggleFavorite } = useFavoriteStore();
   const isFavorite = favorites.includes(id);
@@ -37,8 +44,10 @@ export default function ProjectCard({
     <div className="flex flex-col w-[500px] h-[600px] bg-white rounded-[26px] shadow-lg p-[30px]">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-[30px]">
-          <span className="bg-primary text-white text-5 px-[15px] py-1 rounded-[10px]">
-            모집중
+          <span
+            className={`${PROJECT_STATUS_COLOR[status]} text-white text-5 px-[15px] py-1 rounded-[10px]`}
+          >
+            {PROJECT_STATUS_LABEL[status]}
           </span>
           <span className="text-deep text-5">{category}</span>
         </div>
