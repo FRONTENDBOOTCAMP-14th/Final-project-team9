@@ -66,7 +66,7 @@ export default function ApplyModal({
       if (e.key !== "Tab" || !modalRef.current) return;
 
       const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       );
 
       const firstElement = focusableElements[0];

@@ -1,20 +1,20 @@
-'use client'
+"use client";
 
-import { useFavoriteStore } from '@/store/favorite-store'
-import { Calendar, Clock, Heart, UsersRound } from 'lucide-react'
+import { Calendar, Clock, Heart, UsersRound } from "lucide-react";
+import { useFavoriteStore } from "@/store/favorite-store";
 
 interface ProjectCardProps {
-  id: number
-  title: string
-  description: string
-  owner: string
-  level: string
-  members: number
-  period: string
-  duration: string
-  skills: string[]
-  remain: number
-  category: string
+  id: number;
+  title: string;
+  description: string;
+  owner: string;
+  level: string;
+  members: number;
+  period: string;
+  duration: string;
+  skills: string[];
+  remain: number;
+  category: string;
 }
 
 export default function ProjectCard({
@@ -30,8 +30,8 @@ export default function ProjectCard({
   remain,
   category,
 }: ProjectCardProps) {
-  const { favorites, toggleFavorite } = useFavoriteStore()
-  const isFavorite = favorites.includes(id)
+  const { favorites, toggleFavorite } = useFavoriteStore();
+  const isFavorite = favorites.includes(id);
 
   return (
     <div className="flex flex-col w-[500px] h-[600px] bg-white rounded-[26px] shadow-lg p-[30px]">
@@ -46,7 +46,7 @@ export default function ProjectCard({
         <button onClick={() => toggleFavorite(id)}>
           <Heart
             className={`w-[30px] h-[30px] ${
-              isFavorite ? 'fill-red-500 stroke-red-500' : 'stroke-gray-400'
+              isFavorite ? "fill-red-500 stroke-red-500" : "stroke-gray-400"
             }`}
           />
         </button>
@@ -106,5 +106,5 @@ export default function ProjectCard({
         </button>
       </div>
     </div>
-  )
+  );
 }

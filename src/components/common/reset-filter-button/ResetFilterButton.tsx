@@ -1,10 +1,10 @@
-'use client'
+"use client";
 
-import Button from '@/components/common/Button'
-import { useDropdownStore } from '@/store/dropdown-store'
+import Button from "@/components/common/Button";
+import { useDropdownStore } from "@/store/dropdown-store";
 
 export default function ResetFilterButton() {
-  const { resetAll } = useDropdownStore()
+  const { resetAll } = useDropdownStore();
 
   return (
     <Button
@@ -128,5 +128,5 @@ export default function ResetFilterButton() {
         <span className="text-5">필터 초기화</span>
       </div>
     </Button>
-  )
+  );
 }

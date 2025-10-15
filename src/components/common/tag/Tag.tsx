@@ -1,6 +1,6 @@
 interface TagProps {
-  label: string
-  onRemove: () => void
+  label: string;
+  onRemove: () => void;
 }
 
 export default function Tag({ label, onRemove }: TagProps) {
@@ -15,5 +15,5 @@ export default function Tag({ label, onRemove }: TagProps) {
         ✕
       </button>
     </div>
-  )
+  );
 }

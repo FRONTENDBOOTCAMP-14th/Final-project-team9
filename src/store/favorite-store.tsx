@@ -1,8 +1,8 @@
-import { create } from 'zustand'
+import { create } from "zustand";
 
 interface FavoriteStore {
-  favorites: number[]
-  toggleFavorite: (id: number) => void
+  favorites: number[];
+  toggleFavorite: (id: number) => void;
 }
 
 export const useFavoriteStore = create<FavoriteStore>((set) => ({
@@ -13,4 +13,4 @@ export const useFavoriteStore = create<FavoriteStore>((set) => ({
         ? state.favorites.filter((fav) => fav !== id)
         : [...state.favorites, id],
     })),
-}))
+}));
