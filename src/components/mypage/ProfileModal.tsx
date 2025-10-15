@@ -90,15 +90,6 @@ export default function ProfileEditModal({
     }
   };
 
-  useEffect(() => {
-    const imageUrl = formData.profileImageUrl;
-    return () => {
-      if (imageUrl?.startsWith("blob:")) {
-        URL.revokeObjectURL(imageUrl);
-      }
-    };
-  }, [formData.profileImageUrl]);
-
   // ESC 키로 모달 닫기
   useEffect(() => {
     const handleEscKey = (e: KeyboardEvent) => {
@@ -190,8 +181,27 @@ export default function ProfileEditModal({
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 backdrop-blur-sm">
       <style>{`
-                /* ... 스타일 태그 내용 ... */
-            `}</style>
+        .profile-modal-dropdown [role="listbox"] {
+          font-size: 16px !important;
+          color: rgb(156, 156, 156) !important;
+          border: none !important;
+          border-radius: 0.375rem !important; /* rounded-md */
+        }
+        .profile-modal-dropdown [role="listbox"] li {
+          font-size: 16px !important;
+          color: rgb(156, 156, 156) !important;
+          border: none !important;
+          padding: 0.75rem !important; /* p-3 */
+        }
+        .profile-modal-dropdown button {
+          border: none !important;
+          border-radius: 0.375rem !important; /* rounded-md */
+          padding: 0.75rem !important; /* p-3 */
+        }
+        .profile-modal-dropdown button span {
+          color: rgb(17, 24, 39) !important; /* text-gray-900, 한줄소개와 동일 */
+        }
+      `}</style>
       <div
         ref={modalRef}
         className="bg-[#e9fafe] rounded-2xl px-[90px] py-10 shadow-2xl w-full max-w-[600px] flex flex-col gap-6 relative"
