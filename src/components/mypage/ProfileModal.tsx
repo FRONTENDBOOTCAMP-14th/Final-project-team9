@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import Button from "@/components/common/Button";
 import LabeledInput from "@/components/common/LabeledInput";
 import type { UserProfileCardProps } from "./Profile";
 
@@ -50,7 +51,6 @@ export default function ProfileEditModal({
   const [skillInput, setSkillInput] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [id, setId] = useState("");
 
   // 이미지 파일 변경 핸들러
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,31 +160,31 @@ export default function ProfileEditModal({
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
+            <label className="block text-sm font-medium text-gray mb-1">
               아이디
             </label>
             <input
               type="text"
               value={formData.name}
               disabled
-              className="w-full p-3 bg-gray-100 rounded-md border border-gray-200 text-gray-500 cursor-not-allowed"
+              className="w-full p-3 bg-[#e9fafe] rounded-md border border-gray text-gray-500 cursor-not-allowed"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
+            <label className="block text-sm font-medium text-gray mb-1">
               이메일
             </label>
             <input
               type="email"
               value={formData.email}
               disabled
-              className="w-full p-3 bg-gray-100 rounded-md border border-gray-200 text-gray-500 cursor-not-allowed"
+              className="w-full p-3 bg-[#e9fafe] rounded-md border border-gray text-gray-500 cursor-not-allowed"
             />
           </div>
           <div>
             <label
               htmlFor="introduction"
-              className="block text-sm font-medium text-gray-600 mb-1"
+              className="block text-sm font-medium text-gray mb-1"
             >
               한 줄 소개
             </label>
@@ -194,13 +194,13 @@ export default function ProfileEditModal({
               type="text"
               value={formData.introduction}
               onChange={handleChange}
-              className="w-full p-3 bg-white rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-3 bg-white rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
             />
           </div>
           <div>
             <label
               htmlFor="field"
-              className="block text-sm font-medium text-gray-600 mb-1"
+              className="block text-sm font-medium text-gray mb-1"
             >
               분야
             </label>
@@ -209,7 +209,7 @@ export default function ProfileEditModal({
               name="field"
               value={formData.field}
               onChange={handleChange}
-              className="w-full p-3 bg-white rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-3 bg-white rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
             >
               <option>프론트엔드</option>
               <option>백엔드</option>
@@ -220,7 +220,7 @@ export default function ProfileEditModal({
           <div>
             <label
               htmlFor="experience"
-              className="block text-sm font-medium text-gray-600 mb-1"
+              className="block text-sm font-medium text-gray mb-1"
             >
               경력
             </label>
@@ -229,7 +229,7 @@ export default function ProfileEditModal({
               name="experience"
               value={formData.experience}
               onChange={handleChange}
-              className="w-full p-3 bg-white rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-3 bg-white rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
             >
               <option>신입</option>
               <option>1~3년</option>
@@ -240,7 +240,7 @@ export default function ProfileEditModal({
           <div>
             <label
               htmlFor="skills"
-              className="block text-sm font-medium text-gray-600 mb-1"
+              className="block text-sm font-medium text-gray mb-1"
             >
               기술 스택 (최대 3개)
             </label>
@@ -251,18 +251,18 @@ export default function ProfileEditModal({
               onChange={(e) => setSkillInput(e.target.value)}
               onKeyDown={handleSkillAdd}
               placeholder="기술 스택을 검색하고 Enter를 누르세요"
-              className="w-full p-3 bg-white rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-3 bg-white rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
             />
             <div className="flex gap-2 mt-3 flex-wrap">
               {formData.skills.map((skill) => (
                 <div
                   key={skill}
-                  className="bg-blue-500 text-white text-sm font-medium px-3 py-1 rounded-full flex items-center gap-2"
+                  className="bg-primary text-white text-sm font-bold px-3 py-1 rounded-full flex items-center gap-2"
                 >
                   <span>{skill}</span>
                   <button
                     onClick={() => handleSkillRemove(skill)}
-                    className="text-white hover:bg-blue-700 rounded-full p-0.5"
+                    className="text-white hover:bg-deep rounded-full p-0.5"
                   >
                     <CloseIcon />
                   </button>
@@ -272,19 +272,17 @@ export default function ProfileEditModal({
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 mt-4">
-          <button
+        <div className="flex justify-center gap-10 mt-4">
+          <Button
+            size="xl"
             onClick={onClose}
-            className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+            className="bg-gray-200 text-gray-700 rounded-lg"
           >
-            취소
-          </button>
-          <button
-            onClick={handleSubmit}
-            className="py-2 px-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            완료
-          </button>
+            <span>취소</span>
+          </Button>
+          <Button size="xl" onClick={handleSubmit} className="border-">
+            <span>완료</span>
+          </Button>
         </div>
       </div>
     </div>
