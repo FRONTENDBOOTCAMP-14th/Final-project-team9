@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Button from "@/components/common/Button";
-import LabeledInput from "@/components/common/LabeledInput";
-import type { UserProfileCardProps } from "./Profile";
+import Dropdown from "@/components/common/input/Dropdown";
+import { useDropdownStore } from "@/store/dropdown-store";
+import type { UserProfileCardProps } from "./Profile"; // 파일 경로 확인 필요
 
 const CloseIcon = () => (
   <svg
@@ -20,7 +22,6 @@ const CloseIcon = () => (
   </svg>
 );
 
-// 이미지 위에 표시될 플러스 아이콘
 const PlusIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -50,27 +51,62 @@ export default function ProfileEditModal({
   const [formData, setFormData] = useState(user);
   const [skillInput, setSkillInput] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 상수 분리
+  const MAX_SKILLS = 3;
+  const MAX_INTRODUCTION_LENGTH = 100;
+  const FIELD_OPTIONS = ["프론트엔드", "백엔드", "디자이너", "기획자"];
+  const EXPERIENCE_OPTIONS = ["신입", "1-3년", "3-5년", "5년 이상"];
+
+  const { selectedValues, setSelected } = useDropdownStore();
+
+  // Dropdown 초기값 설정
+  useEffect(() => {
+    setSelected("분야", user.field);
+    setSelected("경력", user.experience);
+  }, [user.field, user.experience, setSelected]);
+
+  // Dropdown 값이 변경될 때 formData 업데이트
+  useEffect(() => {
+    const field = selectedValues["분야"];
+    const experience = selectedValues["경력"];
+
+    if (field && field !== formData.field) {
+      setFormData((prev) => ({ ...prev, field }));
+    }
+    if (experience && experience !== formData.experience) {
+      setFormData((prev) => ({ ...prev, experience }));
+    }
+  }, [selectedValues, formData.field, formData.experience]);
 
   // 이미지 파일 변경 핸들러
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; // Optional Chaining 적용
+    const file = e.target.files?.[0];
     if (file) {
       const newImageUrl = URL.createObjectURL(file);
       setFormData((prev) => ({ ...prev, profileImageUrl: newImageUrl }));
     }
   };
 
-  // 컴포넌트가 언마운트될 때 생성된 Object URL을 해제하여 메모리 누수를 방지합니다.
   useEffect(() => {
     const imageUrl = formData.profileImageUrl;
     return () => {
       if (imageUrl?.startsWith("blob:")) {
-        // Optional Chaining 적용
         URL.revokeObjectURL(imageUrl);
       }
     };
   }, [formData.profileImageUrl]);
+
+  // ESC 키로 모달 닫기
+  useEffect(() => {
+    const handleEscKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleEscKey);
+    return () => document.removeEventListener("keydown", handleEscKey);
+  }, [onClose]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -87,19 +123,33 @@ export default function ProfileEditModal({
     };
   }, [onClose]);
 
+  // --- ✅ 모든 함수를 독립적으로 분리 ---
+
   const handleSkillAdd = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (
-      e.key === "Enter" &&
-      skillInput.trim() !== "" &&
-      formData.skills.length < 3
-    ) {
-      e.preventDefault();
-      setFormData((prev) => ({
-        ...prev,
-        skills: [...prev.skills, skillInput.trim()],
-      }));
-      setSkillInput("");
+    if (e.key !== "Enter") return;
+
+    e.preventDefault();
+    const trimmedSkill = skillInput.trim();
+    if (trimmedSkill === "") return;
+
+    if (formData.skills.length >= MAX_SKILLS) {
+      alert(`최대 ${MAX_SKILLS}개까지만 추가할 수 있습니다.`);
+      return;
     }
+    if (
+      formData.skills
+        .map((s) => s.toLowerCase())
+        .includes(trimmedSkill.toLowerCase())
+    ) {
+      alert("이미 추가된 기술 스택입니다.");
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      skills: [...prev.skills, trimmedSkill],
+    }));
+    setSkillInput("");
   };
 
   const handleSkillRemove = (skillToRemove: string) => {
@@ -118,18 +168,39 @@ export default function ProfileEditModal({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
-    onSave(formData);
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    if (formData.introduction.length > MAX_INTRODUCTION_LENGTH) {
+      newErrors.introduction = `한 줄 소개는 ${MAX_INTRODUCTION_LENGTH}자 이내로 작성해주세요.`;
+    }
+    if (formData.skills.length === 0) {
+      newErrors.skills = "최소 1개의 기술 스택을 추가해주세요.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
+  const handleSubmit = () => {
+    if (validateForm()) {
+      onSave(formData);
+    }
+  };
+
+  // --- ✅ JSX 반환문은 컴포넌트의 마지막에 한번만 존재 ---
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 backdrop-blur-sm">
+      <style>{`
+                /* ... 스타일 태그 내용 ... */
+            `}</style>
       <div
         ref={modalRef}
         className="bg-[#e9fafe] rounded-2xl px-[90px] py-10 shadow-2xl w-full max-w-[600px] flex flex-col gap-6 relative"
       >
-        {/* 프로필 이미지 업로드 섹션 */}
-        <div className="relative mx-auto mb-4">
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="relative mx-auto mb-4 w-32 h-32 group"
+          aria-label="프로필 이미지 변경"
+        >
           <input
             type="file"
             accept="image/*"
@@ -137,26 +208,23 @@ export default function ProfileEditModal({
             onChange={handleImageChange}
             className="hidden"
           />
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 group"
-            aria-label="프로필 이미지 변경"
-          >
-            <img
-              src={
-                formData.profileImageUrl ||
-                `https://placehold.co/128x128/E9FAFE/333333?text=${formData.name.charAt(0)}`
-              }
+          <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 group-hover:border-primary transition-colors bg-gray-100">
+            <Image
+              src={formData.profileImageUrl || "/assets/no-profile.svg"}
               alt="Profile"
+              width={128}
+              height={128}
               className="w-full h-full object-cover"
+              unoptimized={
+                formData.profileImageUrl?.startsWith("blob:") ||
+                formData.profileImageUrl?.endsWith(".svg")
+              }
             />
-            <div className="absolute inset-0 flex justify-end items-end transition-opacity duration-300">
-              <div className="w-10 h-10 bg-deep rounded-full flex justify-center items-center group-hover:bg-primary">
-                <PlusIcon />
-              </div>
-            </div>
-          </button>
-        </div>
+          </div>
+          <div className="absolute -bottom-1 -right-1 w-10 h-10 bg-[color:var(--color-deep)] rounded-full flex justify-center items-center group-hover:bg-primary transition-colors shadow-lg">
+            <PlusIcon />
+          </div>
+        </button>
 
         <div className="space-y-4">
           <div>
@@ -186,7 +254,8 @@ export default function ProfileEditModal({
               htmlFor="introduction"
               className="block text-sm font-medium text-gray mb-1"
             >
-              한 줄 소개
+              한 줄 소개 ({formData.introduction.length}/
+              {MAX_INTRODUCTION_LENGTH})
             </label>
             <input
               id="introduction"
@@ -194,8 +263,12 @@ export default function ProfileEditModal({
               type="text"
               value={formData.introduction}
               onChange={handleChange}
+              maxLength={MAX_INTRODUCTION_LENGTH}
               className="w-full p-3 bg-white rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
             />
+            {errors.introduction && (
+              <p className="text-red-500 text-sm mt-1">{errors.introduction}</p>
+            )}
           </div>
           <div>
             <label
@@ -204,18 +277,15 @@ export default function ProfileEditModal({
             >
               분야
             </label>
-            <select
-              id="field"
-              name="field"
-              value={formData.field}
-              onChange={handleChange}
-              className="w-full p-3 bg-white rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-            >
-              <option>프론트엔드</option>
-              <option>백엔드</option>
-              <option>디자이너</option>
-              <option>기획자</option>
-            </select>
+            <div className="profile-modal-dropdown">
+              <Dropdown
+                options={FIELD_OPTIONS}
+                placeholder="분야"
+                width="100%"
+                height="48px"
+                className="!border-0 !text-[16px] !text-gray"
+              />
+            </div>
           </div>
           <div>
             <label
@@ -224,25 +294,22 @@ export default function ProfileEditModal({
             >
               경력
             </label>
-            <select
-              id="experience"
-              name="experience"
-              value={formData.experience}
-              onChange={handleChange}
-              className="w-full p-3 bg-white rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-            >
-              <option>신입</option>
-              <option>1~3년</option>
-              <option>3~5년</option>
-              <option>5년 이상</option>
-            </select>
+            <div className="profile-modal-dropdown">
+              <Dropdown
+                options={EXPERIENCE_OPTIONS}
+                placeholder="경력"
+                width="100%"
+                height="48px"
+                className="!border-0 !text-[16px] !text-gray"
+              />
+            </div>
           </div>
           <div>
             <label
               htmlFor="skills"
               className="block text-sm font-medium text-gray mb-1"
             >
-              기술 스택 (최대 3개)
+              기술 스택 (최대 {MAX_SKILLS}개)
             </label>
             <input
               id="skills"
@@ -253,6 +320,9 @@ export default function ProfileEditModal({
               placeholder="기술 스택을 검색하고 Enter를 누르세요"
               className="w-full p-3 bg-white rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
             />
+            {errors.skills && (
+              <p className="text-red-500 text-sm mt-1">{errors.skills}</p>
+            )}
             <div className="flex gap-2 mt-3 flex-wrap">
               {formData.skills.map((skill) => (
                 <div
@@ -263,6 +333,7 @@ export default function ProfileEditModal({
                   <button
                     onClick={() => handleSkillRemove(skill)}
                     className="text-white hover:bg-deep rounded-full p-0.5"
+                    aria-label={`${skill} 제거`}
                   >
                     <CloseIcon />
                   </button>

@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import ProfileEditModal from "./ProfileModal";
 
 // SVG 아이콘 컴포넌트들
@@ -44,6 +45,7 @@ export default function UserProfileCard(props: UserProfileCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   // 프로필 데이터를 state로 관리하여 수정 가능하게 합니다.
   const [userData, setUserData] = useState({ ...props });
+  const blobUrlsRef = useRef<Set<string>>(new Set());
 
   const handleSettingsClick = () => {
     setIsModalOpen(true);
@@ -60,20 +62,40 @@ export default function UserProfileCard(props: UserProfileCardProps) {
     console.log("저장될 데이터:", updatedUser);
     setUserData((prev) => ({ ...prev, ...updatedUser }));
     setIsModalOpen(false);
+    // 새로운 blob URL이라면 추적 목록에 추가
+    if (updatedUser.profileImageUrl?.startsWith("blob:")) {
+      blobUrlsRef.current.add(updatedUser.profileImageUrl);
+    }
   };
+
+  // 컴포넌트 언마운트 시 모든 blob URL 정리
+  useEffect(() => {
+    const blobUrls = blobUrlsRef.current;
+    return () => {
+      blobUrls.forEach((url) => {
+        URL.revokeObjectURL(url);
+      });
+    };
+  }, []);
 
   return (
     <>
       <div className="w-[1620px] h-[400px] bg-white rounded-4xl py-9 px-20 shadow-lg flex flex-col justify-between relative mx-auto box-border">
         <div className="flex items-center">
-          <img
-            src={
-              userData.profileImageUrl ||
-              `https://placehold.co/140x140/E9FAFE/333333?text=${userData.name.charAt(0)}`
-            }
-            alt={`${userData.name}'s profile`}
-            className="w-[167px] h-[167px] rounded-full object-cover mr-8 bg-gray-300"
-          />
+          <div className="w-[167px] h-[167px] rounded-full overflow-hidden mr-8 bg-gray-300 relative">
+            <Image
+              src={userData.profileImageUrl || "/assets/no-profile.svg"}
+              alt={`${userData.name}'s profile`}
+              width={167}
+              height={167}
+              className="object-cover"
+              unoptimized={
+                userData.profileImageUrl?.startsWith("blob:") ||
+                userData.profileImageUrl?.endsWith(".svg") ||
+                !userData.profileImageUrl
+              }
+            />
+          </div>
           <div className="flex flex-col gap-2 flex-grow">
             <div className="flex items-center gap-4">
               <h2 className="text-8 text-deep font-extrabold">
