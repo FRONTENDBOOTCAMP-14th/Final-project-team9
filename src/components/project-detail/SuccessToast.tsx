@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect } from "react";
-import type { SuccessToastProps } from "@/types/project-detail";
+import type { SuccessToastProps } from "@/types/project";
 import { FORM_CONSTANTS } from "./constants";
 
 export default function SuccessToast({

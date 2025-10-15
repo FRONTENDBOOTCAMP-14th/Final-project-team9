@@ -4,7 +4,7 @@ import {
   FORM_CONSTANTS,
 } from "@/components/project-detail/constants";
 import { useDropdownStore } from "@/store/dropdown-store";
-import type { FormErrors } from "@/types/project-detail";
+import type { FormErrors } from "@/types/project";
 
 export function useApplyForm(isOpen: boolean) {
   const [reason, setReason] = useState("");

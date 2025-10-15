@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from "react";
 import Button from "@/components/common/Button";
 import Dropdown from "@/components/common/input/Dropdown";
 import { useApplyForm } from "@/hooks/useApplyForm";
-import type { ApplyModalProps } from "@/types/project-detail";
+import type { ApplyModalProps } from "@/types/project";
 import {
   POSITION_OPTIONS,
   FORM_CONSTANTS,
