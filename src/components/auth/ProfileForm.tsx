@@ -1,38 +1,72 @@
 // src/components/auth/ProfileForm.tsx
 
-"use client";
+'use client'
 
-import { useState } from "react";
-import Image from "next/image";
-import Button from "@/components/common/Button";
-import Dropdown from "@/components/common/input/Dropdown"; // 팀원의 드롭다운 컴포넌트 경로
-import LabeledInput from "@/components/common/LabeledInput";
+import { useState } from 'react'
+import Image from 'next/image'
+import Button from '@/components/common/Button'
+import Dropdown from '@/components/common/input/Dropdown' // 팀원의 드롭다운 컴포넌트 경로
+import LabeledInput from '@/components/common/LabeledInput'
+import { supabase } from '@/lib/supabase'
+import { useDropdownStore } from '@/store/dropdown-store'
 
 const ProfileForm = () => {
   // 1. 프로필 폼에 필요한 값들을 state로 관리합니다.
-  const [nickname, setNickname] = useState("");
-  const [introduction, setIntroduction] = useState("");
+  const [nickname, setNickname] = useState('')
+  const [introduction, setIntroduction] = useState('')
+  const { selectedValues } = useDropdownStore()
 
   // 드롭다운에 표시될 옵션들
-  const positionOptions = ["프론트엔드", "백엔드", "디자이너", "기획자"];
+  const positionOptions = ['프론트엔드', '백엔드', '디자이너', '기획자']
   const experienceOptions = [
-    "신입(1년 미만)",
-    "주니어(1~3년)",
-    "미들(3~5년)",
-    "시니어(5년 이상)",
-  ];
+    '신입(1년 미만)',
+    '주니어(1~3년)',
+    '미들(3~5년)',
+    '시니어(5년 이상)',
+  ]
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Zustand 스토어에서 선택된 값을 가져와서 함께 처리
-    // const { selectedValues } = useDropdownStore.getState();
-    // const position = selectedValues['포지션'];
-    // const experience = selectedValues['경력'];
-    console.log("프로필 정보:", {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    const position = selectedValues['포지션']
+    const career = selectedValues['경력']
+
+    if (!position || !career) return alert('포지션과 경력을 선택해주세요.')
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser()
+
+    if (userError || !user) {
+      alert('회원가입을 다시 해주세요!')
+      return
+    }
+
+    const username = user.user_metadata?.username
+
+    const position_id = positionOptions.indexOf(position) + 1
+    const career_id = experienceOptions.indexOf(career) + 1
+
+    const { error: insertError } = await supabase.from('users').insert({
+      id: user.id,
+      email: user.email,
+      username,
       nickname,
-      introduction /* position, experience */,
-    });
-  };
+      bio: introduction,
+      position_id,
+      career_id,
+    })
+
+    if (insertError) {
+      console.error(insertError)
+      alert('프로필 등록에 실패했습니다.')
+      return
+    }
+
+    alert('프로필 등록 완료!')
+    window.location.href = '/'
+  }
 
   return (
     <div className="w-full max-w-[615px]">
@@ -69,7 +103,10 @@ const ProfileForm = () => {
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <form
+        onSubmit={(e) => void handleSubmit(e)}
+        className="flex flex-col gap-5"
+      >
         <LabeledInput
           id="profile-nickname"
           label="닉네임"
@@ -117,7 +154,7 @@ const ProfileForm = () => {
         </Button>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default ProfileForm;
+export default ProfileForm
