@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 export default function SearchBar() {
   return (
@@ -40,5 +40,5 @@ export default function SearchBar() {
         className="w-full h-full text-7 placeholder-gray placeholder:text-7"
       />
     </div>
-  )
+  );
 }

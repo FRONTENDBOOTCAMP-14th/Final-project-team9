@@ -1,9 +1,9 @@
-import Button from '@/components/common/Button'
-import Dropdown from '@/components/common/input/Dropdown'
-import ResetFilterButton from '@/components/common/reset-filter-button/ResetFilterButton'
-import SearchBar from '@/components/common/search-bar/SearchBar'
-import DropdownWithTag from '@/components/common/tag/DropdownWithTag'
-import { jalnan } from '@/fonts'
+import Button from "@/components/common/Button";
+import Dropdown from "@/components/common/input/Dropdown";
+import ResetFilterButton from "@/components/common/reset-filter-button/ResetFilterButton";
+import SearchBar from "@/components/common/search-bar/SearchBar";
+import DropdownWithTag from "@/components/common/tag/DropdownWithTag";
+import { jalnan } from "@/fonts";
 
 export default function FindProjectPage() {
   return (
@@ -19,22 +19,22 @@ export default function FindProjectPage() {
       </div>
       <div className="flex justify-between mt-10">
         <Dropdown
-          options={['기획', '디자인', '프론트엔드', '백엔드', '기타']}
+          options={["기획", "디자인", "프론트엔드", "백엔드", "기타"]}
           placeholder="직무"
           width="250px"
         />
         <Dropdown
-          options={['1개월', '3개월', '6개월', '1년']}
+          options={["1개월", "3개월", "6개월", "1년"]}
           placeholder="기간"
           width="250px"
         />
         <Dropdown
-          options={['앱 개발', '웹 개발', '게임', '시스템', '기타']}
+          options={["앱 개발", "웹 개발", "게임", "시스템", "기타"]}
           placeholder="분야"
           width="250px"
         />
         <Dropdown
-          options={['이커머스', 'SNS', '게임', '유틸', '커뮤니티', '기타']}
+          options={["이커머스", "SNS", "게임", "유틸", "커뮤니티", "기타"]}
           placeholder="도메인"
           width="250px"
         />
@@ -63,5 +63,5 @@ export default function FindProjectPage() {
         </Button>
       </div>
     </div>
-  )
+  );
 }

@@ -1,8 +1,8 @@
 // src/components/common/LabeledInput.tsx
 
 import React, { forwardRef } from "react";
-import { twMerge } from "tailwind-merge";
 import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export interface LabeledInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -16,7 +16,7 @@ export interface LabeledInputProps
 const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(
   (
     { label, error, icon, className, containerClassName, required, ...props },
-    ref
+    ref,
   ) => {
     // 이 컴포넌트의 너비와 높이는 사용하는 곳(LoginForm 등)에서 결정합니다.
     const formFieldContainerStyles = twMerge("relative", containerClassName);
@@ -27,7 +27,7 @@ const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(
         "border-red-500": error,
         "focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600":
           !error,
-      })
+      }),
     );
 
     const inputElementStyles = twMerge(
@@ -35,14 +35,14 @@ const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(
       clsx({
         "pr-[90px]": !!icon,
       }),
-      className
+      className,
     );
 
     const labelStyles = twMerge(
       "absolute left-[30px] text-[#DBDBDB] transition-all duration-200 ease-in-out pointer-events-none",
       "top-[24px] text-[24px]",
       "peer-focus:top-[12px] peer-focus:text-[16px] peer-focus:text-[#DBDBDB]",
-      "peer-[:not(:placeholder-shown)]:top-[12px] peer-[:not(:placeholder-shown)]:text-[16px] peer-[:not(:placeholder-shown)]:text-[#DBDBDB]"
+      "peer-[:not(:placeholder-shown)]:top-[12px] peer-[:not(:placeholder-shown)]:text-[16px] peer-[:not(:placeholder-shown)]:text-[#DBDBDB]",
     );
 
     return (
@@ -75,7 +75,7 @@ const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 LabeledInput.displayName = "LabeledInput";
