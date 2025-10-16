@@ -1,4 +1,5 @@
 import UserProfileCard from "@/components/mypage/Profile";
+import Taps from "@/components/mypage/Taps";
 
 export default function MyPage() {
   return (
@@ -18,6 +19,7 @@ export default function MyPage() {
           completedProjects: 2,
         }}
       />
+      <Taps />
     </div>
   );
 }
