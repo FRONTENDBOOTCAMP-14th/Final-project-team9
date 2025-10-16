@@ -2,7 +2,7 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Image from 'next/image'
 import Button from '@/components/common/Button'
 import Dropdown from '@/components/common/input/Dropdown' // 팀원의 드롭다운 컴포넌트 경로
@@ -15,6 +15,11 @@ const ProfileForm = () => {
   const [nickname, setNickname] = useState('')
   const [introduction, setIntroduction] = useState('')
   const { selectedValues } = useDropdownStore()
+  const [profileImage, setProfileImage] = useState<string>(
+    '/assets/no-profile.svg',
+  )
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 드롭다운에 표시될 옵션들
   const positionOptions = ['프론트엔드', '백엔드', '디자이너', '기획자']
@@ -24,6 +29,36 @@ const ProfileForm = () => {
     '미들(3~5년)',
     '시니어(5년 이상)',
   ]
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // 이미지 파일인지 확인
+      if (!file.type.startsWith('image/')) {
+        alert('이미지 파일만 업로드 가능합니다.')
+        return
+      }
+
+      // 파일 크기 제한 (10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('파일 크기는 10MB 이하여야 합니다.')
+        return
+      }
+
+      setProfileImageFile(file)
+
+      // 미리보기 이미지 생성
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setProfileImage(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -48,6 +83,32 @@ const ProfileForm = () => {
     const position_id = positionOptions.indexOf(position) + 1
     const career_id = experienceOptions.indexOf(career) + 1
 
+    let profileImageUrl = null
+
+    // 프로필 이미지 업로드
+    if (profileImageFile) {
+      const fileExt = profileImageFile.name.split('.').pop()
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`
+      const filePath = `profiles/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('profile-images')
+        .upload(filePath, profileImageFile)
+
+      if (uploadError) {
+        console.error('이미지 업로드 실패:', uploadError)
+        alert('프로필 이미지 업로드에 실패했습니다.')
+        return
+      }
+
+      // 업로드된 이미지의 public URL 가져오기
+      const { data: publicUrlData } = supabase.storage
+        .from('profile-images')
+        .getPublicUrl(filePath)
+
+      profileImageUrl = publicUrlData.publicUrl
+    }
+
     const { error: insertError } = await supabase.from('users').insert({
       id: user.id,
       email: user.email,
@@ -56,6 +117,7 @@ const ProfileForm = () => {
       bio: introduction,
       position_id,
       career_id,
+      profile_image: profileImageUrl,
     })
 
     if (insertError) {
@@ -72,14 +134,23 @@ const ProfileForm = () => {
     <div className="w-full max-w-[615px]">
       <div className="flex justify-center mb-[50px]">
         {/* 프로필 사진 업로드 부분 */}
-        <button className="relative w-[200px] h-[200px] rounded-full bg-gray-200 flex items-center justify-center">
-          <Image
-            src="/assets/no-profile.svg" // 기본 프로필 이미지
-            alt="프로필 사진"
-            width={200}
-            height={200}
-          />
-          <div className="absolute bottom-0 right-0 w-[50px] h-[50px] bg-[#16296D] rounded-full flex items-center justify-center text-white">
+        <button
+          type="button"
+          onClick={handleImageClick}
+          className="relative w-[200px] h-[200px] group"
+          aria-label="프로필 사진 업로드"
+        >
+          <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center overflow-hidden group-hover:opacity-80 transition-opacity">
+            <Image
+              src={profileImage}
+              alt="프로필 사진"
+              width={200}
+              height={200}
+              className="object-cover"
+              unoptimized={profileImage.startsWith('data:')}
+            />
+          </div>
+          <div className="absolute bottom-0 right-0 w-[50px] h-[50px] bg-[#16296D] rounded-full flex items-center justify-center text-white pointer-events-none group-hover:opacity-80 transition-opacity">
             <svg
               width="30"
               height="30"
@@ -101,6 +172,15 @@ const ProfileForm = () => {
             </svg>
           </div>
         </button>
+        {/* 숨겨진 파일 input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="hidden"
+          aria-label="프로필 이미지 파일 선택"
+        />
       </div>
 
       <form
