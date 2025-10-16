@@ -2,8 +2,8 @@
 
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import Button from "@/components/common/Button";
 
 interface FoundIdDisplayProps {

@@ -4,8 +4,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import LabeledInput from "@/components/common/LabeledInput";
 import Button from "@/components/common/Button";
+import LabeledInput from "@/components/common/LabeledInput";
 
 const ResetPasswordForm = () => {
   const [newPassword, setNewPassword] = useState("");
