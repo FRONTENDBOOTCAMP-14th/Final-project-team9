@@ -8,6 +8,7 @@ import { FORM_CONSTANTS } from "./constants";
 export default function SuccessToast({
   isVisible,
   onClose,
+  message = "지원 완료 되었습니다.",
 }: SuccessToastProps) {
   useEffect(() => {
     if (isVisible) {
@@ -46,7 +47,7 @@ export default function SuccessToast({
           </svg>
         </div>
         <span className="text-[length:var(--text-5)] text-black font-normal leading-none text-center flex-1">
-          지원 완료 되었습니다.
+          {message}
         </span>
       </div>
     </div>
