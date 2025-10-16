@@ -24,7 +24,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       type = "button", // 기본값: submit 사고 방지
       ...rest
     },
-    ref,
+    ref
   ) => {
     // disabled를 분리해 loading과 함께 안전 처리
     const { disabled: disabledProp, ...restProps } = rest;
@@ -41,10 +41,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     // 지금은 임시 값
     const sizeStyles = {
-      sm: "h-[32px] px-3 text-sm",
-      md: "h-[40px] px-4 text-base",
-      lg: "h-[48px] px-6 text-lg",
-      xl: "h-[56px] px-8 text-xl",
+      sm: "w-[183px] h-[53px] text-[24px] rounded-[5px]",
+      md: "w-[270px] h-[90px] text-[28px] rounded-[20px]",
+      lg: "w-[615px] h-[80px] text-[28px] rounded-[10px]",
+      xl: "w-[1616] h-[90px] text-[28px] rounded-[20px]",
       filter: "w-[190px] h-[60px] px-[25px]",
       search: "w-[307px] h-[90px] px-10 text-[28px] rounded-[20px]",
     } as const;
@@ -64,8 +64,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         variantStyles[variant],
         variant === "icon" ? iconButtonSizeStyles[size] : sizeStyles[size],
         { "opacity-50": isDisabled },
-        className,
-      ),
+        className
+      )
     );
 
     return (
@@ -85,7 +85,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {loading ? "..." : children}
       </button>
     );
-  },
+  }
 );
 
 Button.displayName = "Button";
