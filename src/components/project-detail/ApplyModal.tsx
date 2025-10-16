@@ -4,13 +4,13 @@ import React, { useEffect, useRef } from "react";
 import Button from "@/components/common/Button";
 import Dropdown from "@/components/common/input/Dropdown";
 import { useApplyForm } from "@/hooks/useApplyForm";
+import type { ApplyModalProps } from "@/types/project";
 import {
   POSITION_OPTIONS,
   FORM_CONSTANTS,
   PLACEHOLDER_TEXT,
 } from "./constants";
 import SuccessToast from "./SuccessToast";
-import type { ApplyModalProps } from "./types";
 
 export default function ApplyModal({
   isOpen,
@@ -66,7 +66,7 @@ export default function ApplyModal({
       if (e.key !== "Tab" || !modalRef.current) return;
 
       const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       );
 
       const firstElement = focusableElements[0];
