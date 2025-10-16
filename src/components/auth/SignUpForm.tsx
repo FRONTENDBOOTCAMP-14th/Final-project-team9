@@ -74,14 +74,14 @@ const SignUpForm = () => {
     <div className="w-full max-w-[615px]">
       <div className="flex justify-center mb-[40px]">
         <Image
-          src="/assets/joyin-logo.webp" // 바로잡은 로고 파일 이름입니다.
+          src="/assets/joyin-logo.webp"
           alt="Joyin 로고"
           width={80}
           height={80}
         />
       </div>
 
-      <div className="text-center mb-8">
+      <div className="text-center mb-[40px]">
         <h1 className="text-[32px] text-[#2E4FF2] font-[jalnan]">회원가입</h1>
       </div>
 
