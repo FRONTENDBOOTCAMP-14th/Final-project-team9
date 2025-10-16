@@ -5,7 +5,7 @@
 import { useState, useEffect, KeyboardEvent } from "react";
 import Image from "next/image";
 import Button from "@/components/common/Button";
-import Tag from "@/components/common/tag/Tag";
+import TagList from "@/components/common/tag/TagList";
 import { ALL_STACKS } from "@/constants/stacks";
 
 // 상수를 사용해 유지보수성을 높입니다.
@@ -57,28 +57,21 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (filteredStacks.length === 0) return;
 
-    // ArrowDown 키: 아래로 이동
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setActiveIndex((prevIndex) => (prevIndex + 1) % filteredStacks.length);
-    }
-    // ArrowUp 키: 위로 이동
-    else if (e.key === "ArrowUp") {
+    } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setActiveIndex(
         (prevIndex) =>
           (prevIndex - 1 + filteredStacks.length) % filteredStacks.length
       );
-    }
-    // Enter 키: 선택
-    else if (e.key === "Enter") {
+    } else if (e.key === "Enter") {
       e.preventDefault();
       if (activeIndex >= 0 && activeIndex < filteredStacks.length) {
         handleSelectStack(filteredStacks[activeIndex]);
       }
-    }
-    // Escape 키: 검색창 닫기
-    else if (e.key === "Escape") {
+    } else if (e.key === "Escape") {
       setSearchTerm("");
     }
   };
@@ -92,10 +85,11 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
   const isMaxSelected = selectedStacks.length >= MAX_STACK_COUNT;
   const placeholderText = isMaxSelected
     ? `최대 ${MAX_STACK_COUNT}개까지 선택할 수 있습니다.`
-    : `${MAX_STACK_COUNT}개를 모두 선택하였습니다.`;
+    : "기술 스택을 검색해주세요.";
 
   return (
     <div className="w-full max-w-[615px]">
+      {/* ... 상단 UI는 동일 ... */}
       <div className="flex justify-center mb-[40px]">
         <Image
           src="/assets/joyin-logo.webp"
@@ -114,6 +108,7 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col">
+        {/* ... input 부분은 동일 ... */}
         <div className="relative">
           <div className="w-[615px] h-[80px] rounded-[10px] border border-gray-300 bg-white flex items-center justify-between px-[30px]">
             <span className="text-black text-[24px] flex-shrink-0 mr-[91px]">
@@ -127,10 +122,9 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
               placeholder={placeholderText}
               disabled={isMaxSelected}
               className="flex-grow h-full bg-transparent text-[24px] text-black placeholder:text-[#D9D9D9] focus:outline-none ml-4 disabled:bg-transparent"
-              autoComplete="off" // 브라우저 자동완성 끄기
+              autoComplete="off"
             />
           </div>
-
           {searchTerm && (
             <div className="absolute top-full mt-2 w-full bg-white border border-gray-300 rounded-[10px] z-10">
               {filteredStacks.length > 0 ? (
@@ -158,15 +152,14 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
           )}
         </div>
 
+        {/* --- 이 부분이 TagList 컴포넌트로 간단하게 바뀝니다 --- */}
         <div className="flex flex-wrap gap-4 mt-4 min-h-[40px]">
-          {selectedStacks.map((stack) => (
-            <Tag
-              key={stack}
-              label={stack}
-              onRemove={() => handleRemoveStack(stack)}
-              className="w-[190px] h-[40px] rounded-[20px] justify-between text-lg"
-            />
-          ))}
+          <TagList
+            items={selectedStacks}
+            removable={true}
+            onRemove={handleRemoveStack}
+            tagClassName="w-[190px] h-[40px] rounded-[20px] justify-between text-lg"
+          />
         </div>
 
         <p className="text-center text-[24px] text-[#16296D] mt-[20px] font-bold">
@@ -178,7 +171,7 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
           variant="primary"
           size="lg"
           className="w-full h-[80px] text-[24px] mt-[40px]"
-          disabled={selectedStacks.length === 0} // 선택된 스택이 없을 때 버튼 비활성화
+          disabled={selectedStacks.length === 0}
         >
           다음
         </Button>
