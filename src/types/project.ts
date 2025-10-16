@@ -114,3 +114,22 @@ export interface SuccessToastProps {
   onClose: () => void;
   message?: string;
 }
+
+// 유저 타입
+export interface Position {
+  name: string;
+}
+
+export interface Career {
+  name: string;
+}
+
+export interface UserData {
+  id: string;
+  username: string;
+  email: string;
+  bio?: string;
+  profile_image?: string;
+  positions: Position;
+  careers: Career;
+}
