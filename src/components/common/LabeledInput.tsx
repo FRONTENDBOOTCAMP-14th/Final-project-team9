@@ -18,11 +18,10 @@ const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(
     { label, error, icon, className, containerClassName, required, ...props },
     ref,
   ) => {
-    // 이 컴포넌트의 너비와 높이는 사용하는 곳(LoginForm 등)에서 결정합니다.
     const formFieldContainerStyles = twMerge("relative", containerClassName);
 
     const inputBoxStyles = twMerge(
-      "relative w-full h-full rounded-[10px] border-[1px] border-white bg-white transition-colors",
+      "relative w-full h-[80px] rounded-[10px] border-[1px] border-white bg-white transition-colors",
       clsx({
         "border-red-500": error,
         "focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600":
@@ -48,13 +47,11 @@ const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(
     return (
       <div className={formFieldContainerStyles}>
         <div className={inputBoxStyles}>
-          {/* required가 true일 때, 고정된 위치에 별표를 렌더링합니다. */}
           {required && (
             <span className="absolute left-[12px] top-[8px] text-red-500">
               *
             </span>
           )}
-
           <input
             ref={ref}
             className={inputElementStyles}
@@ -70,6 +67,8 @@ const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(
             </div>
           )}
         </div>
+
+        {/* [수정] div를 삭제하고, 에러가 있을 때만 p 태그가 렌더링되도록 합니다. */}
         {error && (
           <p className="mt-[10px] text-[20px] text-[#FF0606]">{error}</p>
         )}

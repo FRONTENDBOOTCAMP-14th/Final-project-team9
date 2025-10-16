@@ -134,7 +134,7 @@ const LoginForm = () => {
       {/* 로그인 버튼과 하단 링크 사이 간격: 20px */}
       {/* 하단 링크 스타일: 색상, 글자 크기, 높이 등 모두 반영 */}
       <div className="mt-[20px] flex justify-between items-center text-[20px] text-[#90A5EA] h-[24px]">
-        <Link href="/signup" className="hover:underline">
+        <Link href="/sign-up" className="hover:underline">
           회원가입
         </Link>
         <div className="flex items-center gap-2">
@@ -143,7 +143,7 @@ const LoginForm = () => {
           </Link>
           {/* 구분선 스타일: 글자 크기, 색상 반영 */}
           <span className="text-[12px] text-black">|</span>
-          <Link href="/find-pw" className="hover:underline">
+          <Link href="/find-password" className="hover:underline">
             비밀번호 찾기
           </Link>
         </div>
