@@ -2,22 +2,40 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Button from "@/components/common/Button";
 import PreferenceTagList from "@/components/common/tag/PreferenceTagList";
 import TagList from "@/components/common/tag/TagList";
 import ApplyModal from "@/components/project-detail/ApplyModal";
+import RecruitmentButton from "@/components/project-detail/RecruitmentButton";
 import SuccessToast from "@/components/project-detail/SuccessToast";
 import type { ProjectDetail } from "@/types/project";
 
 interface ProjectDetailContentProps {
   project: ProjectDetail;
+  isOwner?: boolean; // 현재 사용자가 프로젝트 주최자인지
 }
 
 export default function ProjectDetailContent({
   project,
+  isOwner = false,
 }: ProjectDetailContentProps) {
   const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isClosed, setIsClosed] = useState(project.status === "completed");
+
+  const handleCloseRecruitment = async () => {
+    try {
+      // TODO: Supabase API 호출로 교체
+      // await updateProjectStatus(project.id, 'completed');
+
+      setIsClosed(true);
+      setToastMessage("마감 완료 되었습니다");
+      setShowToast(true);
+    } catch (error) {
+      console.error("모집 마감 실패:", error);
+      alert("모집 마감에 실패했습니다. 다시 시도해주세요.");
+    }
+  };
 
   const handleCopyEmail = async () => {
     if (!project.ownerEmail) {
@@ -27,6 +45,7 @@ export default function ProjectDetailContent({
 
     try {
       await navigator.clipboard.writeText(project.ownerEmail);
+      setToastMessage("이메일이 클립보드에 복사되었습니다");
       setShowToast(true);
     } catch (err) {
       console.error("이메일 복사 실패:", err);
@@ -177,17 +196,15 @@ export default function ProjectDetailContent({
                 지원했습니다.
               </p>
 
-              {/* 지원하기 버튼 - 270 x 96, font-size: 28px, 중앙정렬, 하단마진 50px, border-radius: 20px */}
+              {/* 버튼 - 270 x 96, font-size: 28px, 중앙정렬, 하단마진 50px, border-radius: 20px */}
               <div className="flex justify-center mt-auto mb-[50px]">
-                <Button
-                  variant="primary"
-                  size="lg"
-                  onClick={() => setIsModalOpen(true)}
-                  className="w-[270px] h-[96px] text-[28px] rounded-[20px]"
-                  aria-label="프로젝트에 지원하기"
-                >
-                  지원하기
-                </Button>
+                <RecruitmentButton
+                  isClosed={isClosed}
+                  isOwner={isOwner}
+                  onCloseRecruitment={() => void handleCloseRecruitment()}
+                  onApply={() => setIsModalOpen(true)}
+                  size="small"
+                />
               </div>
             </section>
           </div>
@@ -215,13 +232,25 @@ export default function ProjectDetailContent({
             </p>
           )}
         </section>
+
+        {/* 하단 버튼 - 1620 x 90, 상단 120px, 하단 207px */}
+        {/* 하단 지원하기 버튼 - 1620 x 90, font-size: 36px, border-radius: 20px, 상단마진 120px, 하단마진 207px */}
+        <div className="w-full max-w-[1620px] mt-[120px] mb-[207px]">
+          <RecruitmentButton
+            isClosed={isClosed}
+            isOwner={isOwner}
+            onCloseRecruitment={() => void handleCloseRecruitment()}
+            onApply={() => setIsModalOpen(true)}
+            size="large"
+          />
+        </div>
       </div>
 
       {/* 이메일 복사 성공 토스트 */}
       <SuccessToast
         isVisible={showToast}
         onClose={() => setShowToast(false)}
-        message="이메일이 클립보드에 복사되었습니다"
+        message={toastMessage}
       />
 
       {/* 지원하기 모달 */}

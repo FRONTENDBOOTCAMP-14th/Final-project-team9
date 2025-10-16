@@ -1,3 +1,5 @@
+import Footer from "@/components/common/footer/Footer";
+import GoTopButton from "@/components/common/GoTopButton";
 import Header from "@/components/common/header/Header";
 import {
   ProjectDetailHeader,
@@ -73,13 +75,19 @@ React Native와 OpenAI API를 활용하여 크로스플랫폼 앱으로 제작�
 };
 
 export default function ProjectDetailPage() {
+  // TODO: 실제로는 현재 로그인한 사용자 ID와 프로젝트 ownerId를 비교
+  const isOwner = false; // 임시: true로 변경하면 주최자 화면 확인 가능
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header variant="white" />
       <ProjectDetailHeader project={mockProjectData} />
 
       {/* 프로젝트 상세 내용 */}
-      <ProjectDetailContent project={mockProjectDetailData} />
+      <ProjectDetailContent project={mockProjectDetailData} isOwner={isOwner} />
+
+      <Footer />
+      <GoTopButton />
     </div>
   );
 }
