@@ -1,7 +1,10 @@
 import Header from "@/components/common/header/Header";
-import { ProjectDetailHeader } from "@/components/project-detail";
-import type { ProjectHeaderInfo } from "@/types/project";
-import ApplyButton from "./ApplyButton";
+import {
+  ProjectDetailHeader,
+  ProjectDetailContent,
+  ApplyButton,
+} from "@/components/project-detail";
+import type { ProjectHeaderInfo, ProjectDetail } from "@/types/project";
 
 // TODO: 실제로는 Supabase에서 프로젝트 ID로 데이터를 가져와야 함
 const mockProjectData: ProjectHeaderInfo = {
@@ -21,26 +24,26 @@ const mockProjectData: ProjectHeaderInfo = {
   status: "recruiting",
 };
 
+// ProjectDetailContent용 임시 데이터
+const mockProjectDetailData: ProjectDetail = {
+  ...mockProjectData,
+  createdAt: "2025-01-01",
+  updatedAt: "2025-01-01",
+  ownerId: "user123",
+  ownerName: "지훈",
+};
+
 export default function ProjectDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header variant="white" />
       <ProjectDetailHeader project={mockProjectData} />
 
-      {/* 프로젝트 상세 내용 */}
-      <div className="w-full max-w-[1920px] mx-auto px-8 py-12">
-        <div className="max-w-[1620px] mx-auto">
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold mb-4">프로젝트 상세 내용</h2>
-            <p className="text-gray-600 mb-8">
-              여기에 프로젝트 상세 내용이 들어갑니다.
-            </p>
-
-            {/* 임시 지원하기 버튼 */}
-            <ApplyButton />
-          </div>
-        </div>
-      </div>
+      {/* 프로젝트 상세 내용 (지원 버튼 포함) */}
+      <ProjectDetailContent
+        project={mockProjectDetailData}
+        applyButton={<ApplyButton />}
+      />
     </div>
   );
 }
