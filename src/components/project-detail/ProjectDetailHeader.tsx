@@ -53,18 +53,15 @@ export default function ProjectDetailHeader({
 
   // 모집 포지션 데이터 구조화
   const positionList: PositionInfo[] = [
-    { key: "PM", label: "PM", count: project.positions.PM },
+    { key: "기획", label: "기획", count: project.positions.기획 },
+    { key: "디자인", label: "디자인", count: project.positions.디자인 },
     {
-      key: "frontend",
+      key: "프론트엔드",
       label: "프론트엔드",
-      count: project.positions.frontend,
+      count: project.positions.프론트엔드,
     },
-    { key: "backend", label: "백엔드", count: project.positions.backend },
-    {
-      key: "designer",
-      label: "디자이너",
-      count: project.positions.designer,
-    },
+    { key: "백엔드", label: "백엔드", count: project.positions.백엔드 },
+    { key: "기타", label: "기타", count: project.positions.기타 },
   ].filter((position) => position.count > 0);
 
   return (
