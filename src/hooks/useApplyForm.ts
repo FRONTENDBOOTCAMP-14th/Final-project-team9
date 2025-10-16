@@ -3,8 +3,8 @@ import {
   ERROR_MESSAGES,
   FORM_CONSTANTS,
 } from "@/components/project-detail/constants";
-import type { FormErrors } from "@/components/project-detail/types";
 import { useDropdownStore } from "@/store/dropdown-store";
+import type { FormErrors } from "@/types/project";
 
 export function useApplyForm(isOpen: boolean) {
   const [reason, setReason] = useState("");
@@ -62,7 +62,7 @@ export function useApplyForm(isOpen: boolean) {
         setErrors((prev) => ({ ...prev, reason: "" }));
       }
     },
-    [errors.reason],
+    [errors.reason]
   );
 
   return {
