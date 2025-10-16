@@ -39,7 +39,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       icon: "bg-transparent rounded-full hover:bg-gray-200",
     } as const;
 
-    // 지금은 임시 값
     const sizeStyles = {
       sm: "w-[183px] h-[53px] text-[24px] rounded-[5px]",
       md: "w-[270px] h-[90px] text-[28px] rounded-[20px]",
