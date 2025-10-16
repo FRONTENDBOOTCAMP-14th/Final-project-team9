@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import UserProfileCard from "@/components/mypage/Profile";
+import Taps from "@/components/mypage/Taps";
 
 export default async function MyPage() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -15,14 +16,19 @@ export default async function MyPage() {
 
   const supabase = createServerClient(supabaseUrl, supabaseKey, {
     cookies: {
-      getAll() {
-        return cookieStore.getAll();
+      get(name: string) {
+        return cookieStore.get(name)?.value;
       },
-      setAll(cookiesToSet) {
+      set(name: string, value: string, options: object) {
         try {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          );
+          cookieStore.set(name, value, options);
+        } catch {
+          // Server Component에서는 cookie 설정 불가
+        }
+      },
+      remove(name: string, options: object) {
+        try {
+          cookieStore.set(name, "", options);
         } catch {
           // Server Component에서는 cookie 설정 불가
         }
