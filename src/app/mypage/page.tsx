@@ -102,6 +102,7 @@ export default async function MyPage() {
         skills={userData.skills}
         projectCounts={userData.projectCounts}
       />
+      <Taps />
     </div>
   );
 }
