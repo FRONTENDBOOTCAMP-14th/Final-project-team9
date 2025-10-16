@@ -43,7 +43,7 @@ const FoundIdDisplay = ({ foundId }: FoundIdDisplayProps) => {
       </Button>
 
       <Link
-        href="/find-pw"
+        href="/find-password"
         className="text-[#90A5EA] text-[20px] mt-5 hover:underline"
       >
         비밀번호 찾기
