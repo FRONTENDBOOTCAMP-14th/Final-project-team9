@@ -6,6 +6,8 @@ export interface ProjectDetail {
   title: string;
   description: string;
   category: string; // "앱 개발", "웹 개발" 등
+  // 기술 스택 (통합 사용)
+  techStack?: string[];
 
   // 팀 정보
   teamSize: number; // 팀원 수 (예: 5명)
@@ -38,6 +40,8 @@ export interface ProjectHeaderInfo {
   title: string;
   description: string;
   category: string;
+  // 프로젝트 카드/헤더에서도 동일 키 사용
+  techStack?: string[];
   teamSize: number;
   estimatedPeriod: string;
   duration: string;
