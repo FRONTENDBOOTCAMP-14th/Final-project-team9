@@ -5,17 +5,54 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import LabeledInput from "@/components/common/LabeledInput";
+import { supabase } from "@/lib/supabase";
 
 const LoginForm = () => {
+  const router = useRouter();
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // supabese users table에는 비밀번호를 저장하지 않기 때문에 username(아이디)로 supabase.auth에서 email을 파싱 후 검증
+  const handleLogin = async (username: string, password: string) => {
+    try {
+      const { data: users, error: fetchError } = await supabase
+        .from("users")
+        .select("email")
+        .eq("username", username)
+        .single();
+
+      if (fetchError || !users) throw new Error("사용자를 찾을 수 없습니다.");
+
+      const email = users.email;
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+      console.log("로그인 성공", data);
+      router.push("/");
+    } catch (error: any) {
+      console.error("로그인 오류: ", error.message);
+      throw error;
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("로그인 시도:", { id, password });
+    setError(null);
+
+    try {
+      await handleLogin(id, password);
+    } catch (error: any) {
+      setError(error.message);
+    }
   };
 
   return (
@@ -31,7 +68,7 @@ const LoginForm = () => {
       </div>
 
       {/* form 태그의 gap을 없애고 각 요소에 직접 마진을 줍니다. */}
-      <form onSubmit={handleSubmit} className="flex flex-col">
+      <form onSubmit={(e) => handleSubmit} className="flex flex-col">
         <LabeledInput
           id="login-id"
           label="아이디를 입력하세요"
@@ -76,6 +113,13 @@ const LoginForm = () => {
             }
           />
         </div>
+
+        {/* 로그인 에러 메시지 표시 (커스텀좀 부탁드려요 ㅎㅎ..) */}
+        {error && (
+          <p className="text-red-500 text-center mt-[10px] text-[16px]">
+            {error}
+          </p>
+        )}
 
         {/* 비밀번호와 로그인 버튼 사이 간격: 40px */}
         <Button
