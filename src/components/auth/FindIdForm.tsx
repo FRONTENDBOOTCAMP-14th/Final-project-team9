@@ -3,10 +3,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // next/navigation에서 useRouter를 가져옵니다.
 import Image from "next/image";
-import LabeledInput from "@/components/common/LabeledInput";
+import { useRouter } from "next/navigation"; // next/navigation에서 useRouter를 가져옵니다.
 import Button from "@/components/common/Button";
+import LabeledInput from "@/components/common/LabeledInput";
 
 const FindIdForm = () => {
   const router = useRouter(); // useRouter 훅을 사용합니다.

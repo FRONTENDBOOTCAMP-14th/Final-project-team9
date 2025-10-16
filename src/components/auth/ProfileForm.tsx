@@ -1,115 +1,115 @@
 // src/components/auth/ProfileForm.tsx
 
-'use client'
+"use client";
 
-import { useState, useRef } from 'react'
-import Image from 'next/image'
-import Button from '@/components/common/Button'
-import Dropdown from '@/components/common/input/Dropdown' // 팀원의 드롭다운 컴포넌트 경로
-import LabeledInput from '@/components/common/LabeledInput'
-import { supabase } from '@/lib/supabase'
-import { useDropdownStore } from '@/store/dropdown-store'
+import { useState, useRef } from "react";
+import Image from "next/image";
+import Button from "@/components/common/Button";
+import Dropdown from "@/components/common/input/Dropdown"; // 팀원의 드롭다운 컴포넌트 경로
+import LabeledInput from "@/components/common/LabeledInput";
+import { supabase } from "@/lib/supabase";
+import { useDropdownStore } from "@/store/dropdown-store";
 
 const ProfileForm = () => {
   // 1. 프로필 폼에 필요한 값들을 state로 관리합니다.
-  const [nickname, setNickname] = useState('')
-  const [introduction, setIntroduction] = useState('')
-  const { selectedValues } = useDropdownStore()
+  const [nickname, setNickname] = useState("");
+  const [introduction, setIntroduction] = useState("");
+  const { selectedValues } = useDropdownStore();
   const [profileImage, setProfileImage] = useState<string>(
-    '/assets/no-profile.svg',
-  )
-  const [profileImageFile, setProfileImageFile] = useState<File | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+    "/assets/no-profile.svg"
+  );
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 드롭다운에 표시될 옵션들
-  const positionOptions = ['프론트엔드', '백엔드', '디자이너', '기획자']
+  const positionOptions = ["프론트엔드", "백엔드", "디자이너", "기획자"];
   const experienceOptions = [
-    '신입(1년 미만)',
-    '주니어(1~3년)',
-    '미들(3~5년)',
-    '시니어(5년 이상)',
-  ]
+    "신입(1년 미만)",
+    "주니어(1~3년)",
+    "미들(3~5년)",
+    "시니어(5년 이상)",
+  ];
 
   const handleImageClick = () => {
-    fileInputRef.current?.click()
-  }
+    fileInputRef.current?.click();
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
       // 이미지 파일인지 확인
-      if (!file.type.startsWith('image/')) {
-        alert('이미지 파일만 업로드 가능합니다.')
-        return
+      if (!file.type.startsWith("image/")) {
+        alert("이미지 파일만 업로드 가능합니다.");
+        return;
       }
 
       // 파일 크기 제한 (10MB)
       if (file.size > 10 * 1024 * 1024) {
-        alert('파일 크기는 10MB 이하여야 합니다.')
-        return
+        alert("파일 크기는 10MB 이하여야 합니다.");
+        return;
       }
 
-      setProfileImageFile(file)
+      setProfileImageFile(file);
 
       // 미리보기 이미지 생성
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setProfileImage(reader.result as string)
-      }
-      reader.readAsDataURL(file)
+        setProfileImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    const position = selectedValues['포지션']
-    const career = selectedValues['경력']
+    const position = selectedValues["포지션"];
+    const career = selectedValues["경력"];
 
-    if (!position || !career) return alert('포지션과 경력을 선택해주세요.')
+    if (!position || !career) return alert("포지션과 경력을 선택해주세요.");
 
     const {
       data: { user },
       error: userError,
-    } = await supabase.auth.getUser()
+    } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      alert('회원가입을 다시 해주세요!')
-      return
+      alert("회원가입을 다시 해주세요!");
+      return;
     }
 
-    const username = user.user_metadata?.username
+    const username = user.user_metadata?.username;
 
-    const position_id = positionOptions.indexOf(position) + 1
-    const career_id = experienceOptions.indexOf(career) + 1
+    const position_id = positionOptions.indexOf(position) + 1;
+    const career_id = experienceOptions.indexOf(career) + 1;
 
-    let profileImageUrl = null
+    let profileImageUrl = null;
 
     // 프로필 이미지 업로드
     if (profileImageFile) {
-      const fileExt = profileImageFile.name.split('.').pop()
-      const fileName = `${user.id}-${Date.now()}.${fileExt}`
-      const filePath = `profiles/${fileName}`
+      const fileExt = profileImageFile.name.split(".").pop();
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const filePath = `profiles/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('profile-images')
-        .upload(filePath, profileImageFile)
+        .from("profile-images")
+        .upload(filePath, profileImageFile);
 
       if (uploadError) {
-        console.error('이미지 업로드 실패:', uploadError)
-        alert('프로필 이미지 업로드에 실패했습니다.')
-        return
+        console.error("이미지 업로드 실패:", uploadError);
+        alert("프로필 이미지 업로드에 실패했습니다.");
+        return;
       }
 
       // 업로드된 이미지의 public URL 가져오기
       const { data: publicUrlData } = supabase.storage
-        .from('profile-images')
-        .getPublicUrl(filePath)
+        .from("profile-images")
+        .getPublicUrl(filePath);
 
-      profileImageUrl = publicUrlData.publicUrl
+      profileImageUrl = publicUrlData.publicUrl;
     }
 
-    const { error: insertError } = await supabase.from('users').insert({
+    const { error: insertError } = await supabase.from("users").insert({
       id: user.id,
       email: user.email,
       username,
@@ -118,17 +118,26 @@ const ProfileForm = () => {
       position_id,
       career_id,
       profile_image: profileImageUrl,
-    })
+    });
 
     if (insertError) {
-      console.error(insertError)
-      alert('프로필 등록에 실패했습니다.')
-      return
+      console.error(insertError);
+      alert("프로필 등록에 실패했습니다.");
+      return;
     }
 
-    alert('프로필 등록 완료!')
-    window.location.href = '/'
-  }
+    // user_metadata에도 프로필 이미지 URL 저장
+    if (profileImageUrl) {
+      await supabase.auth.updateUser({
+        data: {
+          profile_image: profileImageUrl,
+        },
+      });
+    }
+
+    alert("프로필 등록 완료!");
+    window.location.href = "/";
+  };
 
   return (
     <div className="w-full max-w-[615px]">
@@ -147,7 +156,7 @@ const ProfileForm = () => {
               width={200}
               height={200}
               className="object-cover"
-              unoptimized={profileImage.startsWith('data:')}
+              unoptimized={profileImage.startsWith("data:")}
             />
           </div>
           <div className="absolute bottom-0 right-0 w-[50px] h-[50px] bg-[#16296D] rounded-full flex items-center justify-center text-white pointer-events-none group-hover:opacity-80 transition-opacity">
@@ -234,7 +243,7 @@ const ProfileForm = () => {
         </Button>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default ProfileForm
+export default ProfileForm;

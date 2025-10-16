@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Button from "@/components/common/Button";
 import Dropdown from "@/components/common/input/Dropdown";
+import { supabase } from "@/lib/supabase";
 import { useDropdownStore } from "@/store/dropdown-store";
 import type { UserProfileCardProps } from "./Profile"; // 파일 경로 확인 필요
 
@@ -53,6 +54,7 @@ export default function ProfileEditModal({
   const modalRef = useRef<HTMLDivElement>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
 
   // 상수 분리
   const MAX_SKILLS = 3;
@@ -85,6 +87,21 @@ export default function ProfileEditModal({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // 이미지 파일인지 확인
+      if (!file.type.startsWith("image/")) {
+        alert("이미지 파일만 업로드 가능합니다.");
+        return;
+      }
+
+      // 파일 크기 제한 (10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert("파일 크기는 10MB 이하여야 합니다.");
+        return;
+      }
+
+      setProfileImageFile(file);
+
+      // 미리보기 이미지 생성
       const newImageUrl = URL.createObjectURL(file);
       setFormData((prev) => ({ ...prev, profileImageUrl: newImageUrl }));
     }
@@ -153,7 +170,7 @@ export default function ProfileEditModal({
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -171,9 +188,81 @@ export default function ProfileEditModal({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validateForm()) {
-      onSave(formData);
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    try {
+      // 프로필 이미지 업로드 처리
+      let profileImageUrl = formData.profileImageUrl;
+
+      // 새로운 이미지 파일이 있을 때만 업로드
+      if (profileImageFile) {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+          alert("로그인이 필요합니다.");
+          return;
+        }
+
+        const fileExt = profileImageFile.name.split(".").pop();
+        const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+        const filePath = `profiles/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("profile-images")
+          .upload(filePath, profileImageFile);
+
+        if (uploadError) {
+          console.error("이미지 업로드 실패:", uploadError);
+          alert("프로필 이미지 업로드에 실패했습니다.");
+          return;
+        }
+
+        // 업로드된 이미지의 public URL 가져오기
+        const { data: publicUrlData } = supabase.storage
+          .from("profile-images")
+          .getPublicUrl(filePath);
+
+        profileImageUrl = publicUrlData.publicUrl;
+
+        // users 테이블 업데이트
+        const { error: updateError } = await supabase
+          .from("users")
+          .update({ profile_image: profileImageUrl })
+          .eq("id", user.id);
+
+        if (updateError) {
+          console.error("users 테이블 업데이트 실패:", updateError);
+        }
+
+        // user_metadata 업데이트
+        const { error: metadataError } = await supabase.auth.updateUser({
+          data: {
+            profile_image: profileImageUrl,
+          },
+        });
+
+        if (metadataError) {
+          console.error("user_metadata 업데이트 실패:", metadataError);
+        }
+      } else {
+        // 이미지를 변경하지 않았다면 기존 URL 유지
+        // blob URL이 아닌 원본 URL 사용
+        if (
+          formData.profileImageUrl?.startsWith("blob:") ||
+          formData.profileImageUrl?.startsWith("data:")
+        ) {
+          profileImageUrl = user.profileImageUrl; // 원본 user 데이터의 URL 사용
+        }
+      }
+
+      // 업데이트된 프로필 정보 저장
+      onSave({ ...formData, profileImageUrl });
+    } catch (error) {
+      console.error("프로필 업데이트 실패:", error);
+      alert("프로필 업데이트에 실패했습니다.");
     }
   };
 
@@ -361,7 +450,11 @@ export default function ProfileEditModal({
           >
             <span>취소</span>
           </Button>
-          <Button size="xl" onClick={handleSubmit} className="border-">
+          <Button
+            size="xl"
+            onClick={() => void handleSubmit()}
+            className="border-"
+          >
             <span>완료</span>
           </Button>
         </div>

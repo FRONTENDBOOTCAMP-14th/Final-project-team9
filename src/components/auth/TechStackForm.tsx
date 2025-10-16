@@ -2,7 +2,8 @@
 
 "use client";
 
-import { useState, useEffect, KeyboardEvent } from "react";
+import type { KeyboardEvent } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Button from "@/components/common/Button";
 import TagList from "@/components/common/tag/TagList";
@@ -28,7 +29,7 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
       const filtered = ALL_STACKS.filter(
         (stack) =>
           stack.toLowerCase().includes(searchTerm.toLowerCase()) &&
-          !selectedStacks.includes(stack)
+          !selectedStacks.includes(stack),
       );
       setFilteredStacks(filtered);
     } else {
@@ -50,7 +51,7 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
 
   const handleRemoveStack = (stackToRemove: string) => {
     setSelectedStacks(
-      selectedStacks.filter((stack) => stack !== stackToRemove)
+      selectedStacks.filter((stack) => stack !== stackToRemove),
     );
   };
 
@@ -64,7 +65,7 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
       e.preventDefault();
       setActiveIndex(
         (prevIndex) =>
-          (prevIndex - 1 + filteredStacks.length) % filteredStacks.length
+          (prevIndex - 1 + filteredStacks.length) % filteredStacks.length,
       );
     } else if (e.key === "Enter") {
       e.preventDefault();

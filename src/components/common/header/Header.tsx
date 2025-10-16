@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import LoginButton from "./atoms/LoginButton";
 import Logo from "./atoms/Logo";
 import Navigation from "./atoms/Navigation";
+import ProfileImage from "./atoms/ProfileImage";
 
 interface HeaderProps {
   variant?: "transparent" | "white";
@@ -33,7 +34,10 @@ export default function Header({ variant = "transparent" }: HeaderProps) {
       <div className="w-full max-w-[1920px] mx-auto h-full flex items-center justify-between px-8">
         <Logo />
         <Navigation />
-        <LoginButton />
+        <div className="flex items-center gap-[24px]">
+          <ProfileImage />
+          <LoginButton />
+        </div>
       </div>
     </header>
   );

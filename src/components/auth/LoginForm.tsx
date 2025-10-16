@@ -17,29 +17,93 @@ const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // supabese users table에는 비밀번호를 저장하지 않기 때문에 username(아이디)로 supabase.auth에서 email을 파싱 후 검증
+  // Supabase Auth의 user_metadata에서 username으로 사용자 찾기
   const handleLogin = async (username: string, password: string) => {
     try {
-      const { data: users, error: fetchError } = await supabase
+      // users 테이블에서 username으로 email 찾기
+      const { data: userData } = await supabase
         .from("users")
-        .select("email")
+        .select("email, username")
         .eq("username", username)
-        .single();
+        .maybeSingle();
 
-      if (fetchError || !users) throw new Error("사용자를 찾을 수 없습니다.");
+      // users 테이블에 데이터가 없으면, Supabase Auth에서 직접 로그인 시도
+      if (!userData?.email) {
+        // 사용자에게 이메일 입력 요청
+        const email = prompt(
+          `${username} 계정의 이메일 주소를 입력해주세요.\n(회원가입 시 사용한 이메일)`
+        );
 
-      const email = users.email;
+        if (!email) {
+          throw new Error("이메일 주소가 필요합니다.");
+        }
+
+        // 이메일로 로그인 시도
+        const { data: authData, error: authError } =
+          await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+        if (authError) {
+          throw new Error("이메일 또는 비밀번호가 올바르지 않습니다.");
+        }
+
+        // 로그인 성공 후 users 테이블 확인 및 생성
+        const { data: existingUser } = await supabase
+          .from("users")
+          .select("id")
+          .eq("id", authData.user.id)
+          .maybeSingle();
+
+        if (!existingUser) {
+          const { error: insertError } = await supabase.from("users").insert({
+            id: authData.user.id,
+            email,
+            username,
+            nickname: username, // 기본값으로 username 사용
+            bio: null,
+            position_id: 1, // 기본값: 첫 번째 포지션
+            career_id: 1, // 기본값: 첫 번째 경력
+            profile_image: null,
+          });
+
+          if (insertError) {
+            console.error("users 테이블 생성 실패:", insertError);
+          }
+        }
+
+        router.push("/");
+        return;
+      }
+
+      // users 테이블에 데이터가 있으면 정상 로그인
+      const email = userData.email;
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
-      console.log("로그인 성공", data);
+      if (error) {
+        throw new Error("아이디 또는 비밀번호가 올바르지 않습니다.");
+      }
+
+      // 로그인 성공 후 user_metadata의 username 확인
+      const loggedInUsername = data.user?.user_metadata?.username;
+      if (loggedInUsername && loggedInUsername !== username) {
+        // username이 일치하지 않으면 로그아웃
+        await supabase.auth.signOut();
+        throw new Error("아이디 또는 비밀번호가 올바르지 않습니다.");
+      }
+
       router.push("/");
-    } catch (error: any) {
-      console.error("로그인 오류: ", error.message);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "로그인 중 오류가 발생했습니다.";
+      console.error("로그인 오류: ", errorMessage);
       throw error;
     }
   };
@@ -50,8 +114,12 @@ const LoginForm = () => {
 
     try {
       await handleLogin(id, password);
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("로그인 중 오류가 발생했습니다.");
+      }
     }
   };
 
@@ -68,7 +136,12 @@ const LoginForm = () => {
       </div>
 
       {/* form 태그의 gap을 없애고 각 요소에 직접 마진을 줍니다. */}
-      <form onSubmit={(e) => handleSubmit} className="flex flex-col">
+      <form
+        onSubmit={(e) => {
+          void handleSubmit(e);
+        }}
+        className="flex flex-col"
+      >
         <LabeledInput
           id="login-id"
           label="아이디를 입력하세요"
