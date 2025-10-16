@@ -4,6 +4,7 @@
 
 import { useState, useRef } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import Dropdown from "@/components/common/input/Dropdown"; // 팀원의 드롭다운 컴포넌트 경로
 import LabeledInput from "@/components/common/LabeledInput";
@@ -11,12 +12,13 @@ import { supabase } from "@/lib/supabase";
 import { useDropdownStore } from "@/store/dropdown-store";
 
 const ProfileForm = () => {
+  const router = useRouter();
   // 1. 프로필 폼에 필요한 값들을 state로 관리합니다.
   const [nickname, setNickname] = useState("");
   const [introduction, setIntroduction] = useState("");
   const { selectedValues } = useDropdownStore();
   const [profileImage, setProfileImage] = useState<string>(
-    "/assets/no-profile.svg"
+    "/assets/no-profile.svg",
   );
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -89,7 +91,7 @@ const ProfileForm = () => {
     if (profileImageFile) {
       const fileExt = profileImageFile.name.split(".").pop();
       const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-      const filePath = `profiles/${fileName}`;
+      const filePath = `profiles/${user.id}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from("profile-images")
@@ -136,7 +138,7 @@ const ProfileForm = () => {
     }
 
     alert("프로필 등록 완료!");
-    window.location.href = "/";
+    router.push("/");
   };
 
   return (
