@@ -1,8 +1,8 @@
 import ProjectCard from "@/components/common/project-card/ProjectCard";
-import type { Project } from "@/types/project";
+import type { ProjectCard as ProjectCardType } from "@/types/project";
 
 interface SearchResultsSectionProps {
-  results: Project[];
+  results: ProjectCardType[];
 }
 
 export default function SearchResultsSection({
