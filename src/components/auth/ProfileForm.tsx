@@ -18,7 +18,7 @@ const ProfileForm = () => {
   const [introduction, setIntroduction] = useState("");
   const { selectedValues } = useDropdownStore();
   const [profileImage, setProfileImage] = useState<string>(
-    "/assets/no-profile.svg",
+    "/assets/no-profile.svg"
   );
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -138,7 +138,7 @@ const ProfileForm = () => {
     }
 
     alert("프로필 등록 완료!");
-    router.push("/");
+    router.push("/onboarding/tech-stack");
   };
 
   return (

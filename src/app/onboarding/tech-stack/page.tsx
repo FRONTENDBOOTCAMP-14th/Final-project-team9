@@ -1,15 +1,27 @@
-// src/app/onboarding/tech-stack/page.tsx
+"use client";
 
+import AuthLayout from "@/components/auth/AuthLayout";
 import TechStackSelect from "@/components/auth/TechStackForm";
+import { useUserNickname } from "@/hooks/useUserNickname";
 
 export default function TechStackPage() {
-  // 실제로는 이전 페이지나 DB에서 닉네임 정보를 받아와야 하지만,
-  // 우선 오류 없이 화면을 확인하기 위해 임시 닉네임을 전달합니다.
-  const tempNickname = "조인";
+  const { nickname, isLoading } = useUserNickname();
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        사용자 정보를 불러오는 중...
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <TechStackSelect nickname={tempNickname} />
-    </div>
+    <AuthLayout title="회원가입">
+      {nickname ? (
+        <TechStackSelect nickname={nickname} />
+      ) : (
+        <div>닉네임 정보를 불러올 수 없습니다.</div>
+      )}
+    </AuthLayout>
   );
 }

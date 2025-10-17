@@ -1,15 +1,12 @@
-// src/components/auth/FindIdForm.tsx
-
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation"; // next/navigation에서 useRouter를 가져옵니다.
+import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import LabeledInput from "@/components/common/LabeledInput";
 
 const FindIdForm = () => {
-  const router = useRouter(); // useRouter 훅을 사용합니다.
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [authCode, setAuthCode] = useState("");
   const [isAuthCodeSent, setIsAuthCodeSent] = useState(false);
@@ -22,30 +19,14 @@ const FindIdForm = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // TODO: 나중에 실제 API 호출로 아이디를 받아옵니다.
-    const fetchedIdFromServer = "joyin-frontend"; // 가상 데이터
+    const fetchedIdFromServer = "joyin-frontend";
     const maskedId = maskId(fetchedIdFromServer);
-
-    // 찾은 아이디를 쿼리 파라미터로 담아 result 페이지로 이동시킵니다.
     router.push(`/find-id/result?id=${maskedId}`);
   };
 
   return (
-    <div className="w-full max-w-[615px]">
-      <div className="flex justify-center mb-[40px]">
-        <Image
-          src="/assets/joyin-logo.webp"
-          alt="Joyin 로고"
-          width={80}
-          height={80}
-        />
-      </div>
-      <div className="text-center mb-8">
-        <h1 className="text-[32px] text-[#2E4FF1] font-bold">아이디 찾기</h1>
-      </div>
-
+    <div className="w-full max-w-[6-15px]">
       <form onSubmit={handleSubmit} className="flex flex-col">
-        {/* ... (폼 UI 부분은 동일) ... */}
         <div className="flex items-end gap-2">
           <LabeledInput
             id="find-id-email"

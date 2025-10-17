@@ -1,12 +1,9 @@
-// src/components/auth/FindPasswordForm.tsx
-
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Button from "@/components/common/Button";
 import LabeledInput from "@/components/common/LabeledInput";
-import ResetPasswordForm from "./ResetPasswordForm"; // [추가]
+import ResetPasswordForm from "./ResetPasswordForm";
 
 const FindPasswordForm = () => {
   const [id, setId] = useState("");
@@ -21,25 +18,12 @@ const FindPasswordForm = () => {
     setIsVerified(true); // 인증 성공 시 화면 전환
   };
 
-  // 인증이 완료되면 ResetPasswordForm을 보여줍니다.
   if (isVerified) {
     return <ResetPasswordForm />;
   }
 
-  // 인증 전에는 본인 인증 폼을 보여줍니다.
   return (
     <div className="w-full max-w-[615px]">
-      <div className="flex justify-center mb-[40px]">
-        <Image
-          src="/assets/joyin-logo.webp"
-          alt="Joyin 로고"
-          width={80}
-          height={80}
-        />
-      </div>
-      <div className="text-center mb-8">
-        <h1 className="text-[32px] text-[#2E4FF1] font-bold">비밀번호 찾기</h1>
-      </div>
       <form onSubmit={handleVerificationSubmit} className="flex flex-col">
         <LabeledInput
           id="find-pw-id"

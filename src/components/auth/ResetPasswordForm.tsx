@@ -1,5 +1,3 @@
-// src/components/auth/ResetPasswordForm.tsx
-
 "use client";
 
 import { useState } from "react";
@@ -12,7 +10,7 @@ const ResetPasswordForm = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmError, setConfirmError] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // 비밀번호 보이기 상태 추가
+  const [showPassword, setShowPassword] = useState(false);
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -41,29 +39,17 @@ const ResetPasswordForm = () => {
 
   return (
     <div className="w-full max-w-[615px]">
-      <div className="flex justify-center mb-[40px]">
-        <Image
-          src="/assets/joyin-logo.webp"
-          alt="Joyin 로고"
-          width={80}
-          height={80}
-        />
-      </div>
-      <div className="text-center mb-8">
-        <h1 className="text-[32px] text-[#2E4FF1] font-bold">비밀번호 찾기</h1>
-      </div>
-
+      {/* 로고와 제목은 AuthLayout에서 처리하므로 여기서 제거합니다. */}
       <form onSubmit={handleResetSubmit} className="flex flex-col">
         {/* 새 비밀번호 입력 */}
         <LabeledInput
           id="new-password"
           label="새 비밀번호"
-          type={showPassword ? "text" : "password"} // showPassword 상태에 따라 타입 변경
+          type={showPassword ? "text" : "password"}
           value={newPassword}
           onChange={handlePasswordChange}
           error={passwordError}
           containerClassName="w-full"
-          // 비밀번호 보이기/숨기기 아이콘 추가
           icon={
             <button
               type="button"
@@ -95,7 +81,7 @@ const ResetPasswordForm = () => {
           <LabeledInput
             id="confirm-password"
             label="새 비밀번호 확인"
-            type={showPassword ? "text" : "password"} // showPassword 상태에 따라 타입 변경
+            type={showPassword ? "text" : "password"}
             value={confirmPassword}
             onChange={handleConfirmChange}
             error={confirmError}
