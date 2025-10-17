@@ -1,7 +1,6 @@
+import type { LinkType } from "@/components/auth/AuthNavigationLinks";
+import AuthNavigationLinks from "@/components/auth/AuthNavigationLinks";
 import HeaderLogo from "@/components/auth/HeaderLogo";
-import AuthNavigationLinks, {
-  LinkType,
-} from "@/components/auth/AuthNavigationLinks";
 
 interface AuthLayoutProps {
   /** 이 레이아웃이 감쌀 자식 요소 (예: LoginForm, SignUpForm) */

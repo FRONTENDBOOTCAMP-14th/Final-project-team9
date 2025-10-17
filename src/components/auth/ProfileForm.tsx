@@ -18,7 +18,7 @@ const ProfileForm = () => {
   const [introduction, setIntroduction] = useState("");
   const { selectedValues } = useDropdownStore();
   const [profileImage, setProfileImage] = useState<string>(
-    "/assets/no-profile.svg"
+    "/assets/no-profile.svg",
   );
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);

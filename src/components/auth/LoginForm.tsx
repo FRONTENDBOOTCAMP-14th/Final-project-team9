@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import LabeledInput from "@/components/common/LabeledInput";
 import { supabase } from "@/lib/supabase";
-import Image from "next/image";
 
 const LoginForm = () => {
   const router = useRouter();
