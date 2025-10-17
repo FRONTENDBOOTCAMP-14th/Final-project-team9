@@ -1,10 +1,7 @@
-// src/components/auth/LoginForm.tsx
-
 "use client";
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import LabeledInput from "@/components/common/LabeledInput";
@@ -68,17 +65,7 @@ const LoginForm = () => {
 
   return (
     <div className="w-full max-w-[615px]">
-      {/* 로고와 아이디 입력창 사이 간격: 40px */}
-      <div className="flex justify-center mb-[40px]">
-        <Image
-          src="/assets/joyin-logo.webp"
-          alt="Joyin 로고"
-          width={80}
-          height={80}
-        />
-      </div>
-
-      {/* form 태그의 gap을 없애고 각 요소에 직접 마진을 줍니다. */}
+      {/* 로고와 하단 링크 부분이 모두 제거되었습니다. */}
       <form
         onSubmit={(e) => {
           void handleSubmit(e);
@@ -94,7 +81,6 @@ const LoginForm = () => {
           containerClassName="w-full h-[80px]"
         />
 
-        {/* 아이디와 비밀번호 입력창 사이 간격: 20px */}
         <div className="mt-[20px]">
           <LabeledInput
             id="login-password"
@@ -130,14 +116,12 @@ const LoginForm = () => {
           />
         </div>
 
-        {/* 로그인 에러 메시지 표시 (커스텀좀 부탁드려요 ㅎㅎ..) */}
         {error && (
           <p className="text-red-500 text-center mt-[10px] text-[16px]">
             {error}
           </p>
         )}
 
-        {/* 비밀번호와 로그인 버튼 사이 간격: 40px */}
         <Button
           type="submit"
           size="lg"
@@ -146,24 +130,6 @@ const LoginForm = () => {
           로그인
         </Button>
       </form>
-
-      {/* 로그인 버튼과 하단 링크 사이 간격: 20px */}
-      {/* 하단 링크 스타일: 색상, 글자 크기, 높이 등 모두 반영 */}
-      <div className="mt-[20px] flex justify-between items-center text-[20px] text-[#90A5EA] h-[24px]">
-        <Link href="/sign-up" className="hover:underline">
-          회원가입
-        </Link>
-        <div className="flex items-center gap-2">
-          <Link href="/find-id" className="hover:underline">
-            아이디 찾기
-          </Link>
-          {/* 구분선 스타일: 글자 크기, 색상 반영 */}
-          <span className="text-[12px] text-black">|</span>
-          <Link href="/find-password" className="hover:underline">
-            비밀번호 찾기
-          </Link>
-        </div>
-      </div>
     </div>
   );
 };

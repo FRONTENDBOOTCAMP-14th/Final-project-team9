@@ -1,9 +1,6 @@
-// src/components/auth/SignUpForm.tsx
-
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import LabeledInput from "@/components/common/LabeledInput";
@@ -72,19 +69,7 @@ const SignUpForm = () => {
 
   return (
     <div className="w-full max-w-[615px]">
-      <div className="flex justify-center mb-[40px]">
-        <Image
-          src="/assets/joyin-logo.webp"
-          alt="Joyin 로고"
-          width={80}
-          height={80}
-        />
-      </div>
-
-      <div className="text-center mb-[40px]">
-        <h1 className="text-[32px] text-[#2E4FF2] font-[jalnan]">회원가입</h1>
-      </div>
-
+      {/* 로고와 제목은 AuthLayout에서 처리하므로 여기서 제거합니다. */}
       <form onSubmit={(e) => void handleSubmit(e)} className="flex flex-col">
         {/* 아이디 입력 */}
         <LabeledInput

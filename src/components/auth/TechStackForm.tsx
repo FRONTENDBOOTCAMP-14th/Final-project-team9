@@ -1,15 +1,12 @@
-// src/components/auth/TechStackSelect.tsx
-
 "use client";
 
 import type { KeyboardEvent } from "react";
 import { useState, useEffect } from "react";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import TagList from "@/components/common/tag/TagList";
 import { ALL_STACKS } from "@/constants/stacks";
 
-// 상수를 사용해 유지보수성을 높입니다.
 const MAX_STACK_COUNT = 3;
 
 interface TechStackSelectProps {
@@ -17,11 +14,10 @@ interface TechStackSelectProps {
 }
 
 const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredStacks, setFilteredStacks] = useState<string[]>([]);
   const [selectedStacks, setSelectedStacks] = useState<string[]>([]);
-
-  // 키보드 네비게이션을 위한 상태 (현재 하이라이트된 아이템의 인덱스)
   const [activeIndex, setActiveIndex] = useState(-1);
 
   useEffect(() => {
@@ -35,7 +31,6 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
     } else {
       setFilteredStacks([]);
     }
-    // 검색어가 바뀔 때마다 하이라이트를 초기화합니다.
     setActiveIndex(-1);
   }, [searchTerm, selectedStacks]);
 
@@ -77,10 +72,18 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
     }
   };
 
+  // 3. handleSubmit 함수를 임시 완료 로직으로 수정
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    // 나중에 이 부분에 실제 DB 저장 로직이 들어갑니다.
     console.log("최종 선택된 스택:", selectedStacks);
-    // 실제로는 여기서 API 호출 등의 로직이 실행됩니다.
+
+    // (임시) 사용자에게 가입 완료 알림을 보여줍니다.
+    alert("가입이 완료되었습니다! Joyin에 오신 것을 환영합니다.");
+
+    // (임시) 메인 페이지로 이동시킵니다.
+    // 나중에 complete 페이지가 만들어지면 '/onboarding/complete'로 경로만 바꿔주세요.
+    router.push("/");
   };
 
   const isMaxSelected = selectedStacks.length >= MAX_STACK_COUNT;
@@ -90,18 +93,6 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
 
   return (
     <div className="w-full max-w-[615px]">
-      {/* ... 상단 UI는 동일 ... */}
-      <div className="flex justify-center mb-[40px]">
-        <Image
-          src="/assets/joyin-logo.webp"
-          alt="Joyin 로고"
-          width={80}
-          height={80}
-        />
-      </div>
-      <div className="text-center mb-[40px]">
-        <h1 className="text-[32px] text-[#2E4FF2] font-[jalnan]">회원가입</h1>
-      </div>
       <div className="text-center mb-8">
         <h2 className="text-[32px] text-[#16296D]">
           <span className="font-bold">{nickname}</span>님 거의 다 왔어요!
@@ -109,7 +100,6 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col">
-        {/* ... input 부분은 동일 ... */}
         <div className="relative">
           <div className="w-[615px] h-[80px] rounded-[10px] border border-gray-300 bg-white flex items-center justify-between px-[30px]">
             <span className="text-black text-[24px] flex-shrink-0 mr-[91px]">
@@ -153,7 +143,6 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
           )}
         </div>
 
-        {/* --- 이 부분이 TagList 컴포넌트로 간단하게 바뀝니다 --- */}
         <div className="flex flex-wrap gap-4 mt-4 min-h-[40px]">
           <TagList
             items={selectedStacks}

@@ -1,9 +1,10 @@
+import AuthLayout from "@/components/auth/AuthLayout";
 import ProfileForm from "@/components/auth/ProfileForm";
 
-export default function SignUpNext() {
+export default function ProfilePage() {
   return (
-    <div>
+    <AuthLayout title="프로필 설정">
       <ProfileForm />
-    </div>
+    </AuthLayout>
   );
 }

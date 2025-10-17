@@ -1,9 +1,10 @@
+import AuthLayout from "@/components/auth/AuthLayout";
 import LoginForm from "@/components/auth/LoginForm";
 
 export default function LoginPage() {
   return (
-    <div>
+    <AuthLayout navType="login">
       <LoginForm />
-    </div>
+    </AuthLayout>
   );
 }

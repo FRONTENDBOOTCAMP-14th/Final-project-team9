@@ -138,7 +138,7 @@ const ProfileForm = () => {
     }
 
     alert("프로필 등록 완료!");
-    router.push("/");
+    router.push("/onboarding/tech-stack");
   };
 
   return (

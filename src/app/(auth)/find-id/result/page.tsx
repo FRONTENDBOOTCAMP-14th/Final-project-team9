@@ -1,13 +1,7 @@
-import FoundIdDisplay from "@/components/auth/FoundIdDisplay";
+// ❌ "use client" 제거 (서버 컴포넌트)
+import FindIdResultClient from "@/components/auth/FindIdResultClient";
 
 export default function FindIdResultPage() {
-  // 결과 표시 컴포넌트에 필요한 임시 데이터를 전달합니다.
-  // 실제 prop 이름은 컴포넌트 정의에 따라 다를 수 있습니다.
-  const tempFoundId = "joyin@example.com";
-
-  return (
-    <div>
-      <FoundIdDisplay foundId={tempFoundId} />
-    </div>
-  );
+  // 서버 페이지는 클라 훅을 쓰지 않고, 클라 컴포넌트를 렌더링만 합니다.
+  return <FindIdResultClient />;
 }
