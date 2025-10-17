@@ -106,7 +106,7 @@ const SignUpForm = () => {
         </div>
 
         {/* 이메일 입력 + 인증 버튼 */}
-        <div className="flex items-end gap-2 mt-[20px]">
+        <div className="flex items-end gap-[30px] mt-[20px]">
           <LabeledInput
             id="signup-email"
             label="이메일을 입력하세요"
