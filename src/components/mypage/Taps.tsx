@@ -56,7 +56,7 @@ const mockProjectsData: Record<string, Project[]> = {
       remain: 1,
       category: "앱 개발",
     },
-        {
+    {
       id: 3,
       title: "세 번째 나의 프로젝트",
       description: "설명",
@@ -69,7 +69,7 @@ const mockProjectsData: Record<string, Project[]> = {
       remain: 1,
       category: "앱 개발",
     },
-        {
+    {
       id: 4,
       title: "네 번째 나의 프로젝트",
       description: "설명",

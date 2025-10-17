@@ -4,10 +4,12 @@ import Header from "@/components/common/header/Header";
 import MyPageForm from "@/components/mypage/MyPageForm";
 
 export default async function MyPage() {
-  return <div className="bg-[#e9fafe] pt-35">
-    <Header />
-    <MyPageForm />
-    <Footer />
-    <GoTopButton />
+  return (
+    <div className="bg-[#e9fafe] pt-35">
+      <Header />
+      <MyPageForm />
+      <Footer />
+      <GoTopButton />
     </div>
+  );
 }
