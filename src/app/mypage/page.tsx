@@ -1,5 +1,13 @@
+import Footer from "@/components/common/footer/Footer";
+import GoTopButton from "@/components/common/GoTopButton";
+import Header from "@/components/common/header/Header";
 import MyPageForm from "@/components/mypage/MyPageForm";
 
 export default async function MyPage() {
-  return <MyPageForm />;
+  return <div className="bg-[#e9fafe] pt-35">
+    <Header />
+    <MyPageForm />
+    <Footer />
+    <GoTopButton />
+    </div>
 }
