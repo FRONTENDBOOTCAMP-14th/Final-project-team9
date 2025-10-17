@@ -7,15 +7,21 @@ interface AuthLayoutProps {
   children: React.ReactNode;
   title?: string;
   navType?: LinkType;
+  showLogo?: boolean;
 }
 
-const AuthLayout = ({ children, title, navType }: AuthLayoutProps) => {
+const AuthLayout = ({
+  children,
+  title,
+  navType,
+  showLogo,
+}: AuthLayoutProps) => {
   return (
     <div className="flex flex-col bg-[#E9FBFF]">
       <section className="grid place-items-center h-[min(100dvh,1080px)]">
         <div className="w-full max-w-[615px] mx-auto px-4 py-10 flex flex-col gap-10">
           <header className="w-full">
-            <HeaderLogo />
+            {showLogo !== false && <HeaderLogo />}
             {title && (
               <div className="text-center mt-10">
                 <h1 className="text-3xl text-[#2E4FF2] font-jalnan">{title}</h1>
