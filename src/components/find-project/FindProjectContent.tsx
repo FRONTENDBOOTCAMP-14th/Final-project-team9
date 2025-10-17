@@ -4,10 +4,10 @@ import { useState } from "react";
 import SearchFilterSection from "@/components/find-project/SearchFilterSection";
 import SearchResultsSection from "@/components/find-project/SearchResultsSection";
 import { useSearchFilterStore } from "@/store/search-filter-store";
-import type { Project } from "@/types/project";
+import type { ProjectCard } from "@/types/project";
 
 export default function FindProjectContent() {
-  const [searchResults, setSearchResults] = useState<Project[]>([]);
+  const [searchResults, setSearchResults] = useState<ProjectCard[]>([]);
   const { filters, hasSearched, setHasSearched } = useSearchFilterStore();
 
   const handleSearch = () => {

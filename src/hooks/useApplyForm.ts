@@ -62,7 +62,7 @@ export function useApplyForm(isOpen: boolean) {
         setErrors((prev) => ({ ...prev, reason: "" }));
       }
     },
-    [errors.reason]
+    [errors.reason],
   );
 
   return {

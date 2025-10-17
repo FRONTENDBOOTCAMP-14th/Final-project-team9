@@ -31,7 +31,7 @@ export default function TagList({
   // Fallback to dropdown store when items are not provided
   const derivedItems: TagListItem[] = items
     ? items.map((it) =>
-        typeof it === "string" ? { label: it, value: it } : it
+        typeof it === "string" ? { label: it, value: it } : it,
       )
     : Object.entries(selectedValues)
         .filter(([, value]) => value)
