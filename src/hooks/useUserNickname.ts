@@ -37,7 +37,7 @@ export const useUserNickname = () => {
       }
     };
 
-    fetchUserNickname();
+    void fetchUserNickname();
   }, []); // 컴포넌트가 처음 렌더링될 때 한 번만 실행
 
   // 이 훅을 사용하는 컴포넌트에게 닉네임과 로딩 상태를 반환합니다.
