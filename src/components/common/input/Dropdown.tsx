@@ -13,8 +13,8 @@ interface DropdownProps {
   height?: string;
   className?: string;
   required?: boolean;
-  onChange?: (selected: string) => void; // 이 부분 추가
-  value?: string; // 선택값 표시용
+  onChange?: (selected: string) => void;
+  value?: string;
 }
 
 export default function Dropdown({
@@ -24,7 +24,7 @@ export default function Dropdown({
   height = "96px",
   className,
   required,
-  onChange, // <- 반드시 여기 있어야 함
+  onChange,
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -58,7 +58,7 @@ export default function Dropdown({
   const handleSelect = (option: string) => {
     setSelected(placeholder ?? "", option);
     setIsOpen(false);
-    onChange?.(option); // optional chaining 사용
+    onChange?.(option);
   };
 
   const handleKeyDown = (

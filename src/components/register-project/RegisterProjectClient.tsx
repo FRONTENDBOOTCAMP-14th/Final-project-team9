@@ -133,11 +133,6 @@ export default function RegisterProjectClient() {
 
   const handleNext = () => {
     let canProceed = false;
-    console.log("Current Step:", currentStep);
-    console.log("BaseForm valid:", baseFormRef.current?.validate());
-    console.log("TeamForm valid:", teamFormRef.current?.validate());
-    console.log("DetailForm valid:", detailFormRef.current?.validate());
-
     switch (currentStep) {
       case 1:
         canProceed = baseFormRef.current?.validate() ?? false;
