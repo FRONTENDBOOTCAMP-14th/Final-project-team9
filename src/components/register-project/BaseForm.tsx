@@ -74,7 +74,10 @@ const BaseForm = forwardRef<BaseFormRef, BaseFormProps>(({ onSubmit }, ref) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2" style={{ gap: '130px' }}>
+      <div
+        className="grid grid-cols-1 lg:grid-cols-2 justify-items-center"
+        style={{ gap: '130px' }}
+      >
         {/* 프로젝트 이름 카드 */}
         <FormCard
           title="프로젝트 이름"
