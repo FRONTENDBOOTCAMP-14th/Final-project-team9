@@ -282,6 +282,8 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
                       placeholder={`포지션${index + 1}을 선택해주세요`}
                       width="848px"
                       height="90px"
+                      onChange={(value) => updatePositionRole(index, value)}
+                      value={position.role}
                     />
                   </div>
                   <div className="w-[369px] h-[90px] flex items-center border border-gray-200 rounded-lg px-[40px]">
