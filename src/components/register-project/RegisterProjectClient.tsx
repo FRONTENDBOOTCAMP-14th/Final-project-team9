@@ -43,34 +43,19 @@ export default function RegisterProjectClient() {
         return
       }
 
-      const fieldMap: Record<string, number> = {
-        '웹 개발': 1,
-        '모바일 앱': 2,
-        '시스템': 3,
-        '게임': 4,
-        '기타': 5,
-      }
+      // 프로젝트 등록 전에
+      // 1️⃣ 마스터 테이블에서 ID 조회
+      const { data: domains } = await supabase.from('domains').select('id,name')
+      const { data: fields } = await supabase.from('fields').select('id,name')
+      const { data: techStacksDB } = await supabase
+        .from('tech_stacks')
+        .select('id,name')
+      const { data: positionsDB } = await supabase
+        .from('positions')
+        .select('id,name')
 
-      const domainMap: Record<string, number> = {
-        이커머스: 1,
-        sns: 2,
-        게임: 3,
-        유틸: 4,
-        커뮤니티: 5,
-        기타: 6,
-      }
-
-      const scheduleMap: Record<string, number> = {
-        '1개월': 1,
-        '3개월': 2,
-        '6개월': 3,
-        '1년': 4,
-        '1년 이상': 5,
-      }
-
-      const fieldId = domainMap[baseData.category] // integer
-      const domainId = domainMap[teamData.domain] // integer
-      const scheduleId = scheduleMap[teamData.schedule] // integer
+      const domainId = domains?.find((d) => d.name === teamData.domain)?.id
+      const fieldId = fields?.find((f) => f.name === baseData.category)?.id
 
       const { data: project, error: projectError } = await supabase
         .from('projects')
@@ -82,7 +67,7 @@ export default function RegisterProjectClient() {
             deadline: baseData.deadline,
             short_description: baseData.description,
             domain_id: domainId,
-            expected_schedule: scheduleId,
+            expected_schedule: teamData.schedule,
             detail_plan: detailData.plan,
           },
         ])
@@ -93,20 +78,32 @@ export default function RegisterProjectClient() {
       const projectId = project.id
 
       if (teamData.techStack.length > 0) {
-        const techStacks = teamData.techStack.map((stackId) => ({
-          project_id: projectId,
-          tech_stack_id: Number(stackId),
-        }))
-        await supabase.from('project_tech_stacks').insert(techStacks)
+        const techStacksToInsert = await Promise.all(
+          teamData.techStack.map(async (name) => {
+            let stack = techStacksDB?.find((ts) => ts.name === name)
+            if (!stack) {
+              const { data, error } = await supabase
+                .from('tech_stacks')
+                .insert({ name })
+                .select()
+                .single()
+              if (error) throw error
+              stack = data
+            }
+            return { project_id: projectId, tech_stack_id: stack.id }
+          }),
+        )
+
+        await supabase.from('project_tech_stacks').insert(techStacksToInsert)
       }
 
       if (teamData.positions.length > 0) {
-        const positions = teamData.positions.map((pos) => ({
+        const positionsToInsert = teamData.positions.map((pos) => ({
           project_id: projectId,
           position_name: pos.role,
           recruit_count: pos.count,
         }))
-        await supabase.from('project_positions').insert(positions)
+        await supabase.from('project_positions').insert(positionsToInsert)
       }
 
       if (teamData.requirements.length > 0) {
@@ -164,19 +161,6 @@ export default function RegisterProjectClient() {
     }
   }
 
-  // const renderStepContent = () => {
-  //   switch (currentStep) {
-  //     case 1:
-  //       return <BaseForm ref={baseFormRef} onSubmit={() => {}} />
-  //     case 2:
-  //       return <TeamForm ref={teamFormRef} onSubmit={() => {}} />
-  //     case 3:
-  //       return <DetailForm ref={detailFormRef} onSubmit={() => {}} />
-  //     default:
-  //       return null
-  //   }
-  // }
-
   return (
     <>
       {/* 스텝바 영역 - 555px 여백 */}
@@ -186,7 +170,6 @@ export default function RegisterProjectClient() {
 
       {/* 폼 영역 - 224px 여백 */}
       <div className="pb-20 px-[224px] mt-[160px]">
-        {/* {renderStepContent()} */}
         <div className={currentStep === 1 ? '' : 'hidden'}>
           <BaseForm ref={baseFormRef} onSubmit={() => {}} />
         </div>
