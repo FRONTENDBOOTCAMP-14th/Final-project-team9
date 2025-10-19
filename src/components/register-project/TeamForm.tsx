@@ -156,7 +156,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
       <form>
         {/* 상단 2개 카드 - 2열 그리드 */}
         <div
-          className="grid grid-cols-1 lg:grid-cols-2"
+          className="grid grid-cols-1 lg:grid-cols-2 justify-items-center"
           style={{ gap: '130px' }}
         >
           <FormCard
@@ -193,7 +193,10 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
         </div>
 
         {/* 하단 4개 카드 - 각각 전체 너비 차지 (1473x351) */}
-        <div style={{ marginTop: '130px' }} className="space-y-[130px]">
+        <div
+          style={{ marginTop: '130px' }}
+          className="space-y-[130px] flex flex-col items-center"
+        >
           {/* 기술 스택 카드 */}
           <FormCard
             title="기술 스택"
@@ -271,7 +274,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
                       options={
                         positions.length ? positions : ['불러오는 중...']
                       }
-                      placeholder="포지션을 선택해주세요"
+                      placeholder={`포지션${index + 1}을 선택해주세요`}
                       width="848px"
                       height="90px"
                     />
