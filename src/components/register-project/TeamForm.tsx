@@ -1,25 +1,25 @@
-'use client'
+"use client";
 
 import React, {
   forwardRef,
   useImperativeHandle,
   useEffect,
   useState,
-} from 'react'
-import Dropdown from '@/components/common/input/Dropdown'
-import TechStackSearchBar from '@/components/common/search-bar/TechStackSearchBar'
-import { useDropdownStore } from '@/store/dropdown-store'
-import { useTeamFormStore, type TeamData } from '@/store/team-form-store'
-import FormCard from './FormCard'
-import { supabase } from '@/lib/supabase'
+} from "react";
+import Dropdown from "@/components/common/input/Dropdown";
+import TechStackSearchBar from "@/components/common/search-bar/TechStackSearchBar";
+import { supabase } from "@/lib/supabase";
+import { useDropdownStore } from "@/store/dropdown-store";
+import { useTeamFormStore, type TeamData } from "@/store/team-form-store";
+import FormCard from "./FormCard";
 
 interface TeamFormProps {
-  onSubmit?: (data: TeamData) => void
+  onSubmit?: (data: TeamData) => void;
 }
 
 export interface TeamFormRef {
-  validate: () => boolean
-  getData: () => TeamData
+  validate: () => boolean;
+  getData: () => TeamData;
 }
 
 const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
@@ -54,110 +54,115 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
       updateRequirement,
       addPreference,
       removePreference,
-    } = useTeamFormStore()
+    } = useTeamFormStore();
 
-    const { selectedValues } = useDropdownStore()
-    const [domains, setDomains] = useState<string[]>([])
-    const [positions, setPositions] = useState<string[]>([])
-    const [techStacks, setTechStacks] = useState<string[]>([])
+    const { selectedValues } = useDropdownStore();
+    const [domains, setDomains] = useState<string[]>([]);
+    const [positions, setPositions] = useState<string[]>([]);
+    const [_techStacks, setTechStacks] = useState<string[]>([]);
 
     useEffect(() => {
       const fetchData = async () => {
         const { data: domainData, error: domainError } = await supabase
-          .from('domains')
-          .select('name')
+          .from("domains")
+          .select("name");
         if (!domainError && domainData)
-          setDomains(domainData.map((d) => d.name))
+          setDomains(domainData.map((d) => d.name));
 
         const { data: positionData, error: positionError } = await supabase
-          .from('positions')
-          .select('name')
+          .from("positions")
+          .select("name");
         if (!positionError && positionData)
-          setPositions(positionData.map((p) => p.name))
+          setPositions(positionData.map((p) => p.name));
 
         const { data: techData, error: techError } = await supabase
-          .from('tech_stacks')
-          .select('name')
-        if (!techError && techData) setTechStacks(techData.map((t) => t.name))
-      }
-      fetchData()
-    }, [])
+          .from("tech_stacks")
+          .select("name");
+        if (!techError && techData) setTechStacks(techData.map((t) => t.name));
+      };
+      void fetchData();
+    }, []);
 
     // Dropdown 선택 값을 teamData와 동기화
     useEffect(() => {
-      const domainValue = selectedValues['도메인을 선택해주세요']
-      const scheduleValue = selectedValues['예상 일정을 선택해주세요']
+      const domainValue = selectedValues["도메인을 선택해주세요"];
+      const scheduleValue = selectedValues["예상 일정을 선택해주세요"];
 
       if (domainValue && domainValue !== teamData.domain) {
-        updateTeamData('domain', domainValue)
+        updateTeamData("domain", domainValue);
       }
       if (scheduleValue && scheduleValue !== teamData.schedule) {
-        updateTeamData('schedule', scheduleValue)
+        updateTeamData("schedule", scheduleValue);
       }
 
       // 포지션 드롭다운 값들 동기화
       teamData.positions.forEach((position, index) => {
-        const positionValue = selectedValues[`포지션을 선택해주세요`]
+        const positionValue = selectedValues[`포지션을 선택해주세요`];
         if (positionValue && positionValue !== position.role) {
-          updatePositionRole(index, positionValue)
+          updatePositionRole(index, positionValue);
         }
-      })
+      });
 
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedValues, teamData.domain, teamData.schedule, teamData.positions])
+    }, [
+      selectedValues,
+      teamData.domain,
+      teamData.schedule,
+      teamData.positions,
+    ]);
 
     const validateForm = (): boolean => {
       // 모든 에러 초기화
-      clearAllErrors()
-      let isValid = true
+      clearAllErrors();
+      let isValid = true;
 
       // 도메인 필수 검증
       if (!teamData.domain.trim()) {
-        setError('domain', '도메인을 선택해주세요')
-        isValid = false
+        setError("domain", "도메인을 선택해주세요");
+        isValid = false;
       }
 
       // 예상 일정 필수 검증
       if (!teamData.schedule.trim()) {
-        setError('schedule', '예상 일정을 선택해주세요')
-        isValid = false
+        setError("schedule", "예상 일정을 선택해주세요");
+        isValid = false;
       }
 
       // 기술스택 최소 1개 필수 검증
       if (teamData.techStack.length === 0) {
-        setError('techStack', '기술스택을 최소 1개 이상 선택해주세요')
-        isValid = false
+        setError("techStack", "기술스택을 최소 1개 이상 선택해주세요");
+        isValid = false;
       }
 
       // 포지션 최소 1개 및 역할 입력 필수 검증
       if (teamData.positions.length === 0) {
-        setError('positions', '포지션을 최소 1개 이상 추가해주세요')
-        isValid = false
+        setError("positions", "포지션을 최소 1개 이상 추가해주세요");
+        isValid = false;
       } else {
         // 각 포지션의 역할이 입력되었는지 검증
         for (let i = 0; i < teamData.positions.length; i++) {
           if (!teamData.positions[i].role.trim()) {
-            setError('positions', `${i + 1}번째 포지션의 역할을 입력해주세요`)
-            isValid = false
-            break
+            setError("positions", `${i + 1}번째 포지션의 역할을 입력해주세요`);
+            isValid = false;
+            break;
           }
         }
       }
 
-      return isValid
-    }
+      return isValid;
+    };
 
     useImperativeHandle(ref, () => ({
       validate: validateForm,
       getData: () => teamData,
-    }))
+    }));
 
     return (
       <form>
         {/* 상단 2개 카드 - 2열 그리드 */}
         <div
           className="grid grid-cols-1 lg:grid-cols-2 justify-items-center"
-          style={{ gap: '130px' }}
+          style={{ gap: "130px" }}
         >
           <FormCard
             title="도메인"
@@ -167,7 +172,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
           >
             <div className="w-[571px] h-[90px] ml-[50px] mt-[30px]">
               <Dropdown
-                options={domains.length ? domains : ['불러오는 중...']}
+                options={domains.length ? domains : ["불러오는 중..."]}
                 placeholder="도메인을 선택해주세요"
                 width="571px"
                 height="90px"
@@ -183,7 +188,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
           >
             <div className="w-[571px] h-[90px] ml-[50px] mt-[30px]">
               <Dropdown
-                options={['1개월', '3개월', '6개월', '1년', '1년 이상']}
+                options={["1개월", "3개월", "6개월", "1년", "1년 이상"]}
                 placeholder="예상 일정을 선택해주세요"
                 width="571px"
                 height="90px"
@@ -194,7 +199,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
 
         {/* 하단 4개 카드 - 각각 전체 너비 차지 (1473x351) */}
         <div
-          style={{ marginTop: '130px' }}
+          style={{ marginTop: "130px" }}
           className="space-y-[130px] flex flex-col items-center"
         >
           {/* 기술 스택 카드 */}
@@ -211,35 +216,35 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
                 value={techStackInput}
                 onChange={setTechStackInput}
                 onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    addTechStack(techStackInput)
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addTechStack(techStackInput);
                   }
                 }}
                 placeholder={
                   teamData.techStack.length === 0
-                    ? '최대 10개까지 선택 가능합니다'
+                    ? "최대 10개까지 선택 가능합니다"
                     : undefined
                 }
               />
               <div
                 className="flex flex-wrap mt-3"
-                style={{ marginLeft: '10px' }}
+                style={{ marginLeft: "10px" }}
               >
                 {teamData.techStack.map((tech, index) => (
                   <span
                     key={index}
                     className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 rounded-full"
                     style={{
-                      width: '60px',
-                      height: '24px',
-                      marginTop: '30px',
-                      marginRight: '20px',
-                      marginBottom: '42px',
-                      marginLeft: index === 0 ? '0px' : '20px',
-                      fontSize: 'var(--text-5)',
-                      paddingLeft: '8px',
-                      paddingRight: '8px',
+                      width: "60px",
+                      height: "24px",
+                      marginTop: "30px",
+                      marginRight: "20px",
+                      marginBottom: "42px",
+                      marginLeft: index === 0 ? "0px" : "20px",
+                      fontSize: "var(--text-5)",
+                      paddingLeft: "8px",
+                      paddingRight: "8px",
                     }}
                   >
                     <span className="truncate flex-1">{tech}</span>
@@ -247,7 +252,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
                       type="button"
                       onClick={() => removeTechStack(tech)}
                       className="text-blue-600 hover:text-blue-800 ml-1"
-                      style={{ fontSize: '12px' }}
+                      style={{ fontSize: "12px" }}
                     >
                       ×
                     </button>
@@ -272,7 +277,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
                   <div className="w-[848px]">
                     <Dropdown
                       options={
-                        positions.length ? positions : ['불러오는 중...']
+                        positions.length ? positions : ["불러오는 중..."]
                       }
                       placeholder={`포지션${index + 1}을 선택해주세요`}
                       width="848px"
@@ -284,15 +289,15 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
                       type="button"
                       onClick={() => updatePositionCount(index, -1)}
                       className="w-[30px] h-[30px] flex items-center justify-center text-gray-500 hover:text-gray-700 rounded"
-                      style={{ fontSize: '18px' }}
+                      style={{ fontSize: "18px" }}
                     >
                       −
                     </button>
                     <span
                       className="flex-1 h-full flex items-center justify-center"
                       style={{
-                        fontSize: 'var(--text-7)',
-                        color: 'var(--color-gray)',
+                        fontSize: "var(--text-7)",
+                        color: "var(--color-gray)",
                       }}
                     >
                       {position.count}명
@@ -301,7 +306,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
                       type="button"
                       onClick={() => updatePositionCount(index, 1)}
                       className="w-[30px] h-[30px] flex items-center justify-center text-gray-500 hover:text-gray-700 rounded"
-                      style={{ fontSize: '18px' }}
+                      style={{ fontSize: "18px" }}
                     >
                       +
                     </button>
@@ -310,7 +315,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
                     type="button"
                     onClick={() => removePosition(index)}
                     className="w-[30px] h-[30px] flex items-center justify-center text-gray-500 hover:text-gray-700 rounded ml-[44px]"
-                    style={{ fontSize: '18px' }}
+                    style={{ fontSize: "18px" }}
                   >
                     −
                   </button>
@@ -345,17 +350,17 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
                   placeholder="요구사항을 입력해주세요"
                   className="w-full h-[90px] border border-gray-200 rounded-lg px-[30px] focus:outline-none focus:ring-2 focus:ring-blue-500"
                   style={{
-                    fontSize: 'var(--text-7)',
-                    color: 'var(--color-gray)',
+                    fontSize: "var(--text-7)",
+                    color: "var(--color-gray)",
                   }}
                 />
               ))}
               <div
                 className="mb-2"
                 style={{
-                  marginTop: '19px',
-                  fontSize: 'var(--text-5)',
-                  color: '#dbdbdb',
+                  marginTop: "19px",
+                  fontSize: "var(--text-5)",
+                  color: "#dbdbdb",
                 }}
               >
                 선택사항이예요. 비워두셔도 괜찮아요. (최대 25자까지 가능합니다)
@@ -385,31 +390,31 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
                 value={preferencesInput}
                 onChange={(e) => setPreferencesInput(e.target.value)}
                 onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    addPreference(preferencesInput)
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addPreference(preferencesInput);
                   }
                 }}
                 placeholder="우대 사항을 입력해주세요"
                 className="w-full h-[90px] border border-gray-200 rounded-lg px-[30px] focus:outline-none focus:ring-2 focus:ring-blue-500"
                 style={{
-                  fontSize: 'var(--text-7)',
-                  color: 'var(--color-gray)',
+                  fontSize: "var(--text-7)",
+                  color: "var(--color-gray)",
                 }}
               />
               <div
                 className="mb-2"
                 style={{
-                  marginTop: '19px',
-                  fontSize: 'var(--text-5)',
-                  color: '#dbdbdb',
+                  marginTop: "19px",
+                  fontSize: "var(--text-5)",
+                  color: "#dbdbdb",
                 }}
               >
                 선택사항이예요. 비워두셔도 괜찮아요. (최대 15자까지 가능합니다)
               </div>
               <div
                 className="flex flex-wrap gap-2"
-                style={{ marginTop: '30px' }}
+                style={{ marginTop: "30px" }}
               >
                 {teamData.preferences.map((pref, index) => (
                   <span
@@ -431,10 +436,10 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
           </FormCard>
         </div>
       </form>
-    )
+    );
   },
-)
+);
 
-TeamForm.displayName = 'TeamForm'
+TeamForm.displayName = "TeamForm";
 
-export default TeamForm
+export default TeamForm;

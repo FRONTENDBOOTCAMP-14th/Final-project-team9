@@ -1,82 +1,82 @@
-'use client'
+"use client";
 
 import React, {
   forwardRef,
   useImperativeHandle,
   useEffect,
   useState,
-} from 'react'
-import Dropdown from '@/components/common/input/Dropdown'
-import { useDropdownStore } from '@/store/dropdown-store'
+} from "react";
+import Dropdown from "@/components/common/input/Dropdown";
+import { supabase } from "@/lib/supabase";
+import { useDropdownStore } from "@/store/dropdown-store";
 import {
   useRegisterProjectStore,
   type FormData,
-} from '@/store/register-project-store'
-import FormCard, { CARD_STYLES } from './FormCard'
-import { supabase } from '@/lib/supabase'
+} from "@/store/register-project-store";
+import FormCard, { CARD_STYLES } from "./FormCard";
 
 interface BaseFormProps {
-  onSubmit?: (data: FormData) => void
+  onSubmit?: (data: FormData) => void;
 }
 
 export interface BaseFormRef {
-  validate: () => boolean
-  getData: () => FormData
+  validate: () => boolean;
+  getData: () => FormData;
 }
 
 const BaseForm = forwardRef<BaseFormRef, BaseFormProps>(({ onSubmit }, ref) => {
   const { formData, errors, updateField, validateForm } =
-    useRegisterProjectStore()
+    useRegisterProjectStore();
 
-  const { selectedValues } = useDropdownStore()
-  const [fields, setFields] = useState<string[]>([])
-  const [loadingFields, setLoadingFields] = useState(true)
+  const { selectedValues } = useDropdownStore();
+  const [fields, setFields] = useState<string[]>([]);
+  const [loadingFields, setLoadingFields] = useState(true);
 
   useEffect(() => {
     const fetchFields = async () => {
-      const { data, error } = await supabase.from('fields').select('name')
+      const { data, error } = await supabase.from("fields").select("name");
       if (error) {
-        console.error('도메인 조회 실패:', error)
-        setFields([])
+        console.error("도메인 조회 실패:", error);
+        setFields([]);
       } else {
-        setFields(data.map((d) => d.name))
+        setFields(data.map((d) => d.name));
       }
-      setLoadingFields(false)
-    }
-    fetchFields()
-  }, [])
+      setLoadingFields(false);
+    };
+    void fetchFields();
+  }, []);
 
   // Dropdown 선택 값을 formData와 동기화
   useEffect(() => {
-    const categoryValue = selectedValues['분야']
+    const categoryValue = selectedValues["분야"];
     if (categoryValue) {
-      updateField('category', categoryValue)
+      updateField("category", categoryValue);
     }
-  }, [selectedValues, updateField])
+  }, [selectedValues, updateField]);
 
   // ref를 통해 외부에서 접근할 수 있는 함수들 노출
   useImperativeHandle(ref, () => ({
     validate: validateForm,
     getData: () => formData,
-  }))
+  }));
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
-    updateField(field, value)
-  }
+    updateField(field, value);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (validateForm()) {
-      onSubmit?.(formData)
+      onSubmit?.(formData);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div
         className="grid grid-cols-1 lg:grid-cols-2 justify-items-center"
-        style={{ gap: '130px' }}
+        style={{ gap: "130px" }}
       >
         {/* 프로젝트 이름 카드 */}
         <FormCard
@@ -88,7 +88,7 @@ const BaseForm = forwardRef<BaseFormRef, BaseFormProps>(({ onSubmit }, ref) => {
           <input
             type="text"
             value={formData.projectName}
-            onChange={(e) => handleInputChange('projectName', e.target.value)}
+            onChange={(e) => handleInputChange("projectName", e.target.value)}
             placeholder="예) AI 기반 헬스케어 앱 개발"
             maxLength={30}
             className={CARD_STYLES.input}
@@ -105,7 +105,7 @@ const BaseForm = forwardRef<BaseFormRef, BaseFormProps>(({ onSubmit }, ref) => {
         >
           <div className="w-[571px] h-[90px] ml-[50px] mt-[30px] [&>div]:!w-[571px] [&>div>button]:!h-[90px] [&>div>button]:!pl-[30px] [&>div>button]:!pt-[26px] [&>div>button]:!pb-[27px]">
             <Dropdown
-              options={loadingFields ? ['불러오는 중...'] : fields}
+              options={loadingFields ? ["불러오는 중..."] : fields}
               placeholder="분야"
             />
           </div>
@@ -121,8 +121,8 @@ const BaseForm = forwardRef<BaseFormRef, BaseFormProps>(({ onSubmit }, ref) => {
           <input
             type="date"
             value={formData.deadline}
-            onChange={(e) => handleInputChange('deadline', e.target.value)}
-            min={new Date().toISOString().split('T')[0]}
+            onChange={(e) => handleInputChange("deadline", e.target.value)}
+            min={new Date().toISOString().split("T")[0]}
             className={`${CARD_STYLES.input} pr-[40px]`}
             style={CARD_STYLES.inputStyle}
           />
@@ -138,7 +138,7 @@ const BaseForm = forwardRef<BaseFormRef, BaseFormProps>(({ onSubmit }, ref) => {
           <input
             type="text"
             value={formData.description}
-            onChange={(e) => handleInputChange('description', e.target.value)}
+            onChange={(e) => handleInputChange("description", e.target.value)}
             placeholder="이 프로젝트는 ~하는 것을 목표로 합니다."
             maxLength={100}
             className={CARD_STYLES.input}
@@ -147,9 +147,9 @@ const BaseForm = forwardRef<BaseFormRef, BaseFormProps>(({ onSubmit }, ref) => {
         </FormCard>
       </div>
     </form>
-  )
-})
+  );
+});
 
-BaseForm.displayName = 'BaseForm'
+BaseForm.displayName = "BaseForm";
 
-export default BaseForm
+export default BaseForm;
