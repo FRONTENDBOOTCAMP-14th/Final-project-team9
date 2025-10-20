@@ -1,6 +1,7 @@
 "use client";
 
 import { Calendar, Clock, Heart, UsersRound } from "lucide-react";
+import Image from "next/image";
 import {
   PROJECT_STATUS_LABEL,
   PROJECT_STATUS_COLOR,
@@ -67,7 +68,12 @@ export default function ProjectCard({
       <p className="text-gray text-5 mt-[9px]">{description}</p>
 
       <div className="flex items-center gap-[30px] mt-[91px]">
-        <img src="/assets/no-profile.svg" alt="프로필" width={100} />
+        <Image
+          src="/assets/no-profile.svg"
+          alt="프로필"
+          width={100}
+          height={100}
+        />
         <div className="flex flex-col gap-2.5">
           <div className="font-bold text-deep text-6">{owner}</div>
           <div className="text-4 text-gray">{level}</div>
