@@ -1,11 +1,6 @@
 "use client";
 
-import React, {
-  forwardRef,
-  useImperativeHandle,
-  useEffect,
-  useState,
-} from "react";
+import React, { useImperativeHandle, useEffect, useState } from "react";
 import Dropdown from "@/components/common/input/Dropdown";
 import { supabase } from "@/lib/supabase";
 import { useDropdownStore } from "@/store/dropdown-store";
@@ -17,6 +12,7 @@ import FormCard, { CARD_STYLES } from "./FormCard";
 
 interface BaseFormProps {
   onSubmit?: (data: FormData) => void;
+  ref?: React.Ref<BaseFormRef>;
 }
 
 export interface BaseFormRef {
@@ -24,7 +20,7 @@ export interface BaseFormRef {
   getData: () => FormData;
 }
 
-const BaseForm = forwardRef<BaseFormRef, BaseFormProps>(({ onSubmit }, ref) => {
+export default function BaseForm({ onSubmit, ref }: BaseFormProps) {
   const { formData, errors, updateField, validateForm } =
     useRegisterProjectStore();
 
@@ -148,8 +144,4 @@ const BaseForm = forwardRef<BaseFormRef, BaseFormProps>(({ onSubmit }, ref) => {
       </div>
     </form>
   );
-});
-
-BaseForm.displayName = "BaseForm";
-
-export default BaseForm;
+}

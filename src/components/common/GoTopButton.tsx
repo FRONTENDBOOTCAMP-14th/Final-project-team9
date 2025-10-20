@@ -14,17 +14,10 @@ export default function GoTopButton() {
     <button
       onClick={scrollToTop}
       aria-label="맨 위로 이동"
-      className="fixed bottom-[50px] right-[50px] w-[80px] h-[80px] bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 focus:outline-none"
+      className="fixed bottom-[50px] right-[50px] w-[80px] h-[80px] bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 focus:outline-none flex items-center justify-center"
       type="button"
     >
-      <div className="flex items-center justify-center w-full h-full">
-        <Image
-          src="/assets/go-top.svg"
-          alt="위로 이동"
-          width={58}
-          height={50}
-        />
-      </div>
+      <Image src="/assets/go-top.svg" alt="위로 이동" width={58} height={50} />
     </button>
   );
 }
