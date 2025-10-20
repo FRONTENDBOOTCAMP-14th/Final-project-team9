@@ -55,6 +55,7 @@ export default function ProfileEditModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const previousFocusElement = useRef<HTMLElement | null>(null); // 모달이 열리기 전 포커스된 요소 저장
 
   // 상수 분리
   const MAX_SKILLS = 3;
@@ -83,6 +84,80 @@ export default function ProfileEditModal({
     }
   }, [selectedValues, formData.field, formData.experience]);
 
+  // 모달 접근성 및 상호작용 관리 (포커스 트랩, 외부 클릭, ESC)
+  useEffect(() => {
+    // 모달이 열릴 때 현재 포커스된 요소를 저장
+    previousFocusElement.current = document.activeElement as HTMLElement;
+
+    // 모달이 열리면 모달 내의 첫 번째 대화형 요소에 포커스
+    const focusableElements = modalRef.current?.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    );
+
+    if (focusableElements && focusableElements.length > 0) {
+      // 첫 번째 요소에 포커스
+      focusableElements[0].focus();
+    } else {
+      // 대화형 요소가 없을 경우 모달 컨테이너 자체에 포커스 (폴백)
+      modalRef.current?.focus();
+    }
+
+    // 키보드 이벤트 핸들러
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // ESC 키로 모달 닫기
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+
+      // Tab 키로 포커스 트랩 구현
+      if (e.key === "Tab") {
+        if (!focusableElements || focusableElements.length === 0) {
+          // 포커스 가능한 요소가 없으면 탭 이동을 막음
+          e.preventDefault();
+          return;
+        }
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          // Shift + Tab: 포커스가 첫 번째 요소에 있을 때 마지막 요소로 이동
+          if (document.activeElement === firstElement) {
+            lastElement.focus();
+            e.preventDefault(); // 브라우저의 기본 동작을 막아 포커스가 모달 밖으로 나가지 않도록 함
+          }
+        } else {
+          // Tab: 포커스가 마지막 요소에 있을 때 첫 번째 요소로 이동
+          if (document.activeElement === lastElement) {
+            firstElement.focus();
+            e.preventDefault(); // 브라우저의 기본 동작을 막아 포커스가 모달 밖으로 나가지 않도록 함
+          }
+        }
+      }
+    };
+
+    // 모달 외부 클릭 시 닫기
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // 컴포넌트 언마운트 시 클린업 함수
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("mousedown", handleClickOutside);
+      previousFocusElement.current?.focus(); // 원래 포커스로 복원
+    };
+  }, [onClose]);
+
   // 이미지 파일 변경 핸들러
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -106,30 +181,6 @@ export default function ProfileEditModal({
       setFormData((prev) => ({ ...prev, profileImageUrl: newImageUrl }));
     }
   };
-
-  // ESC 키로 모달 닫기
-  useEffect(() => {
-    const handleEscKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleEscKey);
-    return () => document.removeEventListener("keydown", handleEscKey);
-  }, [onClose]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
-        onClose();
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [onClose]);
 
   // --- ✅ 모든 함수를 독립적으로 분리 ---
 
@@ -266,7 +317,6 @@ export default function ProfileEditModal({
     }
   };
 
-  // --- ✅ JSX 반환문은 컴포넌트의 마지막에 한번만 존재 ---
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 backdrop-blur-sm">
       <style>{`
