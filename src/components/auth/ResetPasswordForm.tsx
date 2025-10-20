@@ -1,16 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
-import LabeledInput from "@/components/common/LabeledInput";
+import PasswordInput from "@/components/common/PasswordInput";
+import { supabase } from "@/lib/supabase";
 
 const ResetPasswordForm = () => {
+  const router = useRouter();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmError, setConfirmError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -19,6 +20,11 @@ const ResetPasswordForm = () => {
       setPasswordError("비밀번호는 8자리 이상 입력 가능합니다");
     } else {
       setPasswordError("");
+    }
+    if (confirmPassword && value !== confirmPassword) {
+      setConfirmError("비밀번호가 일치하지 않습니다");
+    } else {
+      setConfirmError("");
     }
   };
 
@@ -32,63 +38,54 @@ const ResetPasswordForm = () => {
     }
   };
 
-  const handleResetSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleResetSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("새 비밀번호로 변경 시도:", newPassword);
+    if (newPassword !== confirmPassword) {
+      setConfirmError("비밀번호가 일치하지 않습니다");
+      return;
+    }
+    if (passwordError || confirmError || !newPassword) {
+      alert("입력값을 확인해주세요.");
+      return;
+    }
+
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (error) {
+      alert("오류: " + error.message);
+    } else {
+      alert("비밀번호가 성공적으로 변경되었습니다. 다시 로그인해주세요.");
+      await supabase.auth.signOut();
+      router.push("/login");
+    }
   };
 
   return (
     <div className="w-full max-w-[615px]">
-      {/* 로고와 제목은 AuthLayout에서 처리하므로 여기서 제거합니다. */}
-      <form onSubmit={handleResetSubmit} className="flex flex-col">
-        {/* 새 비밀번호 입력 */}
-        <LabeledInput
+      <form
+        onSubmit={(e) => void handleResetSubmit(e)}
+        className="flex flex-col"
+      >
+        <PasswordInput
           id="new-password"
           label="새 비밀번호"
-          type={showPassword ? "text" : "password"}
           value={newPassword}
           onChange={handlePasswordChange}
           error={passwordError}
           containerClassName="w-full"
-          icon={
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="flex items-center justify-center"
-              aria-label="비밀번호 보이기/숨기기"
-            >
-              {showPassword ? (
-                <Image
-                  src="/assets/eye-off.svg"
-                  alt="비밀번호 숨기기"
-                  width={30}
-                  height={16}
-                />
-              ) : (
-                <Image
-                  src="/assets/eye-on.svg"
-                  alt="비밀번호 보기"
-                  width={24}
-                  height={24}
-                />
-              )}
-            </button>
-          }
         />
-
-        {/* 새 비밀번호 확인 입력 */}
         <div className="mt-[20px]">
-          <LabeledInput
+          <PasswordInput
             id="confirm-password"
             label="새 비밀번호 확인"
-            type={showPassword ? "text" : "password"}
             value={confirmPassword}
             onChange={handleConfirmChange}
             error={confirmError}
             containerClassName="w-full"
           />
         </div>
-
         <Button
           type="submit"
           variant="primary"
