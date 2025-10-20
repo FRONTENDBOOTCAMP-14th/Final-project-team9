@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import useScrollLock from "@/hooks/useScrollLock";
 import ProfileEditModal from "./ProfileModal";
 
 // SVG 아이콘 컴포넌트들
@@ -77,6 +78,9 @@ export default function UserProfileCard(props: UserProfileCardProps) {
       });
     };
   }, []);
+
+  // 모달 오픈 시 스크롤 정지 훅
+  useScrollLock(isModalOpen);
 
   return (
     <>
