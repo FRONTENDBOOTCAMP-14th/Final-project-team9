@@ -2,9 +2,8 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import LabeledInput, {
-  LabeledInputProps,
-} from "@/components/common/LabeledInput";
+import type { LabeledInputProps } from "@/components/common/LabeledInput";
+import LabeledInput from "@/components/common/LabeledInput";
 
 // 이 컴포넌트는 LabeledInput의 모든 속성을 받을 수 있습니다.
 const PasswordInput = (props: LabeledInputProps) => {

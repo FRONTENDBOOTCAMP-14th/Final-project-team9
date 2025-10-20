@@ -28,7 +28,7 @@ const LabeledInput = ({
       "border-red-500": error,
       "focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600":
         !error,
-    })
+    }),
   );
 
   const inputElementStyles = twMerge(
@@ -36,14 +36,14 @@ const LabeledInput = ({
     clsx({
       "pr-[90px]": !!icon,
     }),
-    className
+    className,
   );
 
   const labelStyles = twMerge(
     "absolute left-[30px] text-[#DBDBDB] transition-all duration-200 ease-in-out pointer-events-none",
     "top-[24px] text-[24px]",
     "peer-focus:top-[12px] peer-focus:text-[16px] peer-focus:text-[#DBDBDB]",
-    "peer-[:not(:placeholder-shown)]:top-[12px] peer-[:not(:placeholder-shown)]:text-[16px] peer-[:not(:placeholder-shown)]:text-[#DBDBDB]"
+    "peer-[:not(:placeholder-shown)]:top-[12px] peer-[:not(:placeholder-shown)]:text-[16px] peer-[:not(:placeholder-shown)]:text-[#DBDBDB]",
   );
 
   return (
