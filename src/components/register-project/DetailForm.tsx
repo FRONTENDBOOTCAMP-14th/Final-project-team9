@@ -69,7 +69,7 @@ const DetailForm = forwardRef<DetailFormRef, DetailFormProps>(
     };
 
     return (
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6 flex justify-center">
         {/* 프로젝트 상세 계획 카드 */}
         <FormCard
           title="프로젝트 상세 계획"

@@ -13,6 +13,8 @@ interface DropdownProps {
   height?: string;
   className?: string;
   required?: boolean;
+  onChange?: (selected: string) => void;
+  value?: string;
 }
 
 export default function Dropdown({
@@ -22,6 +24,7 @@ export default function Dropdown({
   height = "96px",
   className,
   required,
+  onChange,
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -55,6 +58,7 @@ export default function Dropdown({
   const handleSelect = (option: string) => {
     setSelected(placeholder ?? "", option);
     setIsOpen(false);
+    onChange?.(option);
   };
 
   const handleKeyDown = (

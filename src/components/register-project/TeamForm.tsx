@@ -1,8 +1,14 @@
 "use client";
 
-import React, { forwardRef, useImperativeHandle, useEffect } from "react";
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useEffect,
+  useState,
+} from "react";
 import Dropdown from "@/components/common/input/Dropdown";
 import TechStackSearchBar from "@/components/common/search-bar/TechStackSearchBar";
+import { supabase } from "@/lib/supabase";
 import { useDropdownStore } from "@/store/dropdown-store";
 import { useTeamFormStore, type TeamData } from "@/store/team-form-store";
 import FormCard from "./FormCard";
@@ -51,6 +57,31 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
     } = useTeamFormStore();
 
     const { selectedValues } = useDropdownStore();
+    const [domains, setDomains] = useState<string[]>([]);
+    const [positions, setPositions] = useState<string[]>([]);
+    const [_techStacks, setTechStacks] = useState<string[]>([]);
+
+    useEffect(() => {
+      const fetchData = async () => {
+        const { data: domainData, error: domainError } = await supabase
+          .from("domains")
+          .select("name");
+        if (!domainError && domainData)
+          setDomains(domainData.map((d) => d.name));
+
+        const { data: positionData, error: positionError } = await supabase
+          .from("positions")
+          .select("name");
+        if (!positionError && positionData)
+          setPositions(positionData.map((p) => p.name));
+
+        const { data: techData, error: techError } = await supabase
+          .from("tech_stacks")
+          .select("name");
+        if (!techError && techData) setTechStacks(techData.map((t) => t.name));
+      };
+      void fetchData();
+    }, []);
 
     // Dropdown 선택 값을 teamData와 동기화
     useEffect(() => {
@@ -130,7 +161,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
       <form>
         {/* 상단 2개 카드 - 2열 그리드 */}
         <div
-          className="grid grid-cols-1 lg:grid-cols-2"
+          className="grid grid-cols-1 lg:grid-cols-2 justify-items-center"
           style={{ gap: "130px" }}
         >
           <FormCard
@@ -141,14 +172,7 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
           >
             <div className="w-[571px] h-[90px] ml-[50px] mt-[30px]">
               <Dropdown
-                options={[
-                  "이커머스",
-                  "sns",
-                  "게임",
-                  "유틸",
-                  "커뮤니티",
-                  "기타",
-                ]}
+                options={domains.length ? domains : ["불러오는 중..."]}
                 placeholder="도메인을 선택해주세요"
                 width="571px"
                 height="90px"
@@ -174,7 +198,10 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
         </div>
 
         {/* 하단 4개 카드 - 각각 전체 너비 차지 (1473x351) */}
-        <div style={{ marginTop: "130px" }} className="space-y-[130px]">
+        <div
+          style={{ marginTop: "130px" }}
+          className="space-y-[130px] flex flex-col items-center"
+        >
           {/* 기술 스택 카드 */}
           <FormCard
             title="기술 스택"
@@ -249,16 +276,14 @@ const TeamForm = forwardRef<TeamFormRef, TeamFormProps>(
                 <div key={index} className="flex items-center gap-[44px]">
                   <div className="w-[848px]">
                     <Dropdown
-                      options={[
-                        "프론트엔드",
-                        "백엔드",
-                        "풀스택",
-                        "디자이너",
-                        "기획자",
-                      ]}
-                      placeholder="포지션을 선택해주세요"
+                      options={
+                        positions.length ? positions : ["불러오는 중..."]
+                      }
+                      placeholder={`포지션${index + 1}을 선택해주세요`}
                       width="848px"
                       height="90px"
+                      onChange={(value) => updatePositionRole(index, value)}
+                      value={position.role}
                     />
                   </div>
                   <div className="w-[369px] h-[90px] flex items-center border border-gray-200 rounded-lg px-[40px]">
