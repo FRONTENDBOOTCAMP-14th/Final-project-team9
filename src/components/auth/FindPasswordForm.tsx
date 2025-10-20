@@ -1,30 +1,35 @@
+// src/components/auth/FindPasswordForm.tsx
 "use client";
 
 import { useState } from "react";
 import Button from "@/components/common/Button";
 import LabeledInput from "@/components/common/LabeledInput";
+import EmailVerification from "./EmailVerification";
 import ResetPasswordForm from "./ResetPasswordForm";
 
 const FindPasswordForm = () => {
   const [id, setId] = useState("");
   const [email, setEmail] = useState("");
-  const [authCode, setAuthCode] = useState("");
-  const [isAuthCodeSent, setIsAuthCodeSent] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [showResetForm, setShowResetForm] = useState(false);
 
-  const handleVerificationSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // TODO: 실제 API 호출 로직
-    setIsVerified(true); // 인증 성공 시 화면 전환
+    if (isEmailVerified) {
+      // TODO: 데이터베이스에서 아이디와 이메일이 일치하는지 확인하는 로직 추가
+      setShowResetForm(true);
+    } else {
+      alert("이메일 인증을 먼저 완료해주세요.");
+    }
   };
 
-  if (isVerified) {
+  if (showResetForm) {
     return <ResetPasswordForm />;
   }
 
   return (
     <div className="w-full max-w-[615px]">
-      <form onSubmit={handleVerificationSubmit} className="flex flex-col">
+      <form onSubmit={handleSubmit} className="flex flex-col">
         <LabeledInput
           id="find-pw-id"
           label="아이디를 입력하세요"
@@ -33,48 +38,21 @@ const FindPasswordForm = () => {
           onChange={(e) => setId(e.target.value)}
           containerClassName="w-full h-[80px]"
         />
-        <div className="flex items-end gap-2 mt-[20px]">
-          <LabeledInput
-            id="find-pw-email"
-            label="이메일을 입력하세요"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            containerClassName="flex-grow h-[80px]"
+        <div className="mt-[20px]">
+          <EmailVerification
+            email={email}
+            setEmail={setEmail}
+            isVerified={isEmailVerified}
+            setIsVerified={setIsEmailVerified}
+            otpType="recovery"
           />
-          <Button
-            type="button"
-            variant="secondary"
-            className="h-[80px] w-[104px] text-lg"
-            onClick={() => setIsAuthCodeSent(true)}
-          >
-            인증
-          </Button>
         </div>
-        {isAuthCodeSent && (
-          <div className="relative flex items-end gap-2 mt-[20px]">
-            <LabeledInput
-              id="find-pw-authcode"
-              label="인증번호"
-              type="text"
-              value={authCode}
-              onChange={(e) => setAuthCode(e.target.value)}
-              containerClassName="flex-grow h-[80px]"
-            />
-            <Button
-              type="button"
-              variant="secondary"
-              className="h-[80px] w-[104px] text-lg"
-            >
-              인증 확인
-            </Button>
-          </div>
-        )}
         <Button
           type="submit"
           variant="primary"
           size="lg"
           className="w-full h-[80px] text-[24px] mt-[40px]"
+          disabled={!isEmailVerified}
         >
           확인
         </Button>

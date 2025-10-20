@@ -1,3 +1,4 @@
+// src/components/auth/SignUpForm.tsx
 "use client";
 
 import { useState } from "react";
@@ -5,57 +6,15 @@ import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import LabeledInput from "@/components/common/LabeledInput";
 import PasswordInput from "@/components/common/PasswordInput";
-import { supabase } from "@/lib/supabase";
+import EmailVerification from "./EmailVerification";
 
 const SignUpForm = () => {
   const router = useRouter();
   const [id, setId] = useState("");
   const [email, setEmail] = useState("");
-  const [authCode, setAuthCode] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [isAuthCodeSent, setIsAuthCodeSent] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
-
-  const sendAuthCode = async () => {
-    if (!email) return alert("이메일을 입력해주세요!");
-    if (password !== passwordConfirm) {
-      alert("비밀번호가 일치하지 않습니다!");
-      return;
-    }
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { username: id },
-      },
-    });
-
-    if (error) {
-      alert("회원가입 실패: " + error.message);
-      return;
-    }
-
-    alert("인증코드를 메일로 보냈습니다. 이메일을 확인해주세요!");
-    setIsAuthCodeSent(true);
-  };
-
-  const verifyAuthCode = async () => {
-    if (!authCode) return alert("인증코드를 입력해주세요!");
-    const { error } = await supabase.auth.verifyOtp({
-      email,
-      token: authCode,
-      type: "signup",
-    });
-
-    if (error) {
-      alert("인증 실패: " + error.message);
-      return;
-    }
-
-    alert("인증 완료!");
-    setIsVerified(true);
-  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -95,53 +54,22 @@ const SignUpForm = () => {
             containerClassName="w-full h-[80px]"
           />
         </div>
-        <div className="flex items-end gap-[30px] mt-[20px]">
-          <LabeledInput
-            id="signup-email"
-            label="이메일을 입력하세요"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            containerClassName="flex-grow h-[80px]"
+        <div className="mt-[20px]">
+          <EmailVerification
+            email={email}
+            setEmail={setEmail}
+            isVerified={isVerified}
+            setIsVerified={setIsVerified}
+            otpType="signup"
+            password={password}
+            username={id}
           />
-          <Button
-            type="button"
-            variant="secondary"
-            className="h-[80px] w-[104px] rounded-[10px] border-[1px] border-white text-[#DBDBDB] text-[24px]"
-            onClick={() => void sendAuthCode()}
-          >
-            인증
-          </Button>
         </div>
-        {isAuthCodeSent && (
-          <div className="relative flex items-end gap-2 mt-[20px]">
-            <LabeledInput
-              id="signup-authcode"
-              label="인증번호"
-              type="text"
-              value={authCode}
-              onChange={(e) => setAuthCode(e.target.value)}
-              containerClassName="flex-grow h-[80px]"
-            />
-            <Button
-              type="button"
-              variant="secondary"
-              className="h-[80px] w-[104px] rounded-[10px] border-[1px] border-[white] text-[#DBDBDB] text-[18px]"
-              onClick={() => void verifyAuthCode()}
-            >
-              인증 확인
-            </Button>
-            {isVerified && (
-              <p className="absolute right-[140px] top-1/2 -translate-y-1/2 text-green-500 font-semibold pointer-events-none">
-                인증완료
-              </p>
-            )}
-          </div>
-        )}
         <Button
           type="submit"
           size="lg"
           className="w-full h-[80px] text-[24px] mt-[40px]"
+          disabled={!isVerified}
         >
           다음
         </Button>
