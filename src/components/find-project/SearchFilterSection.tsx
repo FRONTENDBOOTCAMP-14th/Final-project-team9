@@ -4,6 +4,7 @@ import ResetFilterButton from "@/components/common/reset-filter-button/ResetFilt
 import SearchBar from "@/components/common/search-bar/SearchBar";
 import DropdownWithTag from "@/components/common/tag/DropdownWithTag";
 import { jalnan } from "@/fonts";
+import { useSearchFilterStore } from "@/store/search-filter-store";
 
 interface SearchFilterSectionProps {
   onSearch: () => void;
@@ -12,6 +13,9 @@ interface SearchFilterSectionProps {
 export default function SearchFilterSection({
   onSearch,
 }: SearchFilterSectionProps) {
+  const filters = useSearchFilterStore((state) => state.filters);
+  const setSearchQuery = useSearchFilterStore((state) => state.setSearchQuery);
+
   return (
     <section
       className="mt-45 bg-white shadow-2xl rounded-[80px] px-25 py-20 w-full max-w-[1620px] mx-8"
@@ -25,7 +29,10 @@ export default function SearchFilterSection({
       </p>
 
       <div className="mt-15">
-        <SearchBar />
+        <SearchBar
+          value={filters.searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
       </div>
 
       <div

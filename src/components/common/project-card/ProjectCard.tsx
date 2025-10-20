@@ -22,6 +22,7 @@ interface ProjectCardProps {
   remain: number;
   category: string;
   status?: ProjectStatus;
+  profile_image: string;
 }
 
 export default function ProjectCard({
@@ -37,6 +38,7 @@ export default function ProjectCard({
   remain,
   category,
   status = "recruiting",
+  profile_image,
 }: ProjectCardProps) {
   const { favorites, toggleFavorite } = useFavoriteStore();
   const isFavorite = favorites.includes(id);
@@ -69,10 +71,11 @@ export default function ProjectCard({
 
       <div className="flex items-center gap-[30px] mt-[91px]">
         <Image
-          src="/assets/no-profile.svg"
+          src={profile_image}
           alt="프로필"
           width={100}
           height={100}
+          className="rounded-full aspect-square"
         />
         <div className="flex flex-col gap-2.5">
           <div className="font-bold text-deep text-6">{owner}</div>

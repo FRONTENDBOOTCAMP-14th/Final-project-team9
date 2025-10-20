@@ -33,6 +33,7 @@ export default function SearchResultsSection({
                 skills={project.skills}
                 remain={project.remain}
                 category={project.category}
+                profile_image={project.profile_image}
               />
             </li>
           ))}
