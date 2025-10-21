@@ -6,10 +6,13 @@ export async function fetchProjects(
   filters: SearchFilters,
 ): Promise<ProjectCard[]> {
   try {
-    let query = supabase.from("projects").select("*");
+    let query = supabase.from("project_view").select("*");
 
     if (filters.searchQuery) {
-      query.ilike("name", `%${filters.searchQuery}%`);
+      const search = `%${filters.searchQuery}%`;
+      query = query.or(
+        `name.ilike.${search},short_description.ilike.${search},expected_schedule.ilike.${search},detail_plan.ilike.${search},user_nickname.ilike.${search}`,
+      );
     }
 
     if (filters.position) {
