@@ -1,7 +1,8 @@
 "use client";
 
-import React, { forwardRef, useImperativeHandle, useEffect } from "react";
+import React, { useImperativeHandle, useEffect, useState } from "react";
 import Dropdown from "@/components/common/input/Dropdown";
+import { supabase } from "@/lib/supabase";
 import { useDropdownStore } from "@/store/dropdown-store";
 import {
   useRegisterProjectStore,
@@ -11,6 +12,7 @@ import FormCard, { CARD_STYLES } from "./FormCard";
 
 interface BaseFormProps {
   onSubmit?: (data: FormData) => void;
+  ref?: React.Ref<BaseFormRef>;
 }
 
 export interface BaseFormRef {
@@ -18,11 +20,27 @@ export interface BaseFormRef {
   getData: () => FormData;
 }
 
-const BaseForm = forwardRef<BaseFormRef, BaseFormProps>(({ onSubmit }, ref) => {
+export default function BaseForm({ onSubmit, ref }: BaseFormProps) {
   const { formData, errors, updateField, validateForm } =
     useRegisterProjectStore();
 
   const { selectedValues } = useDropdownStore();
+  const [fields, setFields] = useState<string[]>([]);
+  const [loadingFields, setLoadingFields] = useState(true);
+
+  useEffect(() => {
+    const fetchFields = async () => {
+      const { data, error } = await supabase.from("fields").select("name");
+      if (error) {
+        console.error("도메인 조회 실패:", error);
+        setFields([]);
+      } else {
+        setFields(data.map((d) => d.name));
+      }
+      setLoadingFields(false);
+    };
+    void fetchFields();
+  }, []);
 
   // Dropdown 선택 값을 formData와 동기화
   useEffect(() => {
@@ -52,7 +70,10 @@ const BaseForm = forwardRef<BaseFormRef, BaseFormProps>(({ onSubmit }, ref) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2" style={{ gap: "130px" }}>
+      <div
+        className="grid grid-cols-1 lg:grid-cols-2 justify-items-center"
+        style={{ gap: "130px" }}
+      >
         {/* 프로젝트 이름 카드 */}
         <FormCard
           title="프로젝트 이름"
@@ -80,7 +101,7 @@ const BaseForm = forwardRef<BaseFormRef, BaseFormProps>(({ onSubmit }, ref) => {
         >
           <div className="w-[571px] h-[90px] ml-[50px] mt-[30px] [&>div]:!w-[571px] [&>div>button]:!h-[90px] [&>div>button]:!pl-[30px] [&>div>button]:!pt-[26px] [&>div>button]:!pb-[27px]">
             <Dropdown
-              options={["웹 개발", "모바일 앱", "시스템", "게임", "기타"]}
+              options={loadingFields ? ["불러오는 중..."] : fields}
               placeholder="분야"
             />
           </div>
@@ -123,8 +144,4 @@ const BaseForm = forwardRef<BaseFormRef, BaseFormProps>(({ onSubmit }, ref) => {
       </div>
     </form>
   );
-});
-
-BaseForm.displayName = "BaseForm";
-
-export default BaseForm;
+}

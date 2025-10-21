@@ -31,10 +31,12 @@ export default function Header({ variant = "transparent" }: HeaderProps) {
 
   return (
     <header role="banner" className={headerStyles}>
-      <div className="w-full max-w-[1920px] mx-auto h-full flex items-center justify-between px-8">
+      <div className="w-full max-w-[1920px] mx-auto h-full flex items-center px-8 relative">
         <Logo />
-        <Navigation />
-        <div className="flex items-center gap-[24px]">
+        <div className="absolute left-1/2 -translate-x-1/2">
+          <Navigation />
+        </div>
+        <div className="flex items-center gap-[24px] ml-auto">
           <ProfileImage />
           <LoginButton />
         </div>
