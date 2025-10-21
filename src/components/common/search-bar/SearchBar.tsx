@@ -1,6 +1,11 @@
 "use client";
 
-export default function SearchBar() {
+interface SearchBarProps {
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+export default function SearchBar({ value, onChange }: SearchBarProps) {
   return (
     <div className="flex items-center max-w-[1420px] h-[110px] px-10 py-[25px] bg-white rounded-[20px] border border-gray">
       <label htmlFor="search" className="sr-only">
@@ -34,6 +39,8 @@ export default function SearchBar() {
       </svg>
 
       <input
+        value={value} // store 값 그대로 보여줌
+        onChange={onChange}
         id="search"
         type="text"
         placeholder="검색어를 입력하세요."

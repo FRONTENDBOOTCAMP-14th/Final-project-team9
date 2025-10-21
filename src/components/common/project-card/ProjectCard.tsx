@@ -2,6 +2,7 @@
 
 import { Calendar, Clock, Heart, UsersRound } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   PROJECT_STATUS_LABEL,
   PROJECT_STATUS_COLOR,
@@ -22,6 +23,7 @@ interface ProjectCardProps {
   remain: number;
   category: string;
   status?: ProjectStatus;
+  profile_image: string;
 }
 
 export default function ProjectCard({
@@ -37,7 +39,9 @@ export default function ProjectCard({
   remain,
   category,
   status = "recruiting",
+  profile_image,
 }: ProjectCardProps) {
+  const router = useRouter();
   const { favorites, toggleFavorite } = useFavoriteStore();
   const isFavorite = favorites.includes(id);
 
@@ -69,10 +73,11 @@ export default function ProjectCard({
 
       <div className="flex items-center gap-[30px] mt-[91px]">
         <Image
-          src="/assets/no-profile.svg"
+          src={profile_image}
           alt="프로필"
           width={100}
           height={100}
+          className="rounded-full aspect-square"
         />
         <div className="flex flex-col gap-2.5">
           <div className="font-bold text-deep text-6">{owner}</div>
@@ -116,7 +121,10 @@ export default function ProjectCard({
           <span className="text-primary font-bold">{remain}자리</span>
           <span className="text-deep"> 남았어요</span>
         </span>
-        <button className="bg-primary text-white px-[15px] py-[6px] rounded-[10px] text-5 hover:bg-blue-700">
+        <button
+          className="bg-primary text-white px-[15px] py-[6px] rounded-[10px] text-5 hover:bg-blue-700"
+          onClick={() => router.push("/project-detail")}
+        >
           자세히보기
         </button>
       </div>
