@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import React, { useEffect, useRef } from "react";
 import Button from "@/components/common/Button";
 import Dropdown from "@/components/common/input/Dropdown";
-import { supabase } from "@/lib/supabase";
+import { useModalAccessibility } from "@/hooks/useModalAccessibility";
+import { useProfileForm } from "@/hooks/useProfileForm";
 import { useDropdownStore } from "@/store/dropdown-store";
-import type { UserProfileCardProps } from "./Profile"; // 파일 경로 확인 필요
+import ProfileImageUploader from "./ProfileImageUploader";
+import type { UserProfileCardProps } from "./Profile";
 
 const CloseIcon = () => (
   <svg
@@ -23,22 +24,11 @@ const CloseIcon = () => (
   </svg>
 );
 
-const PlusIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="30"
-    height="30"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="white"
-    strokeWidth="3"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="12" y1="5" x2="12" y2="19" />
-    <line x1="5" y1="12" x2="19" y2="12" />
-  </svg>
-);
+// 상수 분리
+const MAX_SKILLS = 3;
+const MAX_INTRODUCTION_LENGTH = 100;
+const FIELD_OPTIONS = ["프론트엔드", "백엔드", "디자이너", "기획자"];
+const EXPERIENCE_OPTIONS = ["신입", "1-3년", "3-5년", "5년 이상"];
 
 export default function ProfileEditModal({
   user,
@@ -49,20 +39,27 @@ export default function ProfileEditModal({
   onClose: () => void;
   onSave: (updatedUser: Omit<UserProfileCardProps, "projectCounts">) => void;
 }) {
-  const [formData, setFormData] = useState(user);
-  const [skillInput, setSkillInput] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
-  const previousFocusElement = useRef<HTMLElement | null>(null); // 모달이 열리기 전 포커스된 요소 저장
 
-  // 상수 분리
-  const MAX_SKILLS = 3;
-  const MAX_INTRODUCTION_LENGTH = 100;
-  const FIELD_OPTIONS = ["프론트엔드", "백엔드", "디자이너", "기획자"];
-  const EXPERIENCE_OPTIONS = ["신입", "1-3년", "3-5년", "5년 이상"];
+  // 1. 모달 접근성 관련 로직
+  useModalAccessibility(modalRef, onClose);
 
+  // 2. 폼 상태 및 핸들러 로직
+  const {
+    formData,
+    setFormData,
+    skillInput,
+    setSkillInput,
+    errors,
+    handleImageChange,
+    handleSkillAdd,
+    handleSkillRemove,
+    handleChange,
+    handleSubmit,
+  } = useProfileForm(user, onSave);
+
+  // 3. 드롭다운 상태 관리
   const { selectedValues, setSelected } = useDropdownStore();
 
   // Dropdown 초기값 설정
@@ -82,243 +79,10 @@ export default function ProfileEditModal({
     if (experience && experience !== formData.experience) {
       setFormData((prev) => ({ ...prev, experience }));
     }
-  }, [selectedValues, formData.field, formData.experience]);
-
-  // 모달 접근성 및 상호작용 관리 (포커스 트랩, 외부 클릭, ESC)
-  useEffect(() => {
-    // 모달이 열릴 때 현재 포커스된 요소를 저장
-    previousFocusElement.current = document.activeElement as HTMLElement;
-
-    // 모달이 열리면 모달 내의 첫 번째 대화형 요소에 포커스
-    const focusableElements = modalRef.current?.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    );
-
-    if (focusableElements && focusableElements.length > 0) {
-      // 첫 번째 요소에 포커스
-      focusableElements[0].focus();
-    } else {
-      // 대화형 요소가 없을 경우 모달 컨테이너 자체에 포커스 (폴백)
-      modalRef.current?.focus();
-    }
-
-    // 키보드 이벤트 핸들러
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // ESC 키로 모달 닫기
-      if (e.key === "Escape") {
-        onClose();
-        return;
-      }
-
-      // Tab 키로 포커스 트랩 구현
-      if (e.key === "Tab") {
-        if (!focusableElements || focusableElements.length === 0) {
-          // 포커스 가능한 요소가 없으면 탭 이동을 막음
-          e.preventDefault();
-          return;
-        }
-
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
-
-        if (e.shiftKey) {
-          // Shift + Tab: 포커스가 첫 번째 요소에 있을 때 마지막 요소로 이동
-          if (document.activeElement === firstElement) {
-            lastElement.focus();
-            e.preventDefault(); // 브라우저의 기본 동작을 막아 포커스가 모달 밖으로 나가지 않도록 함
-          }
-        } else {
-          // Tab: 포커스가 마지막 요소에 있을 때 첫 번째 요소로 이동
-          if (document.activeElement === lastElement) {
-            firstElement.focus();
-            e.preventDefault(); // 브라우저의 기본 동작을 막아 포커스가 모달 밖으로 나가지 않도록 함
-          }
-        }
-      }
-    };
-
-    // 모달 외부 클릭 시 닫기
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
-        onClose();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("mousedown", handleClickOutside);
-
-    // 컴포넌트 언마운트 시 클린업 함수
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("mousedown", handleClickOutside);
-      previousFocusElement.current?.focus(); // 원래 포커스로 복원
-    };
-  }, [onClose]);
-
-  // 이미지 파일 변경 핸들러
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // 이미지 파일인지 확인
-      if (!file.type.startsWith("image/")) {
-        alert("이미지 파일만 업로드 가능합니다.");
-        return;
-      }
-
-      // 파일 크기 제한 (10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        alert("파일 크기는 10MB 이하여야 합니다.");
-        return;
-      }
-
-      setProfileImageFile(file);
-
-      // 미리보기 이미지 생성
-      const newImageUrl = URL.createObjectURL(file);
-      setFormData((prev) => ({ ...prev, profileImageUrl: newImageUrl }));
-    }
-  };
-
-  // --- ✅ 모든 함수를 독립적으로 분리 ---
-
-  const handleSkillAdd = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key !== "Enter") return;
-
-    e.preventDefault();
-    const trimmedSkill = skillInput.trim();
-    if (trimmedSkill === "") return;
-
-    if (formData.skills.length >= MAX_SKILLS) {
-      alert(`최대 ${MAX_SKILLS}개까지만 추가할 수 있습니다.`);
-      return;
-    }
-    if (
-      formData.skills
-        .map((s) => s.toLowerCase())
-        .includes(trimmedSkill.toLowerCase())
-    ) {
-      alert("이미 추가된 기술 스택입니다.");
-      return;
-    }
-
-    setFormData((prev) => ({
-      ...prev,
-      skills: [...prev.skills, trimmedSkill],
-    }));
-    setSkillInput("");
-  };
-
-  const handleSkillRemove = (skillToRemove: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      skills: prev.skills.filter((skill) => skill !== skillToRemove),
-    }));
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    if (formData.introduction.length > MAX_INTRODUCTION_LENGTH) {
-      newErrors.introduction = `한 줄 소개는 ${MAX_INTRODUCTION_LENGTH}자 이내로 작성해주세요.`;
-    }
-    if (formData.skills.length === 0) {
-      newErrors.skills = "최소 1개의 기술 스택을 추가해주세요.";
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async () => {
-    if (!validateForm()) return;
-
-    try {
-      // 프로필 이미지 업로드 처리
-      let profileImageUrl = formData.profileImageUrl;
-
-      // 새로운 이미지 파일이 있을 때만 업로드
-      if (profileImageFile) {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user) {
-          alert("로그인이 필요합니다.");
-          return;
-        }
-
-        const fileExt = profileImageFile.name.split(".").pop();
-        const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-        const filePath = `profiles/${fileName}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from("profile-images")
-          .upload(filePath, profileImageFile);
-
-        if (uploadError) {
-          console.error("이미지 업로드 실패:", uploadError);
-          alert("프로필 이미지 업로드에 실패했습니다.");
-          return;
-        }
-
-        // 업로드된 이미지의 public URL 가져오기
-        const { data: publicUrlData } = supabase.storage
-          .from("profile-images")
-          .getPublicUrl(filePath);
-
-        profileImageUrl = publicUrlData.publicUrl;
-
-        // users 테이블 업데이트
-        const { error: updateError } = await supabase
-          .from("users")
-          .update({ profile_image: profileImageUrl })
-          .eq("id", user.id);
-
-        if (updateError) {
-          console.error("users 테이블 업데이트 실패:", updateError);
-        }
-
-        // user_metadata 업데이트
-        const { error: metadataError } = await supabase.auth.updateUser({
-          data: {
-            profile_image: profileImageUrl,
-          },
-        });
-
-        if (metadataError) {
-          console.error("user_metadata 업데이트 실패:", metadataError);
-        }
-      } else {
-        // 이미지를 변경하지 않았다면 기존 URL 유지
-        // blob URL이 아닌 원본 URL 사용
-        if (
-          formData.profileImageUrl?.startsWith("blob:") ||
-          formData.profileImageUrl?.startsWith("data:")
-        ) {
-          profileImageUrl = user.profileImageUrl; // 원본 user 데이터의 URL 사용
-        }
-      }
-
-      // 업데이트된 프로필 정보 저장
-      onSave({ ...formData, profileImageUrl });
-    } catch (error) {
-      console.error("프로필 업데이트 실패:", error);
-      alert("프로필 업데이트에 실패했습니다.");
-    }
-  };
+  }, [selectedValues, formData.field, formData.experience, setFormData]);
 
   return (
-    <div className="fixed inset-0 flex justify-center items-center z-50 backdrop-blur-sm">
+    <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/50">
       <style>{`
         .profile-modal-dropdown [role="listbox"] {
           font-size: 16px !important;
@@ -345,37 +109,15 @@ export default function ProfileEditModal({
         ref={modalRef}
         className="bg-[#e9fafe] rounded-2xl px-[90px] py-10 shadow-2xl w-full max-w-[600px] flex flex-col gap-6 relative"
       >
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="relative mx-auto mb-4 w-32 h-32 group"
-          aria-label="프로필 이미지 변경"
-        >
-          <input
-            type="file"
-            accept="image/*"
-            ref={fileInputRef}
-            onChange={handleImageChange}
-            className="hidden"
-          />
-          <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 group-hover:border-primary transition-colors bg-gray-100">
-            <Image
-              src={formData.profileImageUrl || "/assets/no-profile.svg"}
-              alt="Profile"
-              width={128}
-              height={128}
-              className="w-full h-full object-cover"
-              unoptimized={
-                formData.profileImageUrl?.startsWith("blob:") ||
-                formData.profileImageUrl?.endsWith(".svg")
-              }
-            />
-          </div>
-          <div className="absolute -bottom-1 -right-1 w-10 h-10 bg-[color:var(--color-deep)] rounded-full flex justify-center items-center group-hover:bg-primary transition-colors shadow-lg">
-            <PlusIcon />
-          </div>
-        </button>
+        <ProfileImageUploader
+          imageUrl={formData.profileImageUrl}
+          name={formData.name}
+          fileInputRef={fileInputRef}
+          onImageChange={handleImageChange}
+        />
 
         <div className="space-y-4">
+          {/* 아이디 */}
           <div>
             <label className="block text-sm font-medium text-gray mb-1">
               아이디
@@ -387,6 +129,7 @@ export default function ProfileEditModal({
               className="w-full p-3 bg-[#e9fafe] rounded-md border border-gray text-gray-500 cursor-not-allowed"
             />
           </div>
+          {/* 이메일 */}
           <div>
             <label className="block text-sm font-medium text-gray mb-1">
               이메일
@@ -398,6 +141,7 @@ export default function ProfileEditModal({
               className="w-full p-3 bg-[#e9fafe] rounded-md border border-gray text-gray-500 cursor-not-allowed"
             />
           </div>
+          {/* 한 줄 소개 */}
           <div>
             <label
               htmlFor="introduction"
@@ -419,6 +163,7 @@ export default function ProfileEditModal({
               <p className="text-red-500 text-sm mt-1">{errors.introduction}</p>
             )}
           </div>
+          {/* 분야 */}
           <div>
             <label
               htmlFor="field"
@@ -426,16 +171,15 @@ export default function ProfileEditModal({
             >
               분야
             </label>
-            <div className="profile-modal-dropdown">
-              <Dropdown
-                options={FIELD_OPTIONS}
-                placeholder="분야"
-                width="100%"
-                height="48px"
-                className="!border-0 !text-[16px] !text-gray"
-              />
-            </div>
+            <Dropdown
+              options={FIELD_OPTIONS}
+              placeholder="분야"
+              width="100%"
+              height="48px"
+              className="!border-0 !text-[16px] !text-gray"
+            />
           </div>
+          {/* 경력 */}
           <div>
             <label
               htmlFor="experience"
@@ -443,16 +187,15 @@ export default function ProfileEditModal({
             >
               경력
             </label>
-            <div className="profile-modal-dropdown">
-              <Dropdown
-                options={EXPERIENCE_OPTIONS}
-                placeholder="경력"
-                width="100%"
-                height="48px"
-                className="!border-0 !text-[16px] !text-gray"
-              />
-            </div>
+            <Dropdown
+              options={EXPERIENCE_OPTIONS}
+              placeholder="경력"
+              width="100%"
+              height="48px"
+              className="!border-0 !text-[16px] !text-gray"
+            />
           </div>
+          {/* 기술 스택 */}
           <div>
             <label
               htmlFor="skills"
