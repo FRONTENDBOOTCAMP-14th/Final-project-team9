@@ -1,27 +1,27 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import SearchFilterSection from '@/components/find-project/SearchFilterSection'
-import SearchResultsSection from '@/components/find-project/SearchResultsSection'
-import { fetchProjects } from '@/hooks/fetchProjects'
-import { useSearchFilterStore } from '@/store/search-filter-store'
-import type { ProjectCard } from '@/types/project'
+import { useState } from "react";
+import SearchFilterSection from "@/components/find-project/SearchFilterSection";
+import SearchResultsSection from "@/components/find-project/SearchResultsSection";
+import { fetchProjects } from "@/hooks/fetchProjects";
+import { useSearchFilterStore } from "@/store/search-filter-store";
+import type { ProjectCard } from "@/types/project";
 
 export default function FindProjectContent() {
-  const [searchResults, setSearchResults] = useState<ProjectCard[]>([])
-  const filters = useSearchFilterStore((state) => state.filters)
-  const hasSearched = useSearchFilterStore((state) => state.hasSearched)
-  const setHasSearched = useSearchFilterStore((state) => state.setHasSearched)
-  const [loading, setLoading] = useState(false)
+  const [searchResults, setSearchResults] = useState<ProjectCard[]>([]);
+  const filters = useSearchFilterStore((state) => state.filters);
+  const hasSearched = useSearchFilterStore((state) => state.hasSearched);
+  const setHasSearched = useSearchFilterStore((state) => state.setHasSearched);
+  const [loading, setLoading] = useState(false);
 
   const handleSearch = async () => {
-    setLoading(true)
-    setHasSearched(true)
+    setLoading(true);
+    setHasSearched(true);
 
-    const data = await fetchProjects(filters)
-    setSearchResults(data)
-    setLoading(false)
-  }
+    const data = await fetchProjects(filters);
+    setSearchResults(data);
+    setLoading(false);
+  };
 
   return (
     <>
@@ -33,5 +33,5 @@ export default function FindProjectContent() {
       ) : null}
       <div className="mt-[318px]" aria-hidden="true" />
     </>
-  )
+  );
 }

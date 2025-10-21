@@ -1,15 +1,15 @@
-import Button from '@/components/common/Button'
-import Dropdown from '@/components/common/input/Dropdown'
-import ResetFilterButton from '@/components/common/reset-filter-button/ResetFilterButton'
-import SearchBar from '@/components/common/search-bar/SearchBar'
-import DropdownWithTag from '@/components/common/tag/DropdownWithTag'
-import { jalnan } from '@/fonts'
-import { useSearchFilterStore } from '@/store/search-filter-store'
-import { useEffect, useState } from 'react'
-import fetchFilterOptions from '@/hooks/fetchFilterOptions'
+import { useEffect, useState } from "react";
+import Button from "@/components/common/Button";
+import Dropdown from "@/components/common/input/Dropdown";
+import ResetFilterButton from "@/components/common/reset-filter-button/ResetFilterButton";
+import SearchBar from "@/components/common/search-bar/SearchBar";
+import DropdownWithTag from "@/components/common/tag/DropdownWithTag";
+import { jalnan } from "@/fonts";
+import fetchFilterOptions from "@/hooks/fetchFilterOptions";
+import { useSearchFilterStore } from "@/store/search-filter-store";
 
 interface SearchFilterSectionProps {
-  onSearch: () => void
+  onSearch: () => void;
 }
 
 export default function SearchFilterSection({
@@ -19,29 +19,29 @@ export default function SearchFilterSection({
     positions: [],
     fields: [],
     domains: [],
-  })
-  const filters = useSearchFilterStore((state) => state.filters)
-  const setPosition = useSearchFilterStore((state) => state.setPosition)
-  const setDuration = useSearchFilterStore((state) => state.setDuration)
-  const setField = useSearchFilterStore((state) => state.setField)
-  const setDomain = useSearchFilterStore((state) => state.setDomain)
-  const setSearchQuery = useSearchFilterStore((state) => state.setSearchQuery)
+  });
+  const filters = useSearchFilterStore((state) => state.filters);
+  const setPosition = useSearchFilterStore((state) => state.setPosition);
+  const setDuration = useSearchFilterStore((state) => state.setDuration);
+  const setField = useSearchFilterStore((state) => state.setField);
+  const setDomain = useSearchFilterStore((state) => state.setDomain);
+  const setSearchQuery = useSearchFilterStore((state) => state.setSearchQuery);
 
   useEffect(() => {
     async function getOptions() {
       try {
-        const result = await fetchFilterOptions()
+        const result = await fetchFilterOptions();
         setOptions({
           positions: result.position.map((p) => p.name),
           fields: result.field.map((f) => f.name),
           domains: result.domain.map((d) => d.name),
-        })
+        });
       } catch (error) {
-        console.error('필터 옵션 불러오기 실패', error)
+        console.error("필터 옵션 불러오기 실패", error);
       }
     }
-    getOptions()
-  }, [])
+    void getOptions();
+  }, []);
 
   return (
     <section
@@ -74,7 +74,7 @@ export default function SearchFilterSection({
           width="250px"
         />
         <Dropdown
-          options={['1개월', '3개월', '6개월', '1년', '1년 이상']}
+          options={["1개월", "3개월", "6개월", "1년", "1년 이상"]}
           onChange={(value) => setDuration(value)}
           placeholder="기간"
           width="250px"
@@ -82,7 +82,7 @@ export default function SearchFilterSection({
         <Dropdown
           options={options.fields}
           onChange={(value) => {
-            setField(value)
+            setField(value);
           }}
           placeholder="분야"
           width="250px"
@@ -125,5 +125,5 @@ export default function SearchFilterSection({
         </Button>
       </div>
     </section>
-  )
+  );
 }
