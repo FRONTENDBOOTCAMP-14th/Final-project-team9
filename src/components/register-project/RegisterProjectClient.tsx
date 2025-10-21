@@ -90,7 +90,7 @@ export default function RegisterProjectClient() {
               stack = data;
             }
             return { project_id: projectId, tech_stack_id: stack.id };
-          }),
+          })
         );
 
         await supabase.from("project_tech_stacks").insert(techStacksToInsert);
@@ -152,6 +152,8 @@ export default function RegisterProjectClient() {
 
     if (canProceed && currentStep < 3) {
       setCurrentStep(currentStep + 1);
+      // 다음 단계로 넘어갈 때 페이지 상단으로 스크롤
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
