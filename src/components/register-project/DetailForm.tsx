@@ -79,19 +79,19 @@ export default function DetailForm({ onSubmit, ref }: DetailFormProps) {
         width="1473px"
         height="649px"
       >
-        <div className="w-full flex flex-col items-center mt-[30px]">
+        <div className="w-full flex flex-col items-center mt-[30px] px-[69px]">
           <textarea
             value={detailData.plan}
             onChange={(e) => handleInputChange(e.target.value)}
             placeholder="ex) 이 프로젝트는 향후 3개월간 주 3회, 매 회 2시간씩 온라인 미팅을 진행하며, 주요 마일스톤은 다음과 같습니다. 첫 달에는 기획 및 디자인 작업을 완료하고, 두 번째 달에는 개발을 시작하여 기본 기능을 구현할 예정입니다. 마지막 달에는 테스트 및 버그 수정을 통해 완성도를 높일 계획입니다. 팀원들은 각자의 역할에 따라 책임감을 가지고 프로젝트에 임해주셨으면 합니다. 또한, 프로젝트 진행 중 발생하는 아이디어나 개선 사항은 언제든지 공유해 주세요. 함께 멋진 결과물을 만들어 나가길 기대합니다."
-            className="w-[1335px] h-[404px] border border-gray-200 rounded-lg px-[30px] py-[30px] focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            className="w-full h-[404px] border border-gray-200 rounded-lg px-[30px] py-[30px] focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             style={{
               fontSize: "var(--text-7)",
               color: "var(--color-gray)",
             }}
             maxLength={1000}
           />
-          <div className="w-[1335px] flex justify-between items-center mt-4">
+          <div className="w-full flex justify-between items-center mt-4">
             <div
               style={{
                 fontSize: "var(--text-5)",
