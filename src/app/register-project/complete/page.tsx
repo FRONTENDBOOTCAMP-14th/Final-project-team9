@@ -14,7 +14,7 @@ export default function RegisterProjectCompletePage() {
         <div className="text-center">
           {/* 완료 메시지 */}
           <h1
-            className={`${jalnan.className} mb-[91px] text-[length:var(--text-12)] text-[color:var(--color-primary)]`}
+            className={`${jalnan.className} mt-[168px] mb-[91px] text-[length:var(--text-12)] text-[color:var(--color-primary)]`}
           >
             등록이 완료되었습니다!
           </h1>
@@ -32,7 +32,7 @@ export default function RegisterProjectCompletePage() {
 
           {/* 프로젝트로 이동 버튼 */}
           <Link
-            href="/projects"
+            href="/project-detail"
             className={`
               ${jalnan.className}
               inline-flex items-center justify-center
