@@ -18,7 +18,10 @@ export default function SearchResultsSection({
       </h2>
 
       {results.length > 0 ? (
-        <ul className="mt-[50px] grid grid-cols-3 gap-6" role="list">
+        <ul
+          className="mt-[50px] grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"
+          role="list"
+        >
           {results.map((project) => (
             <li key={project.id}>
               <ProjectCard
