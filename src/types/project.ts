@@ -23,12 +23,10 @@ export interface ProjectDetail {
 
   // 모집 포지션 정보
   positions: {
-    기획: number;
-    디자인: number;
-    프론트엔드: number;
-    백엔드: number;
-    기타: number;
-  };
+    id: number;
+    position_name: string;
+    recruit_count: number;
+  }[];
 
   // 프로젝트 상태 (모집중 | 모집완료)
   status: ProjectStatus;
@@ -62,12 +60,10 @@ export interface ProjectHeaderInfo {
   estimatedPeriod: string;
   duration: "1개월" | "3개월" | "6개월" | "1년";
   positions: {
-    기획: number;
-    디자인: number;
-    프론트엔드: number;
-    백엔드: number;
-    기타: number;
-  };
+    id: number;
+    position_name: string;
+    recruit_count: number;
+  }[];
   status: ProjectStatus;
 }
 

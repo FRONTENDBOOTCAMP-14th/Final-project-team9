@@ -102,7 +102,7 @@ export default function RegisterProjectClient() {
               stack = data;
             }
             return { project_id: projectId, tech_stack_id: stack.id };
-          })
+          }),
         );
 
         await supabase.from("project_tech_stacks").insert(techStacksToInsert);

@@ -52,17 +52,11 @@ export default function ProjectDetailHeader({
   const isFavorite = favorites.includes(project.id);
 
   // 모집 포지션 데이터 구조화
-  const positionList: PositionInfo[] = [
-    { key: "기획", label: "기획", count: project.positions.기획 },
-    { key: "디자인", label: "디자인", count: project.positions.디자인 },
-    {
-      key: "프론트엔드",
-      label: "프론트엔드",
-      count: project.positions.프론트엔드,
-    },
-    { key: "백엔드", label: "백엔드", count: project.positions.백엔드 },
-    { key: "기타", label: "기타", count: project.positions.기타 },
-  ].filter((position) => position.count > 0);
+  const positionList: PositionInfo[] = project.positions.map((pos) => ({
+    key: pos.id.toString(),
+    label: pos.position_name,
+    count: pos.recruit_count,
+  }));
 
   return (
     <header className="w-full h-[640px] bg-gradient-to-r from-deep to-[#006ebd] py-20">
