@@ -1,8 +1,17 @@
+import type { Metadata } from "next";
 import Footer from "@/components/common/footer/Footer";
 import GoTopButton from "@/components/common/GoTopButton";
 import Header from "@/components/common/header/Header";
 import RegisterProjectClient from "@/components/register-project/RegisterProjectClient";
 import { jalnan } from "@/fonts";
+
+export const metadata: Metadata = {
+  title: "프로젝트 등록 | JOYIN",
+  description: "프로젝트 정보를 입력하고 딱 맞는 팀원을 찾아보세요!",
+  icons: {
+    icon: "/assets/joyin-fav.ico",
+  },
+};
 
 export default function RegisterProjectPage() {
   return (
