@@ -123,7 +123,7 @@ export default function ProjectCard({
         </span>
         <button
           className="bg-primary text-white px-[15px] py-[6px] rounded-[10px] text-5 hover:bg-blue-700"
-          onClick={() => router.push("/project-detail")}
+          onClick={() => router.push(`/project-detail/${id}`)}
         >
           자세히보기
         </button>
