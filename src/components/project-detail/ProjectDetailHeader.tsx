@@ -1,25 +1,25 @@
-'use client'
+"use client";
 
-import { Heart, UsersRound, Calendar, Clock } from 'lucide-react'
-import { PROJECT_STATUS_LABEL } from '@/constants/project'
-import { useFavoriteStore } from '@/store/favorite-store'
-import type { ProjectHeaderInfo } from '@/types/project'
-import type { LucideIcon } from 'lucide-react'
+import { Heart, UsersRound, Calendar, Clock } from "lucide-react";
+import { PROJECT_STATUS_LABEL } from "@/constants/project";
+import { useFavoriteStore } from "@/store/favorite-store";
+import type { ProjectHeaderInfo } from "@/types/project";
+import type { LucideIcon } from "lucide-react";
 
 interface ProjectDetailHeaderProps {
-  project: ProjectHeaderInfo
+  project: ProjectHeaderInfo;
 }
 
 interface InfoCardProps {
-  icon: LucideIcon
-  label: string
-  value: string
+  icon: LucideIcon;
+  label: string;
+  value: string;
 }
 
 interface PositionInfo {
-  key: string
-  label: string
-  count: number
+  key: string;
+  label: string;
+  count: number;
 }
 
 // 정보 카드 컴포넌트
@@ -32,7 +32,7 @@ function InfoCard({ icon: Icon, label, value }: InfoCardProps) {
         <p className="text-[28px] text-white">{value}</p>
       </div>
     </div>
-  )
+  );
 }
 
 // 포지션 카드 컴포넌트
@@ -42,21 +42,21 @@ function PositionCard({ label, count }: { label: string; count: number }) {
       <span className="text-5 mb-2">{label}</span>
       <span className="text-[28px]">{count}명</span>
     </div>
-  )
+  );
 }
 
 export default function ProjectDetailHeader({
   project,
 }: ProjectDetailHeaderProps) {
-  const { favorites, toggleFavorite } = useFavoriteStore()
-  const isFavorite = favorites.includes(project.id)
+  const { favorites, toggleFavorite } = useFavoriteStore();
+  const isFavorite = favorites.includes(project.id);
 
   // 모집 포지션 데이터 구조화
   const positionList: PositionInfo[] = project.positions.map((pos) => ({
     key: pos.id.toString(),
     label: pos.position_name,
     count: pos.recruit_count,
-  }))
+  }));
 
   return (
     <header className="w-full h-[640px] bg-gradient-to-r from-deep to-[#006ebd] py-20">
@@ -92,8 +92,8 @@ export default function ProjectDetailHeader({
               <Heart
                 className={`w-8 h-8 ${
                   isFavorite
-                    ? 'fill-red-500 stroke-red-500'
-                    : 'stroke-white fill-none'
+                    ? "fill-red-500 stroke-red-500"
+                    : "stroke-white fill-none"
                 }`}
                 aria-hidden="true"
               />
@@ -150,5 +150,5 @@ export default function ProjectDetailHeader({
         </div>
       </div>
     </header>
-  )
+  );
 }

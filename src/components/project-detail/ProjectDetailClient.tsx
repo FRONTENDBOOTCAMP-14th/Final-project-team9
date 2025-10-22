@@ -1,13 +1,13 @@
-'use client'
+"use client";
 
-import { ProjectDetailHeader, ProjectDetailContent } from './index'
-import type { ProjectHeaderInfo, ProjectDetail } from '@/types/project'
-import { useIsOwner } from '@/hooks/useIsOwner'
+import { useIsOwner } from "@/hooks/useIsOwner";
+import type { ProjectHeaderInfo, ProjectDetail } from "@/types/project";
+import { ProjectDetailHeader, ProjectDetailContent } from "./index";
 
 interface ProjectDetailClientProps {
-  projectHeaderData: ProjectHeaderInfo
-  projectDetailData: ProjectDetail
-  ownerId: string
+  projectHeaderData: ProjectHeaderInfo;
+  projectDetailData: ProjectDetail;
+  ownerId: string;
 }
 
 export default function ProjectDetailClient({
@@ -15,14 +15,14 @@ export default function ProjectDetailClient({
   projectDetailData,
   ownerId,
 }: ProjectDetailClientProps) {
-  const { isOwner, loading } = useIsOwner(ownerId)
+  const { isOwner, loading } = useIsOwner(ownerId);
 
-  if (loading) return <p>Loading...</p>
+  if (loading) return <p>Loading...</p>;
 
   return (
     <>
       <ProjectDetailHeader project={projectHeaderData} />
       <ProjectDetailContent project={projectDetailData} isOwner={isOwner} />
     </>
-  )
+  );
 }

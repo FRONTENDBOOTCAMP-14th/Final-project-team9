@@ -1,27 +1,27 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export function useIsOwner(projectOwnerId: string) {
-  const [isOwner, setIsOwner] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [isOwner, setIsOwner] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function checkOwner() {
       const {
         data: { user },
-      } = await supabase.auth.getUser()
+      } = await supabase.auth.getUser();
       if (user) {
-        setIsOwner(user.id === projectOwnerId)
+        setIsOwner(user.id === projectOwnerId);
       } else {
-        setIsOwner(false)
+        setIsOwner(false);
       }
-      setLoading(false)
+      setLoading(false);
     }
 
-    checkOwner()
-  }, [projectOwnerId])
+    void checkOwner();
+  }, [projectOwnerId]);
 
-  return { isOwner, loading }
+  return { isOwner, loading };
 }
