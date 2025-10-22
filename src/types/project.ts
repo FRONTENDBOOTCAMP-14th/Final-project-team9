@@ -73,6 +73,7 @@ export interface ProjectHeaderInfo {
 
 // 프로젝트 카드에서 사용할 타입 (검색/목록 페이지)
 export interface ProjectCard {
+  profile_image: string;
   id: number;
   title: string;
   description: string;
@@ -80,11 +81,10 @@ export interface ProjectCard {
   level: string;
   members: number;
   period: string;
-  duration: "1개월" | "3개월" | "6개월" | "1년";
+  duration: string;
   skills: string[];
   remain: number;
-  category: "앱 개발" | "웹 개발" | "게임" | "시스템" | "기타";
-  domain: "이커머스" | "SNS" | "게임" | "유틸" | "커뮤니티" | "기타";
+  category: string;
   position: string;
   status: ProjectStatus;
 }

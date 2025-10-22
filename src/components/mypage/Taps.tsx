@@ -25,6 +25,7 @@ interface Project {
   skills: string[];
   remain: number;
   category: string;
+  profile_image: string;
 }
 
 // 카드 컴포넌트 임시 더미 데이터
@@ -42,6 +43,7 @@ const mockProjectsData: Record<string, Project[]> = {
       skills: ["React", "Next", "JS", "SW", "Spring"],
       remain: 2,
       category: "웹 개발",
+      profile_image: "/assets/no-profile.svg",
     },
     {
       id: 2,
@@ -55,6 +57,7 @@ const mockProjectsData: Record<string, Project[]> = {
       skills: ["Vue", "TS"],
       remain: 1,
       category: "앱 개발",
+      profile_image: "/assets/no-profile.svg",
     },
     {
       id: 3,
@@ -68,6 +71,7 @@ const mockProjectsData: Record<string, Project[]> = {
       skills: ["Vue", "TS"],
       remain: 1,
       category: "앱 개발",
+      profile_image: "/assets/no-profile.svg",
     },
     {
       id: 4,
@@ -81,6 +85,7 @@ const mockProjectsData: Record<string, Project[]> = {
       skills: ["Vue", "TS"],
       remain: 1,
       category: "앱 개발",
+      profile_image: "/assets/no-profile.svg",
     },
   ],
   interestedProjects: [],

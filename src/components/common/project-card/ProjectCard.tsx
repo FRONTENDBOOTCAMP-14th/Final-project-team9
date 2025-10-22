@@ -2,6 +2,7 @@
 
 import { Calendar, Clock, Heart, UsersRound } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   PROJECT_STATUS_LABEL,
   PROJECT_STATUS_COLOR,
@@ -22,6 +23,7 @@ interface ProjectCardProps {
   remain: number;
   category: string;
   status?: ProjectStatus;
+  profile_image: string;
 }
 
 export default function ProjectCard({
@@ -37,7 +39,9 @@ export default function ProjectCard({
   remain,
   category,
   status = "recruiting",
+  profile_image,
 }: ProjectCardProps) {
+  const router = useRouter();
   const { favorites, toggleFavorite } = useFavoriteStore();
   const isFavorite = favorites.includes(id);
 
@@ -62,17 +66,18 @@ export default function ProjectCard({
         </button>
       </div>
 
-      <h2 className="text-8 font-bold text-deep mt-[34px] whitespace-nowrap">
+      <h2 className="text-8 font-bold text-deep mt-[34px] break-words line-clamp-3">
         {title}
       </h2>
-      <p className="text-gray text-5 mt-[9px]">{description}</p>
+      <p className="text-gray text-5 mt-[9px] line-clamp-3">{description}</p>
 
-      <div className="flex items-center gap-[30px] mt-[91px]">
+      <div className="flex items-center gap-[30px] mt-auto">
         <Image
-          src="/assets/no-profile.svg"
+          src={profile_image}
           alt="프로필"
           width={100}
           height={100}
+          className="rounded-full aspect-square"
         />
         <div className="flex flex-col gap-2.5">
           <div className="font-bold text-deep text-6">{owner}</div>
@@ -98,11 +103,11 @@ export default function ProjectCard({
         </div>
       </div>
 
-      <div className="flex flex-wrap justify-between mt-7.5">
+      <div className="flex flex-wrap gap-2 mt-7.5">
         {skills.map((skill) => (
           <span
             key={skill}
-            className="flex items-center justify-center w-15 h-6 bg-[#eeeeee] text-black rounded-full text-3"
+            className="flex items-center justify-center px-3 h-6 bg-[#eeeeee] text-black rounded-full text-3 whitespace-nowrap"
           >
             {skill}
           </span>
@@ -116,7 +121,10 @@ export default function ProjectCard({
           <span className="text-primary font-bold">{remain}자리</span>
           <span className="text-deep"> 남았어요</span>
         </span>
-        <button className="bg-primary text-white px-[15px] py-[6px] rounded-[10px] text-5 hover:bg-blue-700">
+        <button
+          className="bg-primary text-white px-[15px] py-[6px] rounded-[10px] text-5 hover:bg-blue-700"
+          onClick={() => router.push(`/project-detail/${id}`)}
+        >
           자세히보기
         </button>
       </div>
