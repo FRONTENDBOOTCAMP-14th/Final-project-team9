@@ -1,6 +1,8 @@
 import Image from "next/image";
 import MainPageProjectCard from "@/components/common/project-card/MainPageProjectCard";
 import { jalnan } from "@/fonts";
+import { supabase } from "@/lib/supabase";
+import type { ProjectCard } from "@/types/project";
 import type { StatCardData } from "./types";
 
 // 통계 카드 데이터
@@ -25,65 +27,133 @@ const statsData: StatCardData[] = [
   },
 ];
 
-// 임시 프로젝트 데이터
-const projectsData = [
-  {
-    id: 1,
-    title: "AI 기반 주변 맛집 추천 서비스 개발",
-    description: "위치 기반 맛집 추천 AI 서비스",
-    owner: "지훈",
-    level: "주니어(3년 미만)",
-    members: 4,
-    period: "1.1-3.1",
-    duration: "2개월",
-    skills: ["React", "TypeScript", "Next.js"],
-    remain: 2,
-    category: "웹 개발",
-  },
-  {
-    id: 2,
-    title: "사이드 프로젝트 함께 할 앱 개발자 모집",
-    description: "모바일 앱 개발 프로젝트",
-    owner: "김미리",
-    level: "시니어(3년 이상)",
-    members: 6,
-    period: "5.27-6.5",
-    duration: "4개월",
-    skills: ["React Native", "Flutter"],
-    remain: 3,
-    category: "앱 개발",
-  },
-  {
-    id: 3,
-    title: "환경 관련 플랫폼 제작 백엔드 구함",
-    description: "환경 보호 플랫폼 개발",
-    owner: "박주현",
-    level: "주니어(3년 미만)",
-    members: 4,
-    period: "7.18-8.4",
-    duration: "2개월",
-    skills: ["Node.js", "Python", "Django"],
-    remain: 1,
-    category: "웹 개발",
-    status: "모집완료",
-  },
-  {
-    id: 4,
-    title: "영어 학습 서비스 팀원 모집(프론트, 디자인)",
-    description: "영어 학습 서비스 개발",
-    owner: "조수현",
-    level: "주니어(3년 미만)",
-    members: 5,
-    period: "9.24-10.29",
-    duration: "3개월",
-    skills: ["Vue.js", "Figma", "UI/UX"],
-    remain: 2,
-    category: "웹 개발",
-    status: "모집완료",
-  },
-];
+// Supabase에서 랜덤으로 4개의 프로젝트를 가져오는 함수
+async function fetchRandomProjects(): Promise<ProjectCard[]> {
+  try {
+    // 1. 전체 프로젝트 수 확인
+    const { count } = await supabase
+      .from("project_view")
+      .select("*", { count: "exact", head: true });
 
-export default function ProjectSection() {
+    if (!count || count === 0) return [];
+
+    // 2. 랜덤 오프셋 계산 (최대 4개까지만)
+    const limit = Math.min(4, count);
+    const maxOffset = Math.max(0, count - limit);
+    const randomOffset = Math.floor(Math.random() * (maxOffset + 1));
+
+    // 3. 랜덤 오프셋으로 프로젝트 조회
+    const { data: projects } = await supabase
+      .from("project_view")
+      .select("*")
+      .range(randomOffset, randomOffset + limit - 1);
+
+    if (!projects?.length) return [];
+
+    const projectIds = projects.map((p) => String(p.id));
+    const ownerIds = [...new Set(projects.map((p) => p.owner_id))];
+    const fieldIds = [...new Set(projects.map((p) => p.field_id))];
+
+    // 4. 관련 데이터 조회
+    const { data: owners } = await supabase
+      .from("users")
+      .select("id, nickname, profile_image, career_id")
+      .in("id", ownerIds);
+
+    const careerIds = [
+      ...new Set(owners?.map((o) => o.career_id).filter(Boolean)),
+    ];
+    const { data: careers } = await supabase
+      .from("careers")
+      .select("id, name")
+      .in("id", careerIds);
+
+    const { data: positions } = await supabase
+      .from("project_positions")
+      .select("project_id, recruit_count")
+      .in("project_id", projectIds);
+
+    const { data: techLinks } = await supabase
+      .from("project_tech_stacks")
+      .select("project_id, tech_stack_id")
+      .in("project_id", projectIds);
+
+    const techStackIds = [
+      ...new Set(techLinks?.map((t) => t.tech_stack_id).filter(Boolean)),
+    ];
+    const { data: techStacks } = await supabase
+      .from("tech_stacks")
+      .select("id, name")
+      .in("id", techStackIds);
+
+    const { data: fields } = await supabase
+      .from("fields")
+      .select("id, name")
+      .in("id", fieldIds);
+
+    // 5. 데이터 매핑
+    const mappedResults: ProjectCard[] = projects.map((p) => {
+      const owner = owners?.find((o) => o.id === p.owner_id);
+      const careerName =
+        careers?.find((c) => c.id === owner?.career_id)?.name ?? "경력 없음";
+      const memberCount =
+        positions
+          ?.filter((pos) => String(pos.project_id) === String(p.id))
+          .reduce((sum, pos) => sum + (pos.recruit_count ?? 0), 0) ?? 0;
+
+      const skills =
+        techLinks
+          ?.filter((t) => String(t.project_id) === String(p.id))
+          .map((t) => {
+            const tech = techStacks?.find((ts) => ts.id === t.tech_stack_id);
+            return tech?.name ?? "";
+          })
+          .filter(Boolean) ?? [];
+
+      const fieldName =
+        fields?.find((f) => f.id === p.field_id)?.name ?? "기타";
+
+      // 모집 기간 포맷팅: created_at ~ deadline
+      const formatDate = (dateString: string) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        return `${month}.${day}`;
+      };
+
+      const periodFormatted =
+        p.created_at && p.deadline
+          ? `${formatDate(p.created_at)}~${formatDate(p.deadline)}`
+          : p.deadline || "";
+
+      return {
+        id: p.id,
+        title: p.name,
+        description: p.short_description,
+        owner: owner?.nickname || "익명",
+        profile_image: owner?.profile_image || "/assets/no-profile.svg",
+        level: careerName,
+        members: memberCount,
+        period: periodFormatted,
+        duration: p.expected_schedule,
+        skills,
+        remain: 0,
+        category: fieldName,
+        position: p.position,
+        status: p.status || "모집중",
+      };
+    });
+
+    return mappedResults;
+  } catch (err) {
+    console.error("랜덤 프로젝트 조회 오류:", err);
+    return [];
+  }
+}
+
+export default async function ProjectSection() {
+  const projectsData = await fetchRandomProjects();
   return (
     <section
       className="bg-[#E9fbff] py-[100px]"
