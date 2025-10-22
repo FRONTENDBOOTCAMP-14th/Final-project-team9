@@ -1,143 +1,142 @@
-import { supabase } from "@/lib/supabase";
-import type { SearchFilters } from "@/store/search-filter-store";
-import type { ProjectCard } from "@/types/project";
+import { supabase } from '@/lib/supabase'
+import type { SearchFilters } from '@/store/search-filter-store'
+import type { ProjectCard } from '@/types/project'
 
 export async function fetchProjects(
   filters: SearchFilters,
 ): Promise<ProjectCard[]> {
   try {
-    let query = supabase.from("project_view").select("*");
+    let query = supabase.from('project_view').select('*')
 
     if (filters.searchQuery) {
-      const search = `%${filters.searchQuery}%`;
+      const search = `%${filters.searchQuery}%`
       query = query.or(
-        `name.ilike.${search},short_description.ilike.${search},expected_schedule.ilike.${search},detail_plan.ilike.${search},user_nickname.ilike.${search}`,
-      );
+        `name.ilike.${search},short_description.ilike.${search},expected_schedule.ilike.${search},detail_plan.ilike.${search},user_name.ilike.${search}`,
+      )
     }
 
     if (filters.position) {
       const { data: projectPos } = await supabase
-        .from("project_positions")
-        .select("project_id")
-        .eq("position_name", filters.position);
+        .from('project_positions')
+        .select('project_id')
+        .eq('position_name', filters.position)
 
-      const projectIds = projectPos?.map((p) => p.project_id);
-      if (projectIds?.length) query = query.in("id", projectIds);
+      const projectIds = projectPos?.map((p) => p.project_id)
+      if (projectIds?.length) query = query.in('id', projectIds)
     }
     if (filters.duration) {
       const { data: projectDur } = await supabase
-        .from("projects")
-        .select("id")
-        .eq("expected_schedule", filters.duration);
+        .from('projects')
+        .select('id')
+        .eq('expected_schedule', filters.duration)
 
-      const projectIds = projectDur?.map((d) => d.id);
-      if (projectIds?.length) query = query.in("id", projectIds);
+      const projectIds = projectDur?.map((d) => d.id)
+      if (projectIds?.length) query = query.in('id', projectIds)
     }
     if (filters.field) {
       const { data: fieldData } = await supabase
-        .from("fields")
-        .select("id")
-        .eq("name", filters.field);
+        .from('fields')
+        .select('id')
+        .eq('name', filters.field)
 
-      const fieldId = fieldData?.[0]?.id;
+      const fieldId = fieldData?.[0]?.id
 
       if (fieldId) {
         const { data: projectsWithField } = await supabase
-          .from("projects")
-          .select("id")
-          .eq("field_id", fieldId);
-        const projectIds = projectsWithField?.map((p) => p.id);
-        if (projectIds?.length) query = query.in("id", projectIds);
+          .from('projects')
+          .select('id')
+          .eq('field_id', fieldId)
+        const projectIds = projectsWithField?.map((p) => p.id)
+        if (projectIds?.length) query = query.in('id', projectIds)
         else {
-          return [];
+          return []
         }
       }
     }
     const { data: domainData } = await supabase
-      .from("domains")
-      .select("id")
-      .eq("name", filters.domain);
+      .from('domains')
+      .select('id')
+      .eq('name', filters.domain)
 
-    const domainId = domainData?.[0]?.id;
+    const domainId = domainData?.[0]?.id
 
     if (domainId) {
       const { data: projectsWithDomain } = await supabase
-        .from("projects")
-        .select("id")
-        .eq("domain_id", domainId);
-      const projectIds = projectsWithDomain?.map((p) => p.id);
-      if (projectIds?.length) query = query.in("id", projectIds);
+        .from('projects')
+        .select('id')
+        .eq('domain_id', domainId)
+      const projectIds = projectsWithDomain?.map((p) => p.id)
+      if (projectIds?.length) query = query.in('id', projectIds)
       else {
-        return [];
+        return []
       }
     }
 
-    const { data: projects, error: projectsError } = await query;
-    if (projectsError) throw projectsError;
-    if (!projects?.length) return [];
+    const { data: projects, error: projectsError } = await query
+    if (projectsError) throw projectsError
+    if (!projects?.length) return []
 
-    const projectIds = projects.map((p) => String(p.id));
-    const ownerIds = [...new Set(projects.map((p) => p.owner_id))];
-    const fieldIds = [...new Set(projects.map((p) => p.field_id))];
+    const projectIds = projects.map((p) => String(p.id))
+    const ownerIds = [...new Set(projects.map((p) => p.owner_id))]
+    const fieldIds = [...new Set(projects.map((p) => p.field_id))]
 
     const { data: owners } = await supabase
-      .from("users")
-      .select("id, nickname, profile_image, career_id")
-      .in("id", ownerIds);
+      .from('users')
+      .select('id, nickname, profile_image, career_id')
+      .in('id', ownerIds)
 
-    const careerIds = [...new Set(owners?.map((o) => o.career_id))];
+    const careerIds = [...new Set(owners?.map((o) => o.career_id))]
     const { data: careers } = await supabase
-      .from("careers")
-      .select("id, name")
-      .in("id", careerIds);
+      .from('careers')
+      .select('id, name')
+      .in('id', careerIds)
 
     const { data: positions } = await supabase
-      .from("project_positions")
-      .select("project_id, recruit_count")
-      .in("project_id", projectIds);
+      .from('project_positions')
+      .select('project_id, recruit_count')
+      .in('project_id', projectIds)
 
     const { data: techLinks } = await supabase
-      .from("project_tech_stacks")
-      .select("project_id, tech_stack_id")
-      .in("project_id", projectIds);
+      .from('project_tech_stacks')
+      .select('project_id, tech_stack_id')
+      .in('project_id', projectIds)
 
-    const techStackIds = [...new Set(techLinks?.map((t) => t.tech_stack_id))];
+    const techStackIds = [...new Set(techLinks?.map((t) => t.tech_stack_id))]
     const { data: techStacks } = await supabase
-      .from("tech_stacks")
-      .select("id, name")
-      .in("id", techStackIds);
+      .from('tech_stacks')
+      .select('id, name')
+      .in('id', techStackIds)
 
     const { data: fields } = await supabase
-      .from("fields")
-      .select("id, name")
-      .in("id", fieldIds);
+      .from('fields')
+      .select('id, name')
+      .in('id', fieldIds)
 
     const mappedResults: ProjectCard[] = projects.map((p) => {
-      const owner = owners?.find((o) => o.id === p.owner_id);
+      const owner = owners?.find((o) => o.id === p.owner_id)
       const careerName =
-        careers?.find((c) => c.id === owner?.career_id)?.name ?? "경력 없음";
+        careers?.find((c) => c.id === owner?.career_id)?.name ?? '경력 없음'
       const memberCount =
         positions
           ?.filter((pos) => String(pos.project_id) === String(p.id))
-          .reduce((sum, pos) => sum + (pos.recruit_count ?? 0), 0) ?? 0;
+          .reduce((sum, pos) => sum + (pos.recruit_count ?? 0), 0) ?? 0
 
       const skills =
         techLinks
           ?.filter((t) => String(t.project_id) === String(p.id))
           .map((t) => {
-            const tech = techStacks?.find((ts) => ts.id === t.tech_stack_id);
-            return tech?.name ?? "알 수 없음";
-          }) ?? [];
+            const tech = techStacks?.find((ts) => ts.id === t.tech_stack_id)
+            return tech?.name ?? '알 수 없음'
+          }) ?? []
 
-      const fieldName =
-        fields?.find((f) => f.id === p.field_id)?.name ?? "기타";
+      const fieldName = fields?.find((f) => f.id === p.field_id)?.name ?? '기타'
 
       return {
         id: p.id,
         title: p.name,
         description: p.short_description,
-        owner: owner?.nickname || "",
-        profile_image: owner?.profile_image || "/assets/no-profile.svg",
+        owner: owner?.nickname || '',
+        profile_image: owner?.profile_image || '/assets/no-profile.svg',
         level: careerName,
         members: memberCount,
         period: p.deadline,
@@ -146,13 +145,13 @@ export async function fetchProjects(
         remain: 0,
         category: fieldName,
         position: p.position,
-        status: p.status || "모집중",
-      };
-    });
+        status: p.status || '모집중',
+      }
+    })
 
-    return mappedResults;
+    return mappedResults
   } catch (err) {
-    console.error("프로젝트 조회 오류:", err);
-    return [];
+    console.error('프로젝트 조회 오류:', err)
+    return []
   }
 }
