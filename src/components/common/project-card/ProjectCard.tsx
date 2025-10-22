@@ -66,12 +66,12 @@ export default function ProjectCard({
         </button>
       </div>
 
-      <h2 className="text-8 font-bold text-deep mt-[34px] whitespace-nowrap">
+      <h2 className="text-8 font-bold text-deep mt-[34px] break-words line-clamp-3">
         {title}
       </h2>
-      <p className="text-gray text-5 mt-[9px]">{description}</p>
+      <p className="text-gray text-5 mt-[9px] line-clamp-3">{description}</p>
 
-      <div className="flex items-center gap-[30px] mt-[91px]">
+      <div className="flex items-center gap-[30px] mt-auto">
         <Image
           src={profile_image}
           alt="프로필"
@@ -103,11 +103,11 @@ export default function ProjectCard({
         </div>
       </div>
 
-      <div className="flex flex-wrap justify-between mt-7.5">
+      <div className="flex flex-wrap gap-2 mt-7.5">
         {skills.map((skill) => (
           <span
             key={skill}
-            className="flex items-center justify-center w-15 h-6 bg-[#eeeeee] text-black rounded-full text-3"
+            className="flex items-center justify-center px-3 h-6 bg-[#eeeeee] text-black rounded-full text-3 whitespace-nowrap"
           >
             {skill}
           </span>
