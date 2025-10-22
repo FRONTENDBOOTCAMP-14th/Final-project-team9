@@ -6,6 +6,7 @@ interface MainPageProjectCardProps {
   id: number;
   title: string;
   owner: string;
+  profile_image?: string;
   level: string;
   members: number;
   period: string;
@@ -21,15 +22,16 @@ interface MainPageProjectCardProps {
 export default function MainPageProjectCard({
   title,
   owner,
+  profile_image = "/assets/no-profile.svg",
   level,
   members,
   period,
   duration,
   category,
-  status = "모집중",
+  status,
 }: MainPageProjectCardProps) {
   return (
-    <div className="flex flex-col w-[380px] h-[380px] bg-white rounded-[26px] shadow-lg p-[30px]">
+    <div className="relative flex flex-col w-[380px] h-[380px] bg-white rounded-[26px] shadow-lg p-[30px]">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-[30px]">
           <span
@@ -41,24 +43,27 @@ export default function MainPageProjectCard({
         </div>
       </div>
 
-      <h2 className="text-7 text-deep mt-[30px]">{title}</h2>
+      <h2 className="text-7 text-deep mt-[30px] line-clamp-2">{title}</h2>
 
-      <div className="flex items-center gap-[30px] mt-[20px]">
-        <Image
-          src="/assets/no-profile.svg"
-          alt="프로필"
-          width={80}
-          height={80}
-        />
+      <div className="absolute bottom-[110px] left-[30px] right-[30px] flex items-center gap-[30px]">
+        <div className="w-[80px] h-[80px] rounded-full overflow-hidden flex-shrink-0">
+          <Image
+            src={profile_image}
+            alt="프로필"
+            width={80}
+            height={80}
+            className="w-full h-full object-cover"
+          />
+        </div>
         <div className="flex flex-col">
           <div className=" text-deep text-5">{owner}</div>
           <div className="text-3 text-gray">{level}</div>
         </div>
       </div>
 
-      <hr className="mt-[20px] mb-[15px] border-t border-[#d9d9d9]" />
+      <hr className="absolute bottom-[88px] left-[30px] right-[30px] border-t border-[#d9d9d9]" />
 
-      <div className="flex justify-between items-center text-5 text-deep">
+      <div className="absolute bottom-[22px] left-[45px] right-[45px] flex justify-between items-center text-5 text-deep">
         <div className="flex flex-col items-center">
           <span className="text-gray text-[10px] mb-[4px]">모집인원</span>
           <span className="text-deep">{members}명</span>
