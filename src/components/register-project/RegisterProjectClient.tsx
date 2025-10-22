@@ -15,6 +15,10 @@ import TeamForm, {
   type TeamFormRef,
 } from "@/components/register-project/TeamForm";
 import { supabase } from "@/lib/supabase";
+import { useDetailFormStore } from "@/store/detail-form-store";
+import { useDropdownStore } from "@/store/dropdown-store";
+import { useRegisterProjectStore } from "@/store/register-project-store";
+import { useTeamFormStore } from "@/store/team-form-store";
 
 export default function RegisterProjectClient() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -24,6 +28,12 @@ export default function RegisterProjectClient() {
   const teamFormRef = useRef<TeamFormRef>(null);
   const detailFormRef = useRef<DetailFormRef>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Store reset functions
+  const resetBaseForm = useRegisterProjectStore((state) => state.resetForm);
+  const resetTeamForm = useTeamFormStore((state) => state.resetForm);
+  const resetDetailForm = useDetailFormStore((state) => state.resetForm);
+  const resetDropdown = useDropdownStore((state) => state.resetAll);
 
   const handleRegisterProject = async () => {
     if (isSubmitting) return;
@@ -126,6 +136,11 @@ export default function RegisterProjectClient() {
       setShowToast(true);
       // Toast가 보여진 후 완료 페이지로 이동
       setTimeout(() => {
+        // 페이지 이동 전에 폼 데이터 초기화
+        resetBaseForm();
+        resetTeamForm();
+        resetDetailForm();
+        resetDropdown();
         router.push("/register-project/complete");
       }, 1500); // Toast가 보이는 시간을 확보
     } catch (error) {
