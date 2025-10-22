@@ -1,4 +1,5 @@
 import TechStackSearchBar from "@/components/common/search-bar/TechStackSearchBar";
+import TagList from "@/components/common/tag/TagList";
 import FormCard from "../FormCard";
 
 interface TechStackSectionProps {
@@ -41,34 +42,14 @@ export default function TechStackSection({
             techStack.length === 0 ? "최대 10개까지 선택 가능합니다" : undefined
           }
         />
-        <div className="flex flex-wrap mt-3" style={{ marginLeft: "10px" }}>
-          {techStack.map((tech, index) => (
-            <span
-              key={index}
-              className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 rounded-full"
-              style={{
-                width: "60px",
-                height: "24px",
-                marginTop: "30px",
-                marginRight: "20px",
-                marginBottom: "42px",
-                marginLeft: index === 0 ? "0px" : "20px",
-                fontSize: "var(--text-5)",
-                paddingLeft: "8px",
-                paddingRight: "8px",
-              }}
-            >
-              <span className="truncate flex-1">{tech}</span>
-              <button
-                type="button"
-                onClick={() => onRemoveTechStack(tech)}
-                className="text-blue-600 hover:text-blue-800 ml-1"
-                style={{ fontSize: "12px" }}
-              >
-                ×
-              </button>
-            </span>
-          ))}
+        <div className="mt-[20px] ml-[10px]">
+          <TagList
+            items={techStack}
+            removable={true}
+            onRemove={onRemoveTechStack}
+            tagClassName="bg-primary text-white"
+            labelClassName="text-6 font-medium text-white"
+          />
         </div>
       </div>
     </FormCard>
