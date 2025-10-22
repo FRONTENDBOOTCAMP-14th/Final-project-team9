@@ -1,60 +1,48 @@
-// src/components/auth/FindPasswordForm.tsx
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import EmailVerification from "@/components/auth/EmailVerification";
 import Button from "@/components/common/Button";
-import LabeledInput from "@/components/common/LabeledInput";
-import EmailVerification from "./EmailVerification";
-import ResetPasswordForm from "./ResetPasswordForm";
 
 const FindPasswordForm = () => {
-  const [id, setId] = useState("");
+  const router = useRouter();
   const [email, setEmail] = useState("");
-  const [isEmailVerified, setIsEmailVerified] = useState(false);
-  const [showResetForm, setShowResetForm] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isEmailVerified) {
-      // TODO: 데이터베이스에서 아이디와 이메일이 일치하는지 확인하는 로직 추가
-      setShowResetForm(true);
-    } else {
-      alert("이메일 인증을 먼저 완료해주세요.");
+    if (!isVerified) {
+      alert("이메일 인증을 먼저 완료해주세요!");
+      return;
     }
-  };
 
-  if (showResetForm) {
-    return <ResetPasswordForm />;
-  }
+    setIsLoading(true);
+
+    router.push("/reset-password");
+  };
 
   return (
     <div className="w-full max-w-[615px]">
       <form onSubmit={handleSubmit} className="flex flex-col">
-        <LabeledInput
-          id="find-pw-id"
-          label="아이디를 입력하세요"
-          type="text"
-          value={id}
-          onChange={(e) => setId(e.target.value)}
-          containerClassName="w-full h-[80px]"
+        <EmailVerification
+          email={email}
+          setEmail={setEmail}
+          isVerified={isVerified}
+          setIsVerified={setIsVerified}
+          otpType="recovery"
+          disabled={isLoading}
         />
-        <div className="mt-[20px]">
-          <EmailVerification
-            email={email}
-            setEmail={setEmail}
-            isVerified={isEmailVerified}
-            setIsVerified={setIsEmailVerified}
-            otpType="recovery"
-          />
-        </div>
+
         <Button
           type="submit"
           variant="primary"
           size="lg"
           className="w-full h-[80px] text-[24px] mt-[40px]"
-          disabled={!isEmailVerified}
+          disabled={!isVerified || isLoading}
         >
-          확인
+          {isLoading ? "이동 중..." : "확인"}
         </Button>
       </form>
     </div>
