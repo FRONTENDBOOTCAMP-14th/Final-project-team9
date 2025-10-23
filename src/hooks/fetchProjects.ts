@@ -1,3 +1,4 @@
+import { ProjectStatus } from '@/constants/project'
 import { supabase } from '@/lib/supabase'
 import type { SearchFilters } from '@/store/search-filter-store'
 import type { ProjectCard } from '@/types/project'
@@ -26,7 +27,7 @@ export async function fetchProjects(
     }
     if (filters.duration) {
       const { data: projectDur } = await supabase
-        .from('projects')
+        .from('project_view')
         .select('id')
         .eq('expected_schedule', filters.duration)
 
@@ -43,7 +44,7 @@ export async function fetchProjects(
 
       if (fieldId) {
         const { data: projectsWithField } = await supabase
-          .from('projects')
+          .from('project_view')
           .select('id')
           .eq('field_id', fieldId)
         const projectIds = projectsWithField?.map((p) => p.id)
@@ -53,6 +54,21 @@ export async function fetchProjects(
         }
       }
     }
+
+    const { data: projectData } = await query
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const overDateProject = projectData
+      .filter((p) => new Date(p.deadline) < today)
+      .map((p) => p.id)
+
+    await supabase
+      .from('projects')
+      .update({ status: 'false' })
+      .in('id', overDateProject)
+
     const { data: domainData } = await supabase
       .from('domains')
       .select('id')
@@ -91,11 +107,6 @@ export async function fetchProjects(
       .select('id, name')
       .in('id', careerIds)
 
-    const { data: positions } = await supabase
-      .from('project_positions')
-      .select('project_id, recruit_count')
-      .in('project_id', projectIds)
-
     const { data: techLinks } = await supabase
       .from('project_tech_stacks')
       .select('project_id, tech_stack_id')
@@ -117,9 +128,10 @@ export async function fetchProjects(
       const careerName =
         careers?.find((c) => c.id === owner?.career_id)?.name ?? '경력 없음'
       const memberCount =
-        positions
-          ?.filter((pos) => String(pos.project_id) === String(p.id))
-          .reduce((sum, pos) => sum + (pos.recruit_count ?? 0), 0) ?? 0
+        p.project_positions?.reduce(
+          (sum: number, pos: any) => sum + (pos.recruit_count ?? 0),
+          0,
+        ) ?? 0
 
       const skills =
         techLinks
@@ -131,25 +143,41 @@ export async function fetchProjects(
 
       const fieldName = fields?.find((f) => f.id === p.field_id)?.name ?? '기타'
 
+      let remain = 0
+      if (p.deadline) {
+        const today = new Date()
+        const deadlineDate = new Date(p.deadline)
+        const diffTime = deadlineDate.getTime() - today.getTime()
+        remain = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+      }
+
+      const status: ProjectStatus = p.status === 'true' ? 'true' : 'false'
+
       return {
         id: p.id,
         title: p.name,
         description: p.short_description,
-        owner: owner?.nickname || '',
-        profile_image: owner?.profile_image || '/assets/no-profile.svg',
+        owner: p.user_name || '',
+        profile_image: p.user_profile_image || '/assets/no-profile.svg',
         level: careerName,
         members: memberCount,
         period: p.deadline,
         duration: p.expected_schedule,
         skills,
-        remain: 0,
+        remain: remain > 0 ? remain : 0,
         category: fieldName,
         position: p.position,
-        status: p.status || '모집중',
+        status: status,
       }
     })
 
-    return mappedResults
+    const sortedResults = mappedResults.sort((a, b) => {
+      if (a.status === 'false' && b.status !== 'false') return 1
+      if (a.status !== 'false' && b.status === 'false') return -1
+      return 0
+    })
+
+    return sortedResults
   } catch (err) {
     console.error('프로젝트 조회 오류:', err)
     return []
