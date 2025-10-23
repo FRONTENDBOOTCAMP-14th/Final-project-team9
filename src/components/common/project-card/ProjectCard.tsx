@@ -38,7 +38,7 @@ export default function ProjectCard({
   skills,
   remain,
   category,
-  status = "recruiting",
+  status = "true",
   profile_image,
 }: ProjectCardProps) {
   const router = useRouter();

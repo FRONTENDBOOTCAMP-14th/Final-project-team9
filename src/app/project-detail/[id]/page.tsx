@@ -58,6 +58,20 @@ export default async function ProjectDetailPage({
     .in("id", project.project_tech_stacks);
   const techStackNames: string[] = techStack?.map((t) => t.name);
 
+  // 모집 기간 포맷팅: created_at ~ deadline (M.D~M.D 형식)
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${month}.${day}`;
+  };
+
+  const periodFormatted =
+    project.created_at && project.deadline
+      ? `${formatDate(project.created_at)}~${formatDate(project.deadline)}`
+      : project.deadline || "";
+
   // ✅ Header용 데이터
   const projectHeaderData: ProjectHeaderInfo = {
     id: project.id,
@@ -68,14 +82,14 @@ export default async function ProjectDetailPage({
     techStack: techStackNames || [],
     preferences: project.project_preferences || [],
     requirements: project.project_requirements || [],
-    estimatedPeriod: project.deadline,
+    estimatedPeriod: periodFormatted,
     duration: project.expected_schedule,
     positions: project.project_positions || [],
-    status: project.status || "recruiting", // 이부분 해야함
+    status: project.status || "true", // "true" = 모집중, "false" = 모집완료
     teamSize:
       project.project_positions.reduce(
         (sum, pos) => sum + (pos.recruit_count || 0),
-        0,
+        0
       ) || 0,
   };
 

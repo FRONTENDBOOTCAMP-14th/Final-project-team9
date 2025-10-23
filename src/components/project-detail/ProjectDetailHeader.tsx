@@ -59,12 +59,12 @@ export default function ProjectDetailHeader({
   }));
 
   return (
-    <header className="w-full h-[640px] bg-gradient-to-r from-deep to-[#006ebd] py-20">
+    <header className="w-full min-h-[640px] bg-gradient-to-r from-deep to-[#006ebd] py-20">
       <div className="w-full max-w-[1920px] mx-auto px-8 pt-[50px]">
         <div className="max-w-[1620px] mx-auto">
           {/* 상단: 상태, 카테고리와 찜 버튼 */}
-          <div className="flex justify-between items-center mb-8">
-            <div className="flex items-center gap-[50px]">
+          <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
+            <div className="flex items-center gap-[50px] flex-wrap">
               <span
                 className="bg-white text-deep text-5 px-4 py-1.5 rounded-[10px]"
                 role="status"
@@ -106,17 +106,17 @@ export default function ProjectDetailHeader({
           </h1>
 
           {/* 설명 */}
-          <p className="text-white/90 text-9 mb-[117px] leading-relaxed">
+          <p className="text-white/90 text-9 mb-[117px] leading-relaxed break-words">
             {project.description}
           </p>
 
           {/* 프로젝트 정보 */}
           <section
-            className="flex items-center justify-between text-white"
+            className="flex flex-wrap items-center justify-between gap-8 text-white"
             aria-label="프로젝트 상세 정보"
           >
             {/* 기본 정보 */}
-            <div className="flex items-center gap-16">
+            <div className="flex flex-wrap items-center gap-16">
               <InfoCard
                 icon={UsersRound}
                 label="팀 인원"
@@ -136,7 +136,7 @@ export default function ProjectDetailHeader({
 
             {/* 모집 포지션 */}
             <div
-              className="flex items-center gap-[60px]"
+              className="flex flex-wrap items-center gap-[60px]"
               role="list"
               aria-label="모집 포지션"
             >
