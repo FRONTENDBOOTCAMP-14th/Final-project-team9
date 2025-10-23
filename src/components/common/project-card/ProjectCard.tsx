@@ -1,29 +1,29 @@
-'use client'
+"use client";
 
-import { Calendar, Clock, Heart, UsersRound } from 'lucide-react'
-import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { Calendar, Clock, Heart, UsersRound } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   PROJECT_STATUS_LABEL,
   PROJECT_STATUS_COLOR,
   type ProjectStatus,
-} from '@/constants/project'
-import { useFavoriteStore } from '@/store/favorite-store'
+} from "@/constants/project";
+import { useFavoriteStore } from "@/store/favorite-store";
 
 interface ProjectCardProps {
-  id: number
-  title: string
-  description: string
-  owner: string
-  level: string
-  members: number
-  period: string
-  duration: string
-  skills: string[]
-  remain: number
-  category: string
-  status?: ProjectStatus
-  profile_image: string
+  id: number;
+  title: string;
+  description: string;
+  owner: string;
+  level: string;
+  members: number;
+  period: string;
+  duration: string;
+  skills: string[];
+  remain: number;
+  category: string;
+  status?: ProjectStatus;
+  profile_image: string;
 }
 
 export default function ProjectCard({
@@ -38,12 +38,12 @@ export default function ProjectCard({
   skills,
   remain,
   category,
-  status = 'true',
+  status = "true",
   profile_image,
 }: ProjectCardProps) {
-  const router = useRouter()
-  const { favorites, toggleFavorite } = useFavoriteStore()
-  const isFavorite = favorites.includes(id)
+  const router = useRouter();
+  const { favorites, toggleFavorite } = useFavoriteStore();
+  const isFavorite = favorites.includes(id);
 
   return (
     <div className="flex flex-col w-[500px] h-[600px] bg-white rounded-[26px] shadow-lg p-[30px]">
@@ -60,7 +60,7 @@ export default function ProjectCard({
         <button onClick={() => toggleFavorite(id)}>
           <Heart
             className={`w-[30px] h-[30px] ${
-              isFavorite ? 'fill-red-500 stroke-red-500' : 'stroke-gray-400'
+              isFavorite ? "fill-red-500 stroke-red-500" : "stroke-gray-400"
             }`}
           />
         </button>
@@ -118,16 +118,14 @@ export default function ProjectCard({
 
       <div className="flex justify-between items-center mt-5">
         <span className="text-5">
-          {status === 'true' ? (
+          {status === "true" ? (
             <>
               <span className="text-deep">모집 마감까지 </span>
               <span className="text-primary font-bold">{remain}일</span>
               <span className="text-deep"> 남았어요</span>
             </>
           ) : (
-            <>
-              <span className="text-deep">모집이 마감되었어요</span>
-            </>
+            <span className="text-deep">모집이 마감되었어요</span>
           )}
         </span>
         <button
@@ -138,5 +136,5 @@ export default function ProjectCard({
         </button>
       </div>
     </div>
-  )
+  );
 }

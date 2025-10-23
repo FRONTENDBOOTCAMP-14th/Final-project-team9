@@ -89,7 +89,7 @@ export default async function ProjectDetailPage({
     teamSize:
       project.project_positions.reduce(
         (sum, pos) => sum + (pos.recruit_count || 0),
-        0
+        0,
       ) || 0,
   };
 

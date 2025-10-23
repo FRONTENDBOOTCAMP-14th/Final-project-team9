@@ -1,25 +1,25 @@
-'use client'
+"use client";
 
-import Button from '@/components/common/Button'
-import { useDropdownStore } from '@/store/dropdown-store'
-import { useSearchFilterStore } from '@/store/search-filter-store'
+import Button from "@/components/common/Button";
+import { useDropdownStore } from "@/store/dropdown-store";
+import { useSearchFilterStore } from "@/store/search-filter-store";
 
 export default function ResetFilterButton() {
-  const { resetAll } = useDropdownStore()
-  const setSearchQuery = useSearchFilterStore((state) => state.setSearchQuery)
-  const setPosition = useSearchFilterStore((state) => state.setPosition)
-  const setDuration = useSearchFilterStore((state) => state.setDuration)
-  const setField = useSearchFilterStore((state) => state.setField)
-  const setDomain = useSearchFilterStore((state) => state.setDomain)
+  const { resetAll } = useDropdownStore();
+  const setSearchQuery = useSearchFilterStore((state) => state.setSearchQuery);
+  const setPosition = useSearchFilterStore((state) => state.setPosition);
+  const setDuration = useSearchFilterStore((state) => state.setDuration);
+  const setField = useSearchFilterStore((state) => state.setField);
+  const setDomain = useSearchFilterStore((state) => state.setDomain);
 
   const handleReset = () => {
-    resetAll()
-    setSearchQuery('')
-    setPosition('')
-    setDuration('')
-    setField('')
-    setDomain('')
-  }
+    resetAll();
+    setSearchQuery("");
+    setPosition("");
+    setDuration("");
+    setField("");
+    setDomain("");
+  };
 
   return (
     <Button
@@ -143,5 +143,5 @@ export default function ResetFilterButton() {
         <span className="text-5">필터 초기화</span>
       </div>
     </Button>
-  )
+  );
 }
