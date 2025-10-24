@@ -81,9 +81,7 @@ export default function SearchFilterSection({
         />
         <Dropdown
           options={options.fields}
-          onChange={(value) => {
-            setField(value);
-          }}
+          onChange={(value) => setField(value)}
           placeholder="분야"
           width="250px"
         />

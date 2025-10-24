@@ -37,6 +37,7 @@ export default function SearchResultsSection({
                 remain={project.remain}
                 category={project.category}
                 profile_image={project.profile_image}
+                status={project.status}
               />
             </li>
           ))}
