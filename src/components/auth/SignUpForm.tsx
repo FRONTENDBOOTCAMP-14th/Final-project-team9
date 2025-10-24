@@ -6,11 +6,11 @@ import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import LabeledInput from "@/components/common/LabeledInput";
 import PasswordInput from "@/components/common/PasswordInput";
-import EmailVerification from "./EmailVerification";
 import {
   useIdValidation,
   usePasswordValidation,
 } from "@/hooks/useAuthValidation";
+import EmailVerification from "./EmailVerification";
 
 const SignUpForm = () => {
   const router = useRouter();

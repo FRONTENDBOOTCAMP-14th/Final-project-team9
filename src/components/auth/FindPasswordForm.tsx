@@ -2,7 +2,6 @@
 
 import EmailVerification from "@/components/auth/EmailVerification";
 import Button from "@/components/common/Button";
-
 import { useRecoveryFlow } from "@/hooks/useAuthValidation";
 
 const FindPasswordForm = () => {
