@@ -1,31 +1,23 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import EmailVerification from "@/components/auth/EmailVerification";
 import Button from "@/components/common/Button";
 
+import { useRecoveryFlow } from "@/hooks/useAuthValidation";
+
 const FindPasswordForm = () => {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [isVerified, setIsVerified] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!isVerified) {
-      alert("이메일 인증을 먼저 완료해주세요!");
-      return;
-    }
-
-    setIsLoading(true);
-
-    router.push("/reset-password");
-  };
+  const {
+    email,
+    setEmail,
+    isVerified,
+    setIsVerified,
+    isLoading,
+    handleSubmit,
+  } = useRecoveryFlow("find-password");
 
   return (
     <div className="w-full max-w-[615px]">
-      <form onSubmit={handleSubmit} className="flex flex-col">
+      <form onSubmit={(e) => void handleSubmit(e)} className="flex flex-col">
         <EmailVerification
           email={email}
           setEmail={setEmail}
