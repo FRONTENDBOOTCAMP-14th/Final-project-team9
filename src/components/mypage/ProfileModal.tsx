@@ -64,22 +64,22 @@ export default function ProfileEditModal({
 
   // Dropdown 초기값 설정
   useEffect(() => {
-    setSelected("분야", user.field);
+    setSelected("분야", user.positions);
     setSelected("경력", user.experience);
-  }, [user.field, user.experience, setSelected]);
+  }, [user.positions, user.experience, setSelected]);
 
   // Dropdown 값이 변경될 때 formData 업데이트
   useEffect(() => {
     const field = selectedValues["분야"];
     const experience = selectedValues["경력"];
 
-    if (field && field !== formData.field) {
-      setFormData((prev) => ({ ...prev, field }));
+    if (field && field !== formData.positions) {
+      setFormData((prev) => ({ ...prev, positions: field }));
     }
     if (experience && experience !== formData.experience) {
       setFormData((prev) => ({ ...prev, experience }));
     }
-  }, [selectedValues, formData.field, formData.experience, setFormData]);
+  }, [selectedValues, formData.positions, formData.experience, setFormData]);
 
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/50">
@@ -110,8 +110,8 @@ export default function ProfileEditModal({
         className="bg-[#e9fafe] rounded-2xl px-[90px] py-10 shadow-2xl w-full max-w-[600px] flex flex-col gap-6 relative"
       >
         <ProfileImageUploader
-          imageUrl={formData.profileImageUrl}
-          name={formData.name}
+          profile_image={formData.profile_image}
+          username={formData.username}
           fileInputRef={fileInputRef}
           onImageChange={handleImageChange}
         />
@@ -124,7 +124,7 @@ export default function ProfileEditModal({
             </label>
             <input
               type="text"
-              value={formData.name}
+              value={formData.username}
               disabled
               className="w-full p-3 bg-[#e9fafe] rounded-md border border-gray text-gray-500 cursor-not-allowed"
             />
@@ -144,29 +144,28 @@ export default function ProfileEditModal({
           {/* 한 줄 소개 */}
           <div>
             <label
-              htmlFor="introduction"
+              htmlFor="bio"
               className="block text-sm font-medium text-gray mb-1"
             >
-              한 줄 소개 ({formData.introduction.length}/
-              {MAX_INTRODUCTION_LENGTH})
+              한 줄 소개 ({formData.bio.length}/{MAX_INTRODUCTION_LENGTH})
             </label>
             <input
-              id="introduction"
-              name="introduction"
+              id="bio"
+              name="bio"
               type="text"
-              value={formData.introduction}
+              value={formData.bio}
               onChange={handleChange}
               maxLength={MAX_INTRODUCTION_LENGTH}
               className="w-full p-3 bg-white rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
             />
-            {errors.introduction && (
-              <p className="text-red-500 text-sm mt-1">{errors.introduction}</p>
+            {errors.bio && (
+              <p className="text-red-500 text-sm mt-1">{errors.bio}</p>
             )}
           </div>
           {/* 분야 */}
           <div>
             <label
-              htmlFor="field"
+              htmlFor="positions"
               className="block text-sm font-medium text-gray mb-1"
             >
               분야

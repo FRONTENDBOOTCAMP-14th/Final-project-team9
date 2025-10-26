@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { UserProfileCardProps } from "@/components/mypage/Profile";
+import useProfileStore from "@/store/profile-store";
 
 const MAX_SKILLS = 3;
 const MAX_INTRODUCTION_LENGTH = 100;
@@ -8,20 +9,38 @@ export function useProfileForm(
   initialUser: Omit<UserProfileCardProps, "projectCounts">,
   onSave: (updatedUser: Omit<UserProfileCardProps, "projectCounts">) => void,
 ) {
-  const [formData, setFormData] = useState(initialUser);
+  // 기본값을 명시하여 런타임에 일부 필드가 없을 때 발생하는 에러를 방지
+  const defaultInitial = {
+    profile_image: "",
+    username: "",
+    email: "",
+    bio: "",
+    positions: "",
+    experience: "",
+    skills: [] as string[],
+  };
+
+  const [formData, setFormData] = useState(
+    () =>
+      ({
+        ...defaultInitial,
+        ...(initialUser as Partial<typeof defaultInitial>),
+      }) as Omit<UserProfileCardProps, "projectCounts">,
+  );
   const [skillInput, setSkillInput] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const { updateProfile } = useProfileStore();
 
   // 이미지 Object URL 클린업
   useEffect(() => {
-    const imageUrl = formData.profileImageUrl;
+    const imageUrl = formData.profile_image;
     return () => {
       if (imageUrl?.startsWith("blob:")) {
         URL.revokeObjectURL(imageUrl);
       }
     };
-  }, [formData.profileImageUrl]);
+  }, [formData.profile_image]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -36,7 +55,7 @@ export function useProfileForm(
       }
       setProfileImageFile(file);
       const newImageUrl = URL.createObjectURL(file);
-      setFormData((prev) => ({ ...prev, profileImageUrl: newImageUrl }));
+      setFormData((prev) => ({ ...prev, profile_image: newImageUrl }));
     }
   };
 
@@ -45,12 +64,13 @@ export function useProfileForm(
     e.preventDefault();
     const trimmedSkill = skillInput.trim();
     if (trimmedSkill === "") return;
-    if (formData.skills.length >= MAX_SKILLS) {
+    const currentSkills = Array.isArray(formData.skills) ? formData.skills : [];
+    if (currentSkills.length >= MAX_SKILLS) {
       alert(`최대 ${MAX_SKILLS}개까지만 추가할 수 있습니다.`);
       return;
     }
     if (
-      formData.skills
+      currentSkills
         .map((s) => s.toLowerCase())
         .includes(trimmedSkill.toLowerCase())
     ) {
@@ -59,7 +79,10 @@ export function useProfileForm(
     }
     setFormData((prev) => ({
       ...prev,
-      skills: [...prev.skills, trimmedSkill],
+      skills: [
+        ...(Array.isArray(prev.skills) ? prev.skills : []),
+        trimmedSkill,
+      ],
     }));
     setSkillInput("");
   };
@@ -67,7 +90,9 @@ export function useProfileForm(
   const handleSkillRemove = (skillToRemove: string) => {
     setFormData((prev) => ({
       ...prev,
-      skills: prev.skills.filter((skill) => skill !== skillToRemove),
+      skills: (Array.isArray(prev.skills) ? prev.skills : []).filter(
+        (skill) => skill !== skillToRemove,
+      ),
     }));
   };
 
@@ -80,10 +105,15 @@ export function useProfileForm(
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    if (formData.introduction.length > MAX_INTRODUCTION_LENGTH) {
-      newErrors.introduction = `한 줄 소개는 ${MAX_INTRODUCTION_LENGTH}자 이내로 작성해주세요.`;
+    const bioLength = formData?.bio ? formData.bio.length : 0;
+    const skillsLength = Array.isArray(formData?.skills)
+      ? formData.skills.length
+      : 0;
+
+    if (bioLength > MAX_INTRODUCTION_LENGTH) {
+      newErrors.bio = `한 줄 소개는 ${MAX_INTRODUCTION_LENGTH}자 이내로 작성해주세요.`;
     }
-    if (formData.skills.length === 0) {
+    if (skillsLength === 0) {
       newErrors.skills = "최소 1개의 기술 스택을 추가해주세요.";
     }
     setErrors(newErrors);
@@ -92,20 +122,11 @@ export function useProfileForm(
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
-    try {
-      let profileImageUrl = formData.profileImageUrl;
-      if (profileImageFile) {
-        // ... (Supabase 업로드 로직)
-      } else {
-        if (formData.profileImageUrl?.startsWith("blob:")) {
-          profileImageUrl = initialUser.profileImageUrl;
-        }
-      }
-      onSave({ ...formData, profileImageUrl });
-    } catch (error) {
-      console.error("프로필 업데이트 실패:", error);
-      alert("프로필 업데이트에 실패했습니다.");
-    }
+
+    // 스토어의 액션을 호출하는 깔끔한 코드
+    await updateProfile(formData, profileImageFile);
+
+    onSave(formData);
   };
 
   return {

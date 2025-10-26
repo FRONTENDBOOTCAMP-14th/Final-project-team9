@@ -24,6 +24,7 @@ const SettingsIcon = () => (
 );
 
 // Props 타입 정의
+
 export interface ProjectCounts {
   myProjects: number;
   interestedProjects: number;
@@ -32,11 +33,11 @@ export interface ProjectCounts {
 }
 
 export interface UserProfileCardProps {
-  profileImageUrl: string;
-  name: string;
+  profile_image: string;
+  username: string;
   email: string;
-  introduction: string;
-  field: string;
+  bio: string;
+  positions: string;
   experience: string;
   skills: string[];
   projectCounts: ProjectCounts;
@@ -45,7 +46,27 @@ export interface UserProfileCardProps {
 export default function UserProfileCard(props: UserProfileCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   // 프로필 데이터를 state로 관리하여 수정 가능하게 합니다.
-  const [userData, setUserData] = useState({ ...props });
+  // props가 일부 비어있을 수 있으므로 안전한 기본값을 병합합니다.
+  const defaultUser = {
+    profile_image: "",
+    username: "",
+    email: "",
+    bio: "",
+    positions: "",
+    experience: "",
+    skills: [] as string[],
+    projectCounts: {
+      myProjects: 0,
+      interestedProjects: 0,
+      supportedProjects: 0,
+      completedProjects: 0,
+    },
+  } as UserProfileCardProps;
+
+  const [userData, setUserData] = useState<UserProfileCardProps>({
+    ...defaultUser,
+    ...props,
+  });
   const blobUrlsRef = useRef<Set<string>>(new Set());
 
   const handleSettingsClick = () => {
@@ -64,8 +85,8 @@ export default function UserProfileCard(props: UserProfileCardProps) {
     setUserData((prev) => ({ ...prev, ...updatedUser }));
     setIsModalOpen(false);
     // 새로운 blob URL이라면 추적 목록에 추가
-    if (updatedUser.profileImageUrl?.startsWith("blob:")) {
-      blobUrlsRef.current.add(updatedUser.profileImageUrl);
+    if (updatedUser.profile_image?.startsWith("blob:")) {
+      blobUrlsRef.current.add(updatedUser.profile_image);
     }
   };
 
@@ -88,30 +109,28 @@ export default function UserProfileCard(props: UserProfileCardProps) {
         <div className="flex items-center">
           <div className="w-[167px] h-[167px] rounded-full overflow-hidden mr-8 bg-gray-300 relative">
             <Image
-              src={userData.profileImageUrl || "/assets/no-profile.svg"}
-              alt={`${userData.name}'s profile`}
+              src={userData.profile_image || "/assets/no-profile.svg"}
+              alt={`${userData.username}'s profile`}
               width={167}
               height={167}
               className="object-cover"
               unoptimized={
-                userData.profileImageUrl?.startsWith("blob:") ||
-                userData.profileImageUrl?.endsWith(".svg") ||
-                !userData.profileImageUrl
+                userData.profile_image?.startsWith("blob:") ||
+                userData.profile_image?.endsWith(".svg") ||
+                !userData.profile_image
               }
             />
           </div>
           <div className="flex flex-col gap-2 flex-grow">
             <div className="flex items-center gap-4">
               <h2 className="text-8 text-deep font-extrabold">
-                {userData.name}
+                {userData.username}
               </h2>
               <span className="text-5 text-gray">{userData.email}</span>
             </div>
-            <p className="text-5 text-deep font-bold">
-              {userData.introduction}
-            </p>
+            <p className="text-5 text-deep font-bold">{userData.bio}</p>
             <div className="flex gap-3 text-5 text-gray-600">
-              <span>{userData.field}</span>
+              <span>{userData.positions}</span>
               <span>{userData.experience}</span>
             </div>
           </div>
@@ -157,11 +176,11 @@ export default function UserProfileCard(props: UserProfileCardProps) {
       {isModalOpen && (
         <ProfileEditModal
           user={{
-            profileImageUrl: userData.profileImageUrl,
-            name: userData.name,
+            profile_image: userData.profile_image,
+            username: userData.username,
             email: userData.email,
-            introduction: userData.introduction,
-            field: userData.field,
+            bio: userData.bio,
+            positions: userData.positions,
             experience: userData.experience,
             skills: userData.skills,
           }}

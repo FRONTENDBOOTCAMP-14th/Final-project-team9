@@ -19,22 +19,28 @@ const PlusIcon = () => (
 );
 
 interface ProfileImageUploaderProps {
-  imageUrl: string;
-  name: string;
+  profile_image: string;
+  username: string;
   fileInputRef: React.RefObject<HTMLInputElement>;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export default function ProfileImageUploader({
-  imageUrl,
-  name,
+  profile_image,
+  username,
   fileInputRef,
   onImageChange,
 }: ProfileImageUploaderProps) {
-  // name prop을 사용하여 대체 텍스트와 플레이스홀더를 동적으로 생성합니다.
-  const altText = `${name}의 프로필 이미지`;
-  const placeholderUrl = `https://placehold.co/128x128/E9FAFE/333333?text=${name?.charAt(0) || "?"}`;
-
+  // username prop을 사용하여 대체 텍스트와 플레이스홀더를 동적으로 생성합니다.
+  const altText = `${username}의 프로필 이미지`;
+  const placeholderUrl = `https://placehold.co/128x128/E9FAFE/333333?text=${username?.charAt(0) || "?"}`;
+  // next/image는 외부 호스트를 사용하려면 next.config.js에 도메인을 추가해야 합니다.
+  // 여기서는 placeholderUrl 또는 외부 URL을 사용하는 경우 unoptimized=true로 설정해 에러를 회피합니다.
+  const srcToUse = profile_image || placeholderUrl;
+  const shouldUnoptimized =
+    srcToUse.startsWith("blob:") ||
+    srcToUse.endsWith(".svg") ||
+    srcToUse.startsWith("http");
   return (
     <button
       onClick={() => fileInputRef.current?.click()}
@@ -51,15 +57,13 @@ export default function ProfileImageUploader({
       <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 group-hover:border-primary transition-colors bg-gray-100">
         <Image
           // 이미지가 없으면 이름 이니셜 플레이스홀더를 보여줍니다.
-          src={imageUrl || placeholderUrl}
+          src={srcToUse}
           // 동적으로 생성된 alt 텍스트를 사용합니다.
           alt={altText}
           width={128}
           height={128}
           className="w-full h-full object-cover"
-          unoptimized={
-            imageUrl?.startsWith("blob:") || imageUrl?.endsWith(".svg")
-          }
+          unoptimized={shouldUnoptimized}
         />
       </div>
       <div className="absolute -bottom-1 -right-1 w-10 h-10 bg-[color:var(--color-deep)] rounded-full flex justify-center items-center group-hover:bg-primary transition-colors shadow-lg">
