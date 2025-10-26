@@ -116,13 +116,19 @@ export default function ProjectDetailContent({
               </h2>
               {/* project.requirements: string[] 에서 맵핑 */}
               <div className="space-y-4 mb-15">
-                {project.requirements?.map((req, idx) => (
-                  <div key={idx}>
-                    <h3 className="text-lg font-semibold text-deep mb-2">
-                      • {req}
-                    </h3>
-                  </div>
-                ))}
+                {project.requirements && project.requirements.length > 0 ? (
+                  project.requirements.map((req, idx) => (
+                    <div key={idx}>
+                      <h3 className="text-lg font-semibold text-deep mb-2">
+                        • {req}
+                      </h3>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-lg">
+                    등록된 요구사항이 없습니다.
+                  </p>
+                )}
               </div>
 
               {/* 우대사항 */}
@@ -131,7 +137,13 @@ export default function ProjectDetailContent({
                   우대사항 <span aria-hidden="true">⭐</span>
                 </h2>
                 {/* project.preferences: string[] 에서 맵핑 */}
-                <PreferenceTagList items={project.preferences ?? []} />
+                {project.preferences && project.preferences.length > 0 ? (
+                  <PreferenceTagList items={project.preferences} />
+                ) : (
+                  <p className="text-gray-500 text-lg">
+                    등록된 우대사항이 없습니다.
+                  </p>
+                )}
               </div>
             </section>
           </div>
