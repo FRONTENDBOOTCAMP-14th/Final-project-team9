@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Footer from "@/components/common/footer/Footer";
 import GoTopButton from "@/components/common/GoTopButton";
 import Header from "@/components/common/header/Header";
@@ -7,6 +8,38 @@ import type { ProjectHeaderInfo, ProjectDetail } from "@/types/project";
 
 interface ProjectDetailPageProps {
   params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: ProjectDetailPageProps): Promise<Metadata> {
+  const { id } = await params;
+
+  const { data: project } = await supabase
+    .from("project_view")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (!project) {
+    return {
+      title: "프로젝트 상세 | JOYIN",
+      description: "JOYIN에서 다양한 프로젝트를 만나보세요.",
+      icons: {
+        icon: "/assets/joyin-fav.ico",
+      },
+    };
+  }
+
+  return {
+    title: `${project.name} | JOYIN`,
+    description:
+      project.short_description ||
+      "프로젝트 상세 정보를 확인하고 함께할 팀원을 찾아보세요.",
+    icons: {
+      icon: "/assets/joyin-fav.ico",
+    },
+  };
 }
 
 export default async function ProjectDetailPage({
@@ -89,7 +122,7 @@ export default async function ProjectDetailPage({
     teamSize:
       project.project_positions.reduce(
         (sum, pos) => sum + (pos.recruit_count || 0),
-        0,
+        0
       ) || 0,
   };
 
