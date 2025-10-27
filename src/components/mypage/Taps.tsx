@@ -38,90 +38,458 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
         setLoading(true);
 
         if (activeTab === "myProjects") {
-          const res = await supabase
-            .from("project_view")
+          // 1. 프로젝트 기본 정보 가져오기
+          const { data: projectsData, error: projectsError } = await supabase
+            .from("projects")
             .select("*")
             .eq("owner_id", userId);
 
-          console.log("Raw project data:", res.data);
-          const data = res.data?.map((project) => ({
-            id: project.id,
-            title: project.name,
-            description: project.short_description,
-            owner: project.user_name,
-            level: project.career_name || "경력 없음",
-            members: project.position_count || 0,
-            period: project.deadline,
-            duration: project.expected_schedule,
-            skills: project.tech_stacks || [],
-            remain: project.remain_days || 0,
-            category: project.field_name,
-            status: project.status,
-            profile_image: project.profile_image || "/assets/no-profile.svg",
-          })) as ProjectType[] | null;
-          if (res.error) {
-            console.error("프로젝트 로딩 오류:", res.error);
+          if (projectsError) {
+            console.error("프로젝트 로딩 오류:", projectsError);
             setProjects([]);
             return;
           }
-          setProjects(data ?? []);
+
+          if (!projectsData || projectsData.length === 0) {
+            setProjects([]);
+            return;
+          }
+
+          // 2. 사용자 정보 가져오기
+          const { data: userData } = await supabase
+            .from("users")
+            .select("username, profile_image, career_id")
+            .eq("id", userId)
+            .single();
+
+          // 3. 사용자 경력 정보
+          let careerName = "경력 없음";
+          if (userData?.career_id) {
+            const { data: careerData } = await supabase
+              .from("careers")
+              .select("name")
+              .eq("id", userData.career_id)
+              .single();
+            careerName = careerData?.name || "경력 없음";
+          }
+
+          // 4. 각 프로젝트별로 상세 정보 가져오기
+          const formattedProjects = await Promise.all(
+            projectsData.map(async (project) => {
+              // 필드(카테고리) 정보
+              let categoryName = "기타";
+              if (project.field_id) {
+                const { data: fieldData } = await supabase
+                  .from("fields")
+                  .select("name")
+                  .eq("id", project.field_id)
+                  .single();
+                categoryName = fieldData?.name || "기타";
+              }
+
+              // 기술 스택 가져오기
+              const { data: techStackData } = await supabase
+                .from("project_tech_stacks")
+                .select("tech_stacks(name)")
+                .eq("project_id", project.id);
+
+              const techStacks =
+                techStackData
+                  ?.map(
+                    (pts: { tech_stacks: { name: string }[] }) =>
+                      pts.tech_stacks?.[0]?.name || ""
+                  )
+                  .filter(Boolean) || [];
+
+              // 모집 포지션 가져오기
+              const { data: positionsData } = await supabase
+                .from("project_positions")
+                .select("recruit_count")
+                .eq("project_id", project.id);
+
+              const totalMembers =
+                positionsData?.reduce(
+                  (sum, pos) => sum + (pos.recruit_count || 0),
+                  0
+                ) || 0;
+
+              // 마감일 계산
+              const today = new Date();
+              const deadline = new Date(project.deadline);
+              const remainDays = Math.ceil(
+                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+              );
+
+              return {
+                id: project.id,
+                title: project.name,
+                description: project.short_description,
+                owner: userData?.username || "알 수 없음",
+                level: careerName,
+                members: totalMembers,
+                period: project.deadline,
+                duration: project.expected_schedule,
+                skills: techStacks,
+                remain: remainDays > 0 ? remainDays : 0,
+                category: categoryName,
+                status: project.status,
+                profile_image:
+                  userData?.profile_image || "/assets/no-profile.svg",
+              } as ProjectType;
+            })
+          );
+
+          // 모집중(status="true")인 프로젝트를 먼저, 모집완료(status="false")를 나중에 정렬
+          const sortedProjects = formattedProjects.sort((a, b) => {
+            if (a.status === "true" && b.status === "false") return -1;
+            if (a.status === "false" && b.status === "true") return 1;
+            return 0;
+          });
+
+          setProjects(sortedProjects);
           return;
         }
 
         if (activeTab === "interestedProjects") {
-          interface FavRow {
-            projects: ProjectType;
-          }
-          const res = await supabase
+          // 관심 프로젝트 조회
+          const { data: favoriteData, error: favoriteError } = await supabase
             .from("favorite")
-            .select("project_id, projects(*)")
+            .select("project_id")
             .eq("user_id", userId);
-          const data = res.data as unknown as FavRow[] | null;
-          if (res.error) {
-            console.error("관심 프로젝트 로딩 오류:", res.error);
+
+          if (favoriteError) {
+            console.error("관심 프로젝트 조회 실패:", favoriteError);
             setProjects([]);
             return;
           }
-          setProjects((data ?? []).map((r) => r.projects));
+
+          if (!favoriteData || favoriteData.length === 0) {
+            setProjects([]);
+            return;
+          }
+
+          // 프로젝트 ID 목록 추출
+          const projectIds = favoriteData.map((f) => f.project_id);
+
+          // 프로젝트 상세 정보 조회
+          const { data: projectsData, error: projectsError } = await supabase
+            .from("projects")
+            .select("*")
+            .in("id", projectIds);
+
+          if (projectsError || !projectsData) {
+            console.error("프로젝트 조회 실패:", projectsError);
+            setProjects([]);
+            return;
+          }
+
+          // 프로젝트 상세 정보 포맷팅
+          const formattedProjects = await Promise.all(
+            projectsData.map(async (project) => {
+              // 프로젝트 소유자 정보
+              const { data: ownerData } = await supabase
+                .from("users")
+                .select("username, profile_image, career_id")
+                .eq("id", project.owner_id)
+                .single();
+
+              let careerName = "경력 없음";
+              if (ownerData?.career_id) {
+                const { data: careerData } = await supabase
+                  .from("careers")
+                  .select("name")
+                  .eq("id", ownerData.career_id)
+                  .single();
+                careerName = careerData?.name || "경력 없음";
+              }
+
+              // 카테고리
+              let categoryName = "기타";
+              if (project.field_id) {
+                const { data: fieldData } = await supabase
+                  .from("fields")
+                  .select("name")
+                  .eq("id", project.field_id)
+                  .single();
+                categoryName = fieldData?.name || "기타";
+              }
+
+              // 기술스택
+              const { data: techStackData } = await supabase
+                .from("project_tech_stacks")
+                .select("tech_stacks(name)")
+                .eq("project_id", project.id);
+
+              const techStacks =
+                techStackData
+                  ?.map(
+                    (pts: { tech_stacks: { name: string }[] }) =>
+                      pts.tech_stacks?.[0]?.name || ""
+                  )
+                  .filter(Boolean) || [];
+
+              // 모집 인원
+              const { data: positionsData } = await supabase
+                .from("project_positions")
+                .select("recruit_count")
+                .eq("project_id", project.id);
+
+              const totalMembers =
+                positionsData?.reduce(
+                  (sum, pos) => sum + (pos.recruit_count || 0),
+                  0
+                ) || 0;
+
+              // 마감일 계산
+              const today = new Date();
+              const deadline = new Date(project.deadline);
+              const remainDays = Math.ceil(
+                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+              );
+
+              return {
+                id: project.id,
+                title: project.name,
+                description: project.short_description,
+                owner: ownerData?.username || "알 수 없음",
+                level: careerName,
+                members: totalMembers,
+                period: project.deadline,
+                duration: project.expected_schedule,
+                skills: techStacks,
+                remain: remainDays > 0 ? remainDays : 0,
+                category: categoryName,
+                status: project.status,
+                profile_image:
+                  ownerData?.profile_image || "/assets/no-profile.svg",
+              } as ProjectType;
+            })
+          );
+
+          setProjects(formattedProjects);
           return;
         }
 
         if (activeTab === "supportedProjects") {
-          interface AppRow {
-            projects: ProjectType;
-          }
-          const res = await supabase
-            .from("applications")
-            .select("projects(*)")
-            .eq("user_id", userId)
-            .eq("projects.status", "모집중");
-          const data = res.data as unknown as AppRow[] | null;
-          if (res.error) {
-            console.error("지원한 프로젝트 로딩 오류:", res.error);
+          // 지원한 프로젝트 조회
+          const { data: applicationsData, error: applicationsError } =
+            await supabase
+              .from("applications")
+              .select("project_id, position, message, status, created_at")
+              .eq("user_id", userId);
+
+          if (applicationsError) {
+            console.error("지원 내역 조회 실패:", applicationsError);
             setProjects([]);
             return;
           }
-          setProjects((data ?? []).map((r) => r.projects));
+
+          if (!applicationsData || applicationsData.length === 0) {
+            setProjects([]);
+            return;
+          }
+
+          // 프로젝트 ID 목록 추출
+          const projectIds = applicationsData.map((a) => a.project_id);
+
+          // 프로젝트 상세 정보 조회
+          const { data: projectsData, error: projectsError } = await supabase
+            .from("projects")
+            .select("*")
+            .in("id", projectIds);
+
+          if (projectsError || !projectsData) {
+            console.error("프로젝트 조회 실패:", projectsError);
+            setProjects([]);
+            return;
+          }
+
+          // 프로젝트 상세 정보 포맷팅
+          const formattedProjects = await Promise.all(
+            projectsData.map(async (project) => {
+              // 프로젝트 소유자 정보
+              const { data: ownerData } = await supabase
+                .from("users")
+                .select("username, profile_image, career_id")
+                .eq("id", project.owner_id)
+                .single();
+
+              let careerName = "경력 없음";
+              if (ownerData?.career_id) {
+                const { data: careerData } = await supabase
+                  .from("careers")
+                  .select("name")
+                  .eq("id", ownerData.career_id)
+                  .single();
+                careerName = careerData?.name || "경력 없음";
+              }
+
+              // 카테고리
+              let categoryName = "기타";
+              if (project.field_id) {
+                const { data: fieldData } = await supabase
+                  .from("fields")
+                  .select("name")
+                  .eq("id", project.field_id)
+                  .single();
+                categoryName = fieldData?.name || "기타";
+              }
+
+              // 기술스택
+              const { data: techStackData } = await supabase
+                .from("project_tech_stacks")
+                .select("tech_stacks(name)")
+                .eq("project_id", project.id);
+
+              const techStacks =
+                techStackData
+                  ?.map(
+                    (pts: { tech_stacks: { name: string }[] }) =>
+                      pts.tech_stacks?.[0]?.name || ""
+                  )
+                  .filter(Boolean) || [];
+
+              // 모집 인원
+              const { data: positionsData } = await supabase
+                .from("project_positions")
+                .select("recruit_count")
+                .eq("project_id", project.id);
+
+              const totalMembers =
+                positionsData?.reduce(
+                  (sum, pos) => sum + (pos.recruit_count || 0),
+                  0
+                ) || 0;
+
+              // 마감일 계산
+              const today = new Date();
+              const deadline = new Date(project.deadline);
+              const remainDays = Math.ceil(
+                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+              );
+
+              return {
+                id: project.id,
+                title: project.name,
+                description: project.short_description,
+                owner: ownerData?.username || "알 수 없음",
+                level: careerName,
+                members: totalMembers,
+                period: project.deadline,
+                duration: project.expected_schedule,
+                skills: techStacks,
+                remain: remainDays > 0 ? remainDays : 0,
+                category: categoryName,
+                status: project.status,
+                profile_image:
+                  ownerData?.profile_image || "/assets/no-profile.svg",
+              } as ProjectType;
+            })
+          );
+
+          setProjects(formattedProjects);
           return;
         }
 
         if (activeTab === "completedProjects") {
-          interface AppRow {
-            projects: ProjectType;
-          }
-          const today = new Date().toISOString();
-          const res = await supabase
-            .from("applications")
-            .select("projects(*)")
-            .eq("user_id", userId)
-            .lt("projects.expected_end_date", today);
-          const data = res.data as unknown as AppRow[] | null;
-          if (res.error) {
-            console.error("종료된 프로젝트 로딩 오류:", res.error);
+          // 내가 등록한 프로젝트 중 status="false"인 것만 조회
+          const { data: projectsData, error: projectsError } = await supabase
+            .from("projects")
+            .select("*")
+            .eq("owner_id", userId)
+            .eq("status", "false");
+
+          if (projectsError) {
+            // 에러 발생 시 빈 배열 반환
             setProjects([]);
             return;
           }
-          setProjects((data ?? []).map((r) => r.projects));
+
+          if (!projectsData || projectsData.length === 0) {
+            setProjects([]);
+            return;
+          }
+
+          // 사용자 정보
+          const { data: userData } = await supabase
+            .from("users")
+            .select("username, profile_image, career_id")
+            .eq("id", userId)
+            .single();
+
+          let careerName = "경력 없음";
+          if (userData?.career_id) {
+            const { data: careerData } = await supabase
+              .from("careers")
+              .select("name")
+              .eq("id", userData.career_id)
+              .single();
+            careerName = careerData?.name || "경력 없음";
+          }
+
+          // 각 프로젝트 상세 정보
+          const formattedProjects = await Promise.all(
+            projectsData.map(async (project) => {
+              let categoryName = "기타";
+              if (project.field_id) {
+                const { data: fieldData } = await supabase
+                  .from("fields")
+                  .select("name")
+                  .eq("id", project.field_id)
+                  .single();
+                categoryName = fieldData?.name || "기타";
+              }
+
+              const { data: techStackData } = await supabase
+                .from("project_tech_stacks")
+                .select("tech_stacks(name)")
+                .eq("project_id", project.id);
+
+              const techStacks =
+                techStackData
+                  ?.map(
+                    (pts: { tech_stacks: { name: string }[] }) =>
+                      pts.tech_stacks?.[0]?.name || ""
+                  )
+                  .filter(Boolean) || [];
+
+              const { data: positionsData } = await supabase
+                .from("project_positions")
+                .select("recruit_count")
+                .eq("project_id", project.id);
+
+              const totalMembers =
+                positionsData?.reduce(
+                  (sum, pos) => sum + (pos.recruit_count || 0),
+                  0
+                ) || 0;
+
+              const today = new Date();
+              const deadline = new Date(project.deadline);
+              const remainDays = Math.ceil(
+                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+              );
+
+              return {
+                id: project.id,
+                title: project.name,
+                description: project.short_description,
+                owner: userData?.username || "알 수 없음",
+                level: careerName,
+                members: totalMembers,
+                period: project.deadline,
+                duration: project.expected_schedule,
+                skills: techStacks,
+                remain: remainDays > 0 ? remainDays : 0,
+                category: categoryName,
+                status: project.status,
+                profile_image:
+                  userData?.profile_image || "/assets/no-profile.svg",
+              } as ProjectType;
+            })
+          );
+
+          setProjects(formattedProjects);
           return;
         }
       } catch (err) {
@@ -139,55 +507,51 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
     const fetchCounts = async () => {
       if (!userId) return;
       try {
-        const projRes = await supabase
-          .from("project_view")
+        // 1. 나의 프로젝트 수 (모집중 + 모집완료 전체)
+        const { data: myProjectsData } = await supabase
+          .from("projects")
           .select("id")
           .eq("owner_id", userId);
 
-        const favRes = await supabase
+        // 2. 종료된 프로젝트 수 (status="false"인 것만)
+        const { data: completedData } = await supabase
+          .from("projects")
+          .select("id")
+          .eq("owner_id", userId)
+          .eq("status", "false");
+
+        // 3. 관심 프로젝트 수
+        const { data: favoriteData } = await supabase
           .from("favorite")
           .select("id")
           .eq("user_id", userId);
 
-        const appRes = await supabase
+        // 4. 지원한 프로젝트 수
+        const { data: applicationsData } = await supabase
           .from("applications")
-          .select("projects(expected_end_date,status)")
+          .select("id")
           .eq("user_id", userId);
 
-        if (projRes.error || favRes.error || appRes.error) {
-          console.error(
-            "counts fetch err",
-            projRes.error || favRes.error || appRes.error,
-          );
-          return;
-        }
-
-        const myProjects = (projRes.data ?? []).length;
-        const interestedProjects = (favRes.data ?? []).length;
-        const appData = appRes.data as
-          | { projects?: { expected_end_date?: string; status?: string } }[]
-          | null;
-        const supportedProjects = (appData ?? []).filter(
-          (a) => a.projects?.status === "모집중",
-        ).length;
-        const completedProjects = (appData ?? []).filter((a) => {
-          const end = a.projects?.expected_end_date;
-          return end ? new Date(end) < new Date() : false;
-        }).length;
-
         onProjectCountsChange?.({
-          myProjects,
-          interestedProjects,
-          supportedProjects,
-          completedProjects,
+          myProjects: myProjectsData?.length || 0,
+          interestedProjects: favoriteData?.length || 0,
+          supportedProjects: applicationsData?.length || 0,
+          completedProjects: completedData?.length || 0,
         });
-      } catch (err) {
-        console.error("counts fetch err", err);
+      } catch {
+        // 에러 발생 시 0으로 초기화
+        onProjectCountsChange?.({
+          myProjects: 0,
+          interestedProjects: 0,
+          supportedProjects: 0,
+          completedProjects: 0,
+        });
       }
     };
 
     void fetchCounts();
-  }, [userId, onProjectCountsChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   const activeProjects = projects;
 

@@ -18,13 +18,13 @@ const ProfileForm = () => {
   const [introduction, setIntroduction] = useState("");
   const { selectedValues } = useDropdownStore();
   const [profileImage, setProfileImage] = useState<string>(
-    "/assets/no-profile.svg",
+    "/assets/no-profile.svg"
   );
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 드롭다운에 표시될 옵션들
-  const positionOptions = ["프론트엔드", "백엔드", "디자이너", "기획자"];
+  const positionOptions = ["프론트엔드", "백엔드", "기획자", "디자이너"];
   const experienceOptions = [
     "신입(1년 미만)",
     "주니어(1~3년)",
@@ -83,7 +83,16 @@ const ProfileForm = () => {
     const username = user.user_metadata?.username;
 
     const position_id = positionOptions.indexOf(position) + 1;
-    const career_id = experienceOptions.indexOf(career) + 1;
+
+    // 경력 매핑 (데이터베이스와 일치시키기 위함)
+    // DB careers 테이블: ID 1("1년 미만"), 2("1년"), 3("2년"), 4("3년"), 5("5년"), 6("5년 이상")
+    const careerMapping: Record<string, number> = {
+      "신입(1년 미만)": 1, // DB: "1년 미만"
+      "주니어(1~3년)": 4, // DB: "3년"
+      "미들(3~5년)": 5, // DB: "5년"
+      "시니어(5년 이상)": 6, // DB: "5년 이상"
+    };
+    const career_id = careerMapping[career] || 1;
 
     let profileImageUrl = null;
 

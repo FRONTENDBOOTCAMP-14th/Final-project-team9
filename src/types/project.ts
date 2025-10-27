@@ -70,7 +70,7 @@ export interface ProjectHeaderInfo {
 // 프로젝트 카드에서 사용할 타입 (검색/목록 페이지)
 export interface ProjectCard {
   profile_image: string;
-  id: number;
+  id: string; // UUID
   title: string;
   description: string;
   owner: string;
