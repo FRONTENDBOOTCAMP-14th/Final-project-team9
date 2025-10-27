@@ -1,10 +1,14 @@
-import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { jalnan } from "../../fonts";
+import type { User } from "@supabase/supabase-js";
 
 interface ButtonData {
   href: string;
   text: string;
   ariaLabel: string;
+  isAuth?: boolean;
 }
 
 const buttonData: ButtonData[] = [
@@ -17,6 +21,7 @@ const buttonData: ButtonData[] = [
     href: "/register-project",
     text: "프로젝트 등록",
     ariaLabel: "새 프로젝트 등록 페이지로 이동",
+    isAuth: true,
   },
 ];
 
@@ -36,6 +41,29 @@ const buttonBaseStyles = `
 `;
 
 export default function MainPageButton() {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const { data } = await supabase.auth.getUser();
+        setUser(data.user);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    void fetchUser();
+  }, []);
+
+  const handleClick = async (button: ButtonData) => {
+    if (button.isAuth && !user) {
+      router.push("/login");
+      return;
+    }
+    router.push(button.href);
+  };
+
   return (
     <section
       className="flex gap-24 justify-center"
@@ -43,14 +71,14 @@ export default function MainPageButton() {
       aria-label="주요 액션 버튼"
     >
       {buttonData.map((button) => (
-        <Link
+        <button
           key={button.href}
-          href={button.href}
+          onClick={() => void handleClick(button)}
           className={`${jalnan.className} ${buttonBaseStyles}`}
           aria-label={button.ariaLabel}
         >
           <span>{button.text}</span>
-        </Link>
+        </button>
       ))}
     </section>
   );
