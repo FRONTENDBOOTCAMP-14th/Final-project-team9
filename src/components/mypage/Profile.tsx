@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import useScrollLock from "@/hooks/useScrollLock";
 import ProfileEditModal from "./ProfileModal";
 
 // SVG 아이콘 컴포넌트들
@@ -23,6 +24,7 @@ const SettingsIcon = () => (
 );
 
 // Props 타입 정의
+
 export interface ProjectCounts {
   myProjects: number;
   interestedProjects: number;
@@ -31,20 +33,40 @@ export interface ProjectCounts {
 }
 
 export interface UserProfileCardProps {
-  profileImageUrl: string;
-  name: string;
+  profile_image: string;
+  username: string;
   email: string;
-  introduction: string;
-  field: string;
-  experience: string;
-  skills: string[];
+  bio: string;
+  positions: string;
+  careers: string;
+  tech_stacks: string[];
   projectCounts: ProjectCounts;
 }
 
 export default function UserProfileCard(props: UserProfileCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   // 프로필 데이터를 state로 관리하여 수정 가능하게 합니다.
-  const [userData, setUserData] = useState({ ...props });
+  // props가 일부 비어있을 수 있으므로 안전한 기본값을 병합합니다.
+  const defaultUser = {
+    profile_image: "",
+    username: "",
+    email: "",
+    bio: "",
+    positions: "",
+    careers: "",
+    tech_stacks: [] as string[],
+    projectCounts: {
+      myProjects: 0,
+      interestedProjects: 0,
+      supportedProjects: 0,
+      completedProjects: 0,
+    },
+  } as UserProfileCardProps;
+
+  const [userData, setUserData] = useState<UserProfileCardProps>({
+    ...defaultUser,
+    ...props,
+  });
   const blobUrlsRef = useRef<Set<string>>(new Set());
 
   const handleSettingsClick = () => {
@@ -63,8 +85,8 @@ export default function UserProfileCard(props: UserProfileCardProps) {
     setUserData((prev) => ({ ...prev, ...updatedUser }));
     setIsModalOpen(false);
     // 새로운 blob URL이라면 추적 목록에 추가
-    if (updatedUser.profileImageUrl?.startsWith("blob:")) {
-      blobUrlsRef.current.add(updatedUser.profileImageUrl);
+    if (updatedUser.profile_image?.startsWith("blob:")) {
+      blobUrlsRef.current.add(updatedUser.profile_image);
     }
   };
 
@@ -78,37 +100,38 @@ export default function UserProfileCard(props: UserProfileCardProps) {
     };
   }, []);
 
+  // 모달 오픈 시 스크롤 정지 훅
+  useScrollLock(isModalOpen);
+
   return (
     <>
       <div className="w-[1620px] h-[400px] bg-white rounded-4xl py-9 px-20 shadow-lg flex flex-col justify-between relative mx-auto box-border">
         <div className="flex items-center">
           <div className="w-[167px] h-[167px] rounded-full overflow-hidden mr-8 bg-gray-300 relative">
             <Image
-              src={userData.profileImageUrl || "/assets/no-profile.svg"}
-              alt={`${userData.name}'s profile`}
+              src={userData.profile_image || "/assets/no-profile.svg"}
+              alt={`${userData.username}'s profile`}
               width={167}
               height={167}
               className="object-cover"
               unoptimized={
-                userData.profileImageUrl?.startsWith("blob:") ||
-                userData.profileImageUrl?.endsWith(".svg") ||
-                !userData.profileImageUrl
+                userData.profile_image?.startsWith("blob:") ||
+                userData.profile_image?.endsWith(".svg") ||
+                !userData.profile_image
               }
             />
           </div>
           <div className="flex flex-col gap-2 flex-grow">
             <div className="flex items-center gap-4">
               <h2 className="text-8 text-deep font-extrabold">
-                {userData.name}
+                {userData.username}
               </h2>
               <span className="text-5 text-gray">{userData.email}</span>
             </div>
-            <p className="text-5 text-deep font-bold">
-              {userData.introduction}
-            </p>
+            <p className="text-5 text-deep font-bold">{userData.bio}</p>
             <div className="flex gap-3 text-5 text-gray-600">
-              <span>{userData.field}</span>
-              <span>{userData.experience}</span>
+              <span>{userData.positions}</span>
+              <span>{userData.careers}</span>
             </div>
           </div>
           <button
@@ -139,7 +162,7 @@ export default function UserProfileCard(props: UserProfileCardProps) {
         <hr className="border-t-2 border-zinc-300" />
 
         <div className="flex items-center gap-3">
-          {userData.skills.map((skill) => (
+          {userData.tech_stacks.map((skill) => (
             <span
               key={skill}
               className="bg-primary text-white text-6 font-bold py-1 px-5 rounded-full"
@@ -153,13 +176,13 @@ export default function UserProfileCard(props: UserProfileCardProps) {
       {isModalOpen && (
         <ProfileEditModal
           user={{
-            profileImageUrl: userData.profileImageUrl,
-            name: userData.name,
+            profile_image: userData.profile_image,
+            username: userData.username,
             email: userData.email,
-            introduction: userData.introduction,
-            field: userData.field,
-            experience: userData.experience,
-            skills: userData.skills,
+            bio: userData.bio,
+            positions: userData.positions,
+            careers: userData.careers,
+            tech_stacks: userData.tech_stacks,
           }}
           onClose={handleCloseModal}
           onSave={handleSaveProfile}

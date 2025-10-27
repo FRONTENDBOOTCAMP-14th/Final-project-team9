@@ -6,7 +6,7 @@ import MyPageForm from "@/components/mypage/MyPageForm";
 export default async function MyPage() {
   return (
     <div className="bg-[#e9fafe] pt-35">
-      <Header />
+      <Header variant="white" />
       <MyPageForm />
       <Footer />
       <GoTopButton />
