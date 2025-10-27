@@ -7,30 +7,64 @@ import TagList from "@/components/common/tag/TagList";
 import ApplyModal from "@/components/project-detail/ApplyModal";
 import RecruitmentButton from "@/components/project-detail/RecruitmentButton";
 import SuccessToast from "@/components/project-detail/SuccessToast";
+import type { ProjectStatus } from "@/constants/project";
+import { supabase } from "@/lib/supabase";
 import type { ProjectDetail } from "@/types/project";
 
 interface ProjectDetailContentProps {
   project: ProjectDetail;
   isOwner?: boolean; // 현재 사용자가 프로젝트 주최자인지
+  onStatusChange?: (status: ProjectStatus) => void; // 상태 변경 콜백
 }
 
 export default function ProjectDetailContent({
   project,
   isOwner = false,
+  onStatusChange,
 }: ProjectDetailContentProps) {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isClosed, setIsClosed] = useState(project.status === "completed");
+  const [isClosed, setIsClosed] = useState(project.status === "false");
+  const [applicantCount, setApplicantCount] = useState(
+    project.applicantCount || 0
+  );
+
+  // 지원자 수 실시간 조회
+  const fetchApplicantCount = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("projects")
+        .select("applicant_count")
+        .eq("id", project.id)
+        .single();
+
+      if (!error && data) {
+        setApplicantCount(data.applicant_count || 0);
+      }
+    } catch (error) {
+      console.error("지원자 수 조회 실패:", error);
+    }
+  };
 
   const handleCloseRecruitment = async () => {
     try {
-      // TODO: Supabase API 호출로 교체
-      // await updateProjectStatus(project.id, 'completed');
+      // Supabase에서 프로젝트 상태를 "false"(모집완료)로 업데이트
+      const { error } = await supabase
+        .from("projects")
+        .update({ status: "false" })
+        .eq("id", project.id);
+
+      if (error) throw error;
 
       setIsClosed(true);
       setToastMessage("마감 완료 되었습니다");
       setShowToast(true);
+
+      // 부모 컴포넌트에 상태 변경 알림
+      if (onStatusChange) {
+        onStatusChange("false");
+      }
     } catch (error) {
       console.error("모집 마감 실패:", error);
       alert("모집 마감에 실패했습니다. 다시 시도해주세요.");
@@ -57,11 +91,11 @@ export default function ProjectDetailContent({
     <div className="w-full max-w-[1920px] mx-auto px-8 py-12">
       <div className="max-w-[1620px] mx-auto">
         {/* 상단: 왼쪽(기술스택 + 요구사항/우대사항) + 오른쪽(주최자 + 지원버튼) */}
-        <div className="flex gap-[30px] mb-[30px]">
+        <div className="flex flex-col lg:flex-row gap-[30px] mb-[30px]">
           {/* 왼쪽 컬럼 - 기술스택 + 요구사항/우대사항 */}
-          <div className="flex-1 max-w-[1090px] space-y-[30px]">
-            {/* 기술 스택 - 1090 x 241 */}
-            <section className="bg-white rounded-2xl shadow-lg p-13 w-full h-[241px]">
+          <div className="flex-1 w-full max-w-[1090px] space-y-[30px]">
+            {/* 기술 스택 - 1090 x 241 (최소 높이) */}
+            <section className="bg-white rounded-2xl shadow-lg p-13 w-full min-h-[241px]">
               <h2 className="text-4xl font-bold text-deep mb-14">
                 기술 스택 <span aria-hidden="true">🚀</span>
               </h2>
@@ -75,20 +109,26 @@ export default function ProjectDetailContent({
               />
             </section>
 
-            {/* 요구사항 + 우대사항 - 1090 x 483 */}
-            <section className="bg-white rounded-2xl shadow-lg p-13 w-full h-[483px]">
+            {/* 요구사항 + 우대사항 - 1090 x 483 (최소 높이) */}
+            <section className="bg-white rounded-2xl shadow-lg p-13 w-full min-h-[483px]">
               <h2 className="text-4xl font-bold text-deep mb-6">
                 요구사항 <span aria-hidden="true">📋</span>
               </h2>
               {/* project.requirements: string[] 에서 맵핑 */}
               <div className="space-y-4 mb-15">
-                {project.requirements?.map((req, idx) => (
-                  <div key={idx}>
-                    <h3 className="text-lg font-semibold text-deep mb-2">
-                      • {req}
-                    </h3>
-                  </div>
-                ))}
+                {project.requirements && project.requirements.length > 0 ? (
+                  project.requirements.map((req, idx) => (
+                    <div key={idx}>
+                      <h3 className="text-lg font-semibold text-deep mb-2">
+                        • {req}
+                      </h3>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-lg">
+                    등록된 요구사항이 없습니다.
+                  </p>
+                )}
               </div>
 
               {/* 우대사항 */}
@@ -97,13 +137,19 @@ export default function ProjectDetailContent({
                   우대사항 <span aria-hidden="true">⭐</span>
                 </h2>
                 {/* project.preferences: string[] 에서 맵핑 */}
-                <PreferenceTagList items={project.preferences ?? []} />
+                {project.preferences && project.preferences.length > 0 ? (
+                  <PreferenceTagList items={project.preferences} />
+                ) : (
+                  <p className="text-gray-500 text-lg">
+                    등록된 우대사항이 없습니다.
+                  </p>
+                )}
               </div>
             </section>
           </div>
 
           {/* 오른쪽 컬럼 - 프로젝트 주최자 + 지원 */}
-          <div className="w-[500px] space-y-[30px]">
+          <div className="w-full lg:w-[500px] space-y-[30px]">
             {/* 프로젝트 주최자 박스 - 500 x 406 */}
             <section
               className="bg-white rounded-2xl shadow-lg p-13 w-full h-[406px]"
@@ -189,10 +235,7 @@ export default function ProjectDetailContent({
                 지원 <span aria-hidden="true">🎉</span>
               </h2>
               <p className="text-xl text-gray mb-6">
-                현재{" "}
-                <strong className="font-bold">
-                  {project.applicantCount || 0}명
-                </strong>{" "}
+                현재 <strong className="font-bold">{applicantCount}명</strong>{" "}
                 지원했습니다.
               </p>
 
@@ -212,7 +255,7 @@ export default function ProjectDetailContent({
 
         {/* 하단: 프로젝트 상세 계획 - 1620 width, 높이 가변 */}
         <section
-          className="bg-white rounded-2xl shadow-lg p-13 w-[1620px]"
+          className="bg-white rounded-2xl shadow-lg p-13 w-full max-w-[1620px]"
           aria-labelledby="project-plan-title"
         >
           <h2
@@ -223,7 +266,7 @@ export default function ProjectDetailContent({
           </h2>
           {/* project.projectPlan: string 에서 맵핑 */}
           {project.projectPlan ? (
-            <div className="space-y-6 text-deep whitespace-pre-wrap text-[28px]">
+            <div className="space-y-6 text-deep whitespace-pre-wrap text-[28px] break-words">
               {project.projectPlan}
             </div>
           ) : (
@@ -258,9 +301,39 @@ export default function ProjectDetailContent({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={(data) => {
-          console.log("지원 데이터:", data);
-          // TODO: Supabase에 지원 데이터 저장
-          setIsModalOpen(false);
+          void (async () => {
+            try {
+              console.log("지원 데이터:", data);
+
+              // Supabase에서 applicant_count 증가
+              const { data: currentProject, error: fetchError } = await supabase
+                .from("projects")
+                .select("applicant_count")
+                .eq("id", project.id)
+                .single();
+
+              if (fetchError) throw fetchError;
+
+              const newCount = (currentProject.applicant_count || 0) + 1;
+
+              const { error: updateError } = await supabase
+                .from("projects")
+                .update({ applicant_count: newCount })
+                .eq("id", project.id);
+
+              if (updateError) throw updateError;
+
+              // 최신 지원자 수 반영
+              await fetchApplicantCount();
+
+              setIsModalOpen(false);
+              setToastMessage("지원이 완료되었습니다");
+              setShowToast(true);
+            } catch (error) {
+              console.error("지원 실패:", error);
+              alert("지원에 실패했습니다. 다시 시도해주세요.");
+            }
+          })();
         }}
       />
     </div>

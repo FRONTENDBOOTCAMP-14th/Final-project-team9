@@ -1,3 +1,4 @@
+// src/components/auth/AuthLayout.tsx
 import type { LinkType } from "@/components/auth/AuthNavigationLinks";
 import AuthNavigationLinks from "@/components/auth/AuthNavigationLinks";
 import HeaderLogo from "@/components/auth/HeaderLogo";
@@ -17,9 +18,14 @@ const AuthLayout = ({
   showLogo,
 }: AuthLayoutProps) => {
   return (
-    <div className="flex flex-col bg-[#E9FBFF]">
-      <section className="grid place-items-center h-[min(100dvh,1080px)]">
-        <div className="w-full max-w-[615px] mx-auto px-4 py-10 flex flex-col gap-10">
+    // 최상위 div가 최소 화면 높이 유지
+    <div className="flex flex-col min-h-dvh bg-[#E9FBFF]">
+      {/* --- [수정] ---
+        - justify-center 추가하여 내부 컨텐츠를 수직 중앙 정렬
+      */}
+      <section className="flex flex-col items-center justify-center flex-grow py-10 sm:py-20">
+        {/* 내부 컨텐츠 너비 및 최대 너비 유지 */}
+        <div className="w-full max-w-[615px] mx-auto px-4 flex flex-col gap-10">
           <header className="w-full">
             {showLogo !== false && <HeaderLogo />}
             {title && (
@@ -31,9 +37,11 @@ const AuthLayout = ({
 
           <main className="w-full">{children}</main>
 
-          <div className="w-full">
-            <AuthNavigationLinks type={navType} />
-          </div>
+          {navType && (
+            <div className="w-full">
+              <AuthNavigationLinks type={navType} />
+            </div>
+          )}
         </div>
       </section>
 

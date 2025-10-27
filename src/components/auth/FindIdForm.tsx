@@ -1,51 +1,60 @@
-// src/components/auth/FindIdForm.tsx
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import EmailVerification from "@/components/auth/EmailVerification";
 import Button from "@/components/common/Button";
-import EmailVerification from "./EmailVerification";
+import { useRecoveryFlow } from "@/hooks/useAuthValidation";
 
 const FindIdForm = () => {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [isVerified, setIsVerified] = useState(false);
+  const {
+    email,
+    setEmail,
+    isVerified,
+    setIsVerified,
+    isLoading,
+    formError,
+    handleSubmit,
+  } = useRecoveryFlow("find-id");
 
-  const maskId = (id: string) => {
-    if (id.length <= 4) return "****";
-    return id.slice(0, 4) + "*".repeat(id.length - 4);
-  };
+  const [disabledReason, setDisabledReason] = useState("");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!isVerified) {
-      alert("이메일 인증을 먼저 완료해주세요!");
-      return;
-    }
-    // TODO: Supabase 로직을 사용하여 이메일로 아이디를 찾습니다.
-    const fetchedIdFromServer = "joyin-frontend"; // 임시 데이터
-    const maskedId = maskId(fetchedIdFromServer);
-    router.push(`/find-id/result?id=${maskedId}`);
-  };
+  useEffect(() => {
+    if (!isVerified) setDisabledReason("이메일 인증을 먼저 완료해주세요.");
+    else if (isLoading) setDisabledReason("아이디를 찾는 중입니다.");
+    else setDisabledReason("확인 버튼을 눌러주세요.");
+  }, [isVerified, isLoading]);
 
   return (
     <div className="w-full max-w-[615px]">
-      <form onSubmit={handleSubmit} className="flex flex-col">
+      <form onSubmit={(e) => void handleSubmit(e)} className="flex flex-col">
         <EmailVerification
           email={email}
           setEmail={setEmail}
           isVerified={isVerified}
           setIsVerified={setIsVerified}
-          otpType="magiclink"
+          otpType="recovery"
+          disabled={isLoading}
         />
+
+        {formError && (
+          <p className="text-red-500 mt-2 text-center">{formError}</p>
+        )}
+
+        <span id="find-id-disabled-reason" className="sr-only">
+          {disabledReason}
+        </span>
+
         <Button
           type="submit"
           variant="primary"
           size="lg"
           className="w-full h-[80px] text-[24px] mt-[40px]"
-          disabled={!isVerified}
+          disabled={!isVerified || isLoading}
+          aria-describedby={
+            !isVerified || isLoading ? "find-id-disabled-reason" : undefined
+          }
         >
-          확인
+          {isLoading ? "아이디 찾는 중..." : "확인"}
         </Button>
       </form>
     </div>

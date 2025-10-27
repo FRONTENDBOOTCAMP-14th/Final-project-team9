@@ -38,7 +38,7 @@ export default function ProjectCard({
   skills,
   remain,
   category,
-  status = "recruiting",
+  status = "true",
   profile_image,
 }: ProjectCardProps) {
   const router = useRouter();
@@ -118,8 +118,15 @@ export default function ProjectCard({
 
       <div className="flex justify-between items-center mt-5">
         <span className="text-5">
-          <span className="text-primary font-bold">{remain}자리</span>
-          <span className="text-deep"> 남았어요</span>
+          {status === "true" ? (
+            <>
+              <span className="text-deep">모집 마감까지 </span>
+              <span className="text-primary font-bold">{remain}일</span>
+              <span className="text-deep"> 남았어요</span>
+            </>
+          ) : (
+            <span className="text-deep">모집이 마감되었어요</span>
+          )}
         </span>
         <button
           className="bg-primary text-white px-[15px] py-[6px] rounded-[10px] text-5 hover:bg-blue-700"

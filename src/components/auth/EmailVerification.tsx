@@ -1,19 +1,36 @@
-// src/components/auth/EmailVerification.tsx
 "use client";
 
 import { useState } from "react";
 import Button from "@/components/common/Button";
 import LabeledInput from "@/components/common/LabeledInput";
 import { supabase } from "@/lib/supabase";
+import type { User, Session } from "@supabase/supabase-js";
+// 'VerifyOtpResponse' 대신 User와 Session을 직접 import 합니다.
+
+/**
+ * onVerifySuccess의 data 타입을 직접 정의합니다.
+ * (verifyOtp의 성공 반환 값)
+ */
+interface VerifySuccessData {
+  user: User | null;
+  session: Session | null;
+}
 
 interface EmailVerificationProps {
   email: string;
   setEmail: (email: string) => void;
   isVerified: boolean;
   setIsVerified: (isVerified: boolean) => void;
-  otpType: "signup" | "magiclink" | "recovery";
+  /** 'signup': 회원가입, 'recovery': 아이디/비밀번호 찾기 */
+  otpType: "signup" | "recovery";
   password?: string; // 회원가입 시에만 사용
-  username?: string; // 회원가입 시에만 사용 (id prop에서 이름 변경)
+  username?: string; // 회원가입 시에만 사용
+  disabled?: boolean;
+  /**
+   * (핵심) 인증 성공 시 호출될 콜백 함수.
+   * 인증 데이터를 부모 컴포넌트로 전달합니다.
+   */
+  onVerifySuccess?: (data: VerifySuccessData) => void | Promise<void>;
 }
 
 const EmailVerification = ({
@@ -24,40 +41,47 @@ const EmailVerification = ({
   otpType,
   password,
   username,
+  disabled = false,
+  onVerifySuccess,
 }: EmailVerificationProps) => {
   const [authCode, setAuthCode] = useState("");
   const [isAuthCodeSent, setIsAuthCodeSent] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
 
+  // --- 1. 인증 코드 전송 ---
   const sendAuthCode = async () => {
     if (!email) {
       alert("이메일을 입력해주세요!");
       return;
     }
 
+    setIsSending(true);
     let error;
 
     if (otpType === "signup") {
-      if (!password || !username) {
-        alert("아이디와 비밀번호를 모두 입력해주세요.");
-        return;
-      }
-      // 회원가입 로직
+      // --- 회원가입 인증 코드 요청 ---
       const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { username }, // data 필드에 username 추가
+          data: { username },
         },
       });
       error = signUpError;
     } else {
-      // 아이디/비밀번호 찾기 로직
+      // --- 아이디/비밀번호 찾기 인증 코드 요청 (recovery) ---
       const { error: signInError } = await supabase.auth.signInWithOtp({
         email,
+        options: {
+          // 가입된 유저에게만 보내기 (올바른 설정)
+          shouldCreateUser: false,
+        },
       });
       error = signInError;
     }
 
+    setIsSending(false);
     if (error) {
       alert("인증코드 전송 실패: " + error.message);
       return;
@@ -67,16 +91,26 @@ const EmailVerification = ({
     setIsAuthCodeSent(true);
   };
 
+  // --- 2. 인증 코드 검증 ---
   const verifyAuthCode = async () => {
     if (!authCode) {
       alert("인증코드를 입력해주세요!");
       return;
     }
-    const { error } = await supabase.auth.verifyOtp({
+
+    setIsVerifying(true);
+
+    // (필수 수정!)
+    // 'recovery' 모드(signInWithOtp)로 보낸 코드는 'email' 타입으로 검증
+    const verificationType = otpType === "signup" ? "signup" : "email";
+
+    const { data, error } = await supabase.auth.verifyOtp({
       email,
       token: authCode,
-      type: otpType,
+      type: verificationType,
     });
+
+    setIsVerifying(false);
 
     if (error) {
       alert("인증 실패: " + error.message);
@@ -85,8 +119,17 @@ const EmailVerification = ({
 
     alert("인증 완료!");
     setIsVerified(true);
+
+    // (핵심) 인증 성공 시, 부모가 넘겨준 onVerifySuccess 함수를 실행
+    if (onVerifySuccess && data) {
+      // 부모의 로직(아이디 찾기, 페이지 이동 등)이 실행될 때까지 기다림
+      await onVerifySuccess(data);
+    }
   };
 
+  const totalDisabled = disabled || isSending || isVerifying;
+
+  // --- 3. UI 렌더링 ---
   return (
     <>
       <div className="flex items-end gap-2">
@@ -97,16 +140,16 @@ const EmailVerification = ({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           containerClassName="flex-grow h-[80px]"
-          disabled={isAuthCodeSent || isVerified}
+          disabled={totalDisabled || isAuthCodeSent || isVerified}
         />
         <Button
           type="button"
           variant="secondary"
           className="h-[80px] w-[104px] rounded-[10px] border-[1px] border-white text-[#DBDBDB] text-[24px]"
           onClick={() => void sendAuthCode()}
-          disabled={isAuthCodeSent || isVerified}
+          disabled={totalDisabled || isAuthCodeSent || isVerified}
         >
-          인증
+          {isSending ? "전송중" : "인증"}
         </Button>
       </div>
       {isAuthCodeSent && (
@@ -118,16 +161,16 @@ const EmailVerification = ({
             value={authCode}
             onChange={(e) => setAuthCode(e.target.value)}
             containerClassName="flex-grow h-[80px]"
-            disabled={isVerified}
+            disabled={totalDisabled || isVerified}
           />
           <Button
             type="button"
             variant="secondary"
             className="h-[80px] w-[104px] rounded-[10px] border-[1px] border-[white] text-[#DBDBDB] text-[18px]"
             onClick={() => void verifyAuthCode()}
-            disabled={isVerified}
+            disabled={totalDisabled || isVerified}
           >
-            인증 확인
+            {isVerifying ? "확인중" : "인증 확인"}
           </Button>
           {isVerified && (
             <p className="absolute right-[140px] top-1/2 -translate-y-1/2 text-green-500 font-semibold pointer-events-none">

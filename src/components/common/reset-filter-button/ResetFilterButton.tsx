@@ -2,9 +2,24 @@
 
 import Button from "@/components/common/Button";
 import { useDropdownStore } from "@/store/dropdown-store";
+import { useSearchFilterStore } from "@/store/search-filter-store";
 
 export default function ResetFilterButton() {
   const { resetAll } = useDropdownStore();
+  const setSearchQuery = useSearchFilterStore((state) => state.setSearchQuery);
+  const setPosition = useSearchFilterStore((state) => state.setPosition);
+  const setDuration = useSearchFilterStore((state) => state.setDuration);
+  const setField = useSearchFilterStore((state) => state.setField);
+  const setDomain = useSearchFilterStore((state) => state.setDomain);
+
+  const handleReset = () => {
+    resetAll();
+    setSearchQuery("");
+    setPosition("");
+    setDuration("");
+    setField("");
+    setDomain("");
+  };
 
   return (
     <Button
@@ -13,7 +28,7 @@ export default function ResetFilterButton() {
       size="filter"
       variant="secondary"
       className="text-gray rounded-[10px]"
-      onClick={resetAll}
+      onClick={handleReset}
     >
       <div className="flex items-center gap-3">
         <svg

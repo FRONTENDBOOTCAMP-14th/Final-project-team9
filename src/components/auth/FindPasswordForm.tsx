@@ -1,60 +1,55 @@
-// src/components/auth/FindPasswordForm.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import EmailVerification from "@/components/auth/EmailVerification";
 import Button from "@/components/common/Button";
-import LabeledInput from "@/components/common/LabeledInput";
-import EmailVerification from "./EmailVerification";
-import ResetPasswordForm from "./ResetPasswordForm";
+import { useRecoveryFlow } from "@/hooks/useAuthValidation";
 
 const FindPasswordForm = () => {
-  const [id, setId] = useState("");
-  const [email, setEmail] = useState("");
-  const [isEmailVerified, setIsEmailVerified] = useState(false);
-  const [showResetForm, setShowResetForm] = useState(false);
+  const {
+    email,
+    setEmail,
+    isVerified,
+    setIsVerified,
+    isLoading,
+    handleSubmit,
+  } = useRecoveryFlow("find-password");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (isEmailVerified) {
-      // TODO: 데이터베이스에서 아이디와 이메일이 일치하는지 확인하는 로직 추가
-      setShowResetForm(true);
-    } else {
-      alert("이메일 인증을 먼저 완료해주세요.");
-    }
-  };
+  const [disabledReason, setDisabledReason] = useState("");
 
-  if (showResetForm) {
-    return <ResetPasswordForm />;
-  }
+  useEffect(() => {
+    if (!isVerified) setDisabledReason("이메일 인증을 먼저 완료해주세요.");
+    else if (isLoading) setDisabledReason("페이지 이동 중입니다.");
+    else setDisabledReason("확인 버튼을 눌러주세요.");
+  }, [isVerified, isLoading]);
 
   return (
     <div className="w-full max-w-[615px]">
-      <form onSubmit={handleSubmit} className="flex flex-col">
-        <LabeledInput
-          id="find-pw-id"
-          label="아이디를 입력하세요"
-          type="text"
-          value={id}
-          onChange={(e) => setId(e.target.value)}
-          containerClassName="w-full h-[80px]"
+      <form onSubmit={(e) => void handleSubmit(e)} className="flex flex-col">
+        <EmailVerification
+          email={email}
+          setEmail={setEmail}
+          isVerified={isVerified}
+          setIsVerified={setIsVerified}
+          otpType="recovery"
+          disabled={isLoading}
         />
-        <div className="mt-[20px]">
-          <EmailVerification
-            email={email}
-            setEmail={setEmail}
-            isVerified={isEmailVerified}
-            setIsVerified={setIsEmailVerified}
-            otpType="recovery"
-          />
-        </div>
+
+        <span id="find-pw-disabled-reason" className="sr-only">
+          {disabledReason}
+        </span>
+
         <Button
           type="submit"
           variant="primary"
           size="lg"
           className="w-full h-[80px] text-[24px] mt-[40px]"
-          disabled={!isEmailVerified}
+          disabled={!isVerified || isLoading}
+          aria-describedby={
+            !isVerified || isLoading ? "find-pw-disabled-reason" : undefined
+          }
         >
-          확인
+          {isLoading ? "이동 중..." : "확인"}
         </Button>
       </form>
     </div>
