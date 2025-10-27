@@ -2,7 +2,7 @@
 
 ## 사이드 프로젝트, 이제 JOYIN에서 함께할 팀원을 찾아보세요\!
 
-**[🚀 JOYIN 배포 페이지 바로가기](https://final-project-team9.vercel.app/login)**
+**[🚀 JOYIN 배포 페이지 바로가기](https://final-project-team9.vercel.app)**
 
 **개발자, 디자이너, 기획자** 누구나 아이디어를 공유하고 협업할 동료를 만날 수 있는 곳,<br> 멋쟁이 사자처럼 프론트엔드 부트캠프 14기 파이널 프로젝트 **9in구직** 팀이 만들었습니다.
 
