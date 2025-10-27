@@ -16,15 +16,13 @@ const ResetPasswordForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [formMessage, setFormMessage] = useState<string | null>(null);
 
-  // (보안) 이 페이지는 반드시 로그인된 사용자만 접근해야 합니다.
+  const [disabledReason, setDisabledReason] = useState("");
+
   useEffect(() => {
     const checkUser = async () => {
       const { data } = await supabase.auth.getUser();
-
-      // 'find-password'에서 OTP로 로그인하지 않았다면 user가 null입니다.
       if (!data.user) {
         alert("잘못된 접근입니다. 비밀번호 찾기를 다시 시도해주세요.");
-        // 'push' 대신 'replace'를 사용해 뒤로가기 기록을 남기지 않습니다.
         router.replace("/find-password");
       }
     };
@@ -35,12 +33,10 @@ const ResetPasswordForm = () => {
     const { value } = e.target;
     setNewPassword(value);
     if (value.length > 0 && value.length < 8) {
-      // (Joyin 정책: 8자리)
       setPasswordError("비밀번호는 8자리 이상 입력 가능합니다");
     } else {
       setPasswordError("");
     }
-    // 확인 비밀번호 필드도 즉시 업데이트
     if (confirmPassword && value !== confirmPassword) {
       setConfirmError("비밀번호가 일치하지 않습니다");
     } else {
@@ -60,7 +56,7 @@ const ResetPasswordForm = () => {
 
   const handleResetSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setFormMessage(null); // 메시지 초기화
+    setFormMessage(null);
 
     if (newPassword !== confirmPassword) {
       setConfirmError("비밀번호가 일치하지 않습니다");
@@ -71,7 +67,7 @@ const ResetPasswordForm = () => {
       return;
     }
 
-    setIsLoading(true); // 로딩 시작
+    setIsLoading(true);
 
     const { error } = await supabase.auth.updateUser({
       password: newPassword,
@@ -79,17 +75,35 @@ const ResetPasswordForm = () => {
 
     if (error) {
       setFormMessage("오류: " + error.message);
-      setIsLoading(false); // 로딩 끝
+      setIsLoading(false);
     } else {
       setFormMessage(
         "비밀번호가 성공적으로 변경되었습니다. 다시 로그인해주세요.",
       );
-
       await supabase.auth.signOut();
       alert("비밀번호가 성공적으로 변경되었습니다. 다시 로그인해주세요.");
       router.push("/login");
     }
   };
+
+  const isSubmitDisabled =
+    isLoading ||
+    !!passwordError ||
+    !!confirmError ||
+    !newPassword ||
+    !confirmPassword;
+
+  useEffect(() => {
+    let reason = "";
+    if (!newPassword) reason = "새 비밀번호를 입력해주세요.";
+    else if (passwordError) reason = passwordError;
+    else if (!confirmPassword) reason = "비밀번호 확인을 입력해주세요.";
+    else if (confirmError) reason = confirmError;
+    else if (isLoading) reason = "비밀번호를 변경 중입니다.";
+    else reason = "비밀번호 변경";
+
+    setDisabledReason(reason);
+  }, [newPassword, passwordError, confirmPassword, confirmError, isLoading]);
 
   return (
     <div className="w-full max-w-[615px]">
@@ -130,12 +144,19 @@ const ResetPasswordForm = () => {
           </p>
         )}
 
+        <span id="reset-pw-disabled-reason" className="sr-only">
+          {disabledReason}
+        </span>
+
         <Button
           type="submit"
           variant="primary"
           size="lg"
           className="w-full h-[80px] text-[24px] mt-[40px]"
-          disabled={isLoading}
+          disabled={isSubmitDisabled}
+          aria-describedby={
+            isSubmitDisabled ? "reset-pw-disabled-reason" : undefined
+          }
         >
           {isLoading ? "변경 중..." : "확인"}
         </Button>

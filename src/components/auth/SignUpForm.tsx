@@ -1,7 +1,6 @@
-// src/components/auth/SignUpForm.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import LabeledInput from "@/components/common/LabeledInput";
@@ -35,6 +34,8 @@ const SignUpForm = () => {
   const [confirmError, setConfirmError] = useState<string | null>(null);
   const [isVerified, setIsVerified] = useState(false);
 
+  const [submitDisabledReason, setSubmitDisabledReason] = useState("");
+
   const handleConfirmChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setPasswordConfirm(value);
@@ -67,6 +68,32 @@ const SignUpForm = () => {
 
   const isSubmitDisabled = !isVerified || isEmailSendDisabled;
 
+  useEffect(() => {
+    let reason = "";
+
+    if (!isIdValid) reason = idError || "아이디를 올바르게 입력해주세요.";
+    else if (isCheckingId) reason = "아이디 중복 확인 중입니다.";
+    else if (!isPasswordValid)
+      reason = passwordError || "비밀번호를 올바르게 입력해주세요.";
+    else if (!passwordConfirm) reason = "비밀번호 확인을 입력해주세요.";
+    else if (confirmError) reason = confirmError;
+    else if (!email) reason = "이메일을 입력해주세요.";
+    else if (!isVerified) reason = "이메일 인증을 완료해주세요.";
+    else reason = "다음 단계로 진행하세요.";
+
+    setSubmitDisabledReason(reason);
+  }, [
+    isIdValid,
+    idError,
+    isCheckingId,
+    isPasswordValid,
+    passwordError,
+    passwordConfirm,
+    confirmError,
+    email,
+    isVerified,
+  ]);
+
   return (
     <div className="w-full max-w-[615px]">
       <form onSubmit={(e) => void handleSubmit(e)} className="flex flex-col">
@@ -76,7 +103,7 @@ const SignUpForm = () => {
           type="text"
           value={id}
           onChange={handleIdChange}
-          containerClassName="w-full "
+          containerClassName="w-full"
           error={idError}
           disabled={isVerified}
         />
@@ -86,7 +113,7 @@ const SignUpForm = () => {
             label="비밀번호"
             value={password}
             onChange={handlePasswordChange}
-            containerClassName="w-full "
+            containerClassName="w-full"
             error={passwordError}
             disabled={isVerified}
           />
@@ -97,7 +124,7 @@ const SignUpForm = () => {
             label="비밀번호 확인"
             value={passwordConfirm}
             onChange={handleConfirmChange}
-            containerClassName="w-full "
+            containerClassName="w-full"
             error={confirmError}
             disabled={isVerified}
           />
@@ -114,11 +141,19 @@ const SignUpForm = () => {
             disabled={isEmailSendDisabled}
           />
         </div>
+
+        <span id="submit-disabled-reason" className="sr-only">
+          {submitDisabledReason}
+        </span>
+
         <Button
           type="submit"
           size="lg"
           className="w-full  text-[24px] mt-[40px]"
           disabled={isSubmitDisabled}
+          aria-describedby={
+            isSubmitDisabled ? "submit-disabled-reason" : undefined
+          }
         >
           다음
         </Button>
