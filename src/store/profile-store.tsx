@@ -85,10 +85,9 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
         const { error: tableError } = await supabase
           .from("users")
           .update({
-            introduction: updatedData.bio,
-            field: updatedData.positions,
-            tech_stacks: updatedData.experience,
-            skills: updatedData.skills,
+            bio: updatedData.bio,
+            position_id: updatedData.positions,
+            tech_stacks: updatedData.tech_stacks,
             profile_image: finalImageUrl,
           })
           .eq("id", user.id);
@@ -107,7 +106,6 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
       alert("프로필 업데이트에 실패했습니다.");
     }
   },
-
   // 모달을 여는 함수
   openModal: () => set({ isModalOpen: true }),
 

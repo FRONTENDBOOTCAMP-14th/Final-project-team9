@@ -25,7 +25,7 @@ export function useProfileForm(
       ({
         ...defaultInitial,
         ...(initialUser as Partial<typeof defaultInitial>),
-      }) as Omit<UserProfileCardProps, "projectCounts">,
+      }) as unknown as Omit<UserProfileCardProps, "projectCounts">,
   );
   const [skillInput, setSkillInput] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -64,7 +64,9 @@ export function useProfileForm(
     e.preventDefault();
     const trimmedSkill = skillInput.trim();
     if (trimmedSkill === "") return;
-    const currentSkills = Array.isArray(formData.skills) ? formData.skills : [];
+    const currentSkills = Array.isArray(formData.tech_stacks)
+      ? formData.tech_stacks
+      : [];
     if (currentSkills.length >= MAX_SKILLS) {
       alert(`최대 ${MAX_SKILLS}개까지만 추가할 수 있습니다.`);
       return;
@@ -79,8 +81,8 @@ export function useProfileForm(
     }
     setFormData((prev) => ({
       ...prev,
-      skills: [
-        ...(Array.isArray(prev.skills) ? prev.skills : []),
+      tech_stacks: [
+        ...(Array.isArray(prev.tech_stacks) ? prev.tech_stacks : []),
         trimmedSkill,
       ],
     }));
@@ -90,9 +92,10 @@ export function useProfileForm(
   const handleSkillRemove = (skillToRemove: string) => {
     setFormData((prev) => ({
       ...prev,
-      skills: (Array.isArray(prev.skills) ? prev.skills : []).filter(
-        (skill) => skill !== skillToRemove,
-      ),
+      tech_stacks: (Array.isArray(prev.tech_stacks)
+        ? prev.tech_stacks
+        : []
+      ).filter((skill) => skill !== skillToRemove),
     }));
   };
 
@@ -106,15 +109,15 @@ export function useProfileForm(
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     const bioLength = formData?.bio ? formData.bio.length : 0;
-    const skillsLength = Array.isArray(formData?.skills)
-      ? formData.skills.length
+    const techStacksLength = Array.isArray(formData?.tech_stacks)
+      ? formData.tech_stacks.length
       : 0;
 
     if (bioLength > MAX_INTRODUCTION_LENGTH) {
       newErrors.bio = `한 줄 소개는 ${MAX_INTRODUCTION_LENGTH}자 이내로 작성해주세요.`;
     }
-    if (skillsLength === 0) {
-      newErrors.skills = "최소 1개의 기술 스택을 추가해주세요.";
+    if (techStacksLength === 0) {
+      newErrors.tech_stacks = "최소 1개의 기술 스택을 추가해주세요.";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

@@ -65,21 +65,21 @@ export default function ProfileEditModal({
   // Dropdown 초기값 설정
   useEffect(() => {
     setSelected("분야", user.positions);
-    setSelected("경력", user.experience);
-  }, [user.positions, user.experience, setSelected]);
+    setSelected("경력", user.careers);
+  }, [user.positions, user.careers, setSelected]);
 
   // Dropdown 값이 변경될 때 formData 업데이트
   useEffect(() => {
     const field = selectedValues["분야"];
-    const experience = selectedValues["경력"];
+    const careers = selectedValues["경력"];
 
     if (field && field !== formData.positions) {
       setFormData((prev) => ({ ...prev, positions: field }));
     }
-    if (experience && experience !== formData.experience) {
-      setFormData((prev) => ({ ...prev, experience }));
+    if (careers && careers !== formData.careers) {
+      setFormData((prev) => ({ ...prev, careers }));
     }
-  }, [selectedValues, formData.positions, formData.experience, setFormData]);
+  }, [selectedValues, formData.positions, formData.careers, setFormData]);
 
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/50">
@@ -215,7 +215,7 @@ export default function ProfileEditModal({
               <p className="text-red-500 text-sm mt-1">{errors.skills}</p>
             )}
             <div className="flex gap-2 mt-3 flex-wrap">
-              {formData.skills.map((skill) => (
+              {formData.tech_stacks.map((skill) => (
                 <div
                   key={skill}
                   className="bg-primary text-white text-sm font-bold px-3 py-1 rounded-full flex items-center gap-2"

@@ -8,7 +8,7 @@ import Taps from "@/components/mypage/Taps";
 import { supabase } from "@/lib/supabase";
 import type { UserData } from "@/types/project";
 
-type ExtendedUserData = UserData & { skills?: string[] };
+type ExtendedUserData = UserData & { tech_stacks?: string[] };
 
 export default function MyPageForm() {
   const router = useRouter();
@@ -68,22 +68,44 @@ export default function MyPageForm() {
 
   return (
     <div className="min-h-screen bg-[#e9fafe]">
-      <UserProfileCard
-        profile_image={userData.profile_image || "/assets/no-profile.svg"}
-        username={userData.username}
-        email={userData.email}
-        bio={userData.bio}
-        positions={userData.positions?.name || ""}
-        experience={userData.careers?.name || ""}
-        skills={userData.skills || []}
-        projectCounts={{
-          myProjects: 0,
-          interestedProjects: 0,
-          supportedProjects: 0,
-          completedProjects: 0,
-        }}
-      />
-      <Taps />
+      {userData && (
+        <>
+          <UserProfileCard
+            profile_image={userData.profile_image || "/assets/no-profile.svg"}
+            username={userData.username}
+            email={userData.email}
+            bio={userData.bio}
+            positions={userData.positions?.name || ""}
+            careers={userData.careers?.name || ""}
+            tech_stacks={userData.tech_stacks || []}
+            projectCounts={{
+              myProjects: 0,
+              interestedProjects: 0,
+              supportedProjects: 0,
+              completedProjects: 0,
+            }}
+          />
+          <Taps
+            userId={userData.id}
+            onProjectCountsChange={(counts) => {
+              // 프로젝트 수 업데이트
+              setUserData((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      projectCounts: {
+                        myProjects: counts.myProjects,
+                        interestedProjects: counts.interestedProjects,
+                        supportedProjects: counts.supportedProjects,
+                        completedProjects: counts.completedProjects,
+                      },
+                    }
+                  : null,
+              );
+            }}
+          />
+        </>
+      )}
     </div>
   );
 }

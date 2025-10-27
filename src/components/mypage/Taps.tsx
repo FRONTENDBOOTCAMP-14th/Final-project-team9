@@ -1,123 +1,195 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProjectCard from "@/components/common/project-card/ProjectCard";
+import { supabase } from "@/lib/supabase";
 import { useFavoriteStore } from "@/store/favorite-store";
+import type { ProjectCard as ProjectType } from "@/types/project";
 
 // 각 탭의 이름과 데이터 키를 정의
 const TABS = [
   { name: "나의 프로젝트", key: "myProjects" },
   { name: "관심 프로젝트", key: "interestedProjects" },
-  { name: "지원한 프로젝트", key: "supportedProjects " },
+  { name: "지원한 프로젝트", key: "supportedProjects" },
   { name: "종료된 프로젝트", key: "completedProjects" },
 ];
 
-// 프로젝트 데이터 타입 정의 (카드 컴포넌트 임시 데이터 삭제시 삭제)
-interface Project {
-  id: number;
-  title: string;
-  description: string;
-  owner: string;
-  level: string;
-  members: number;
-  period: string;
-  duration: string;
-  skills: string[];
-  remain: number;
-  category: string;
-  profile_image: string;
+interface Props {
+  userId?: string;
+  onProjectCountsChange?: (counts: {
+    myProjects: number;
+    interestedProjects: number;
+    supportedProjects: number;
+    completedProjects: number;
+  }) => void;
 }
 
-// 카드 컴포넌트 임시 더미 데이터
-const mockProjectsData: Record<string, Project[]> = {
-  myProjects: [
-    {
-      id: 1,
-      title: "AI 기반 주변 맛집 추천 서비스",
-      description: "AI를 기반으로 주변의 맛집을 찾는 서비스",
-      owner: "지훈",
-      level: "주니어(3년 미만)",
-      members: 4,
-      period: "1.1-3.1",
-      duration: "2개월",
-      skills: ["React", "Next", "JS", "SW", "Spring"],
-      remain: 2,
-      category: "웹 개발",
-      profile_image: "/assets/no-profile.svg",
-    },
-    {
-      id: 2,
-      title: "두 번째 나의 프로젝트",
-      description: "설명",
-      owner: "미리",
-      level: "시니어(5년 이상)",
-      members: 3,
-      period: "2.1-4.1",
-      duration: "2개월",
-      skills: ["Vue", "TS"],
-      remain: 1,
-      category: "앱 개발",
-      profile_image: "/assets/no-profile.svg",
-    },
-    {
-      id: 3,
-      title: "세 번째 나의 프로젝트",
-      description: "설명",
-      owner: "미리",
-      level: "시니어(5년 이상)",
-      members: 3,
-      period: "2.1-4.1",
-      duration: "2개월",
-      skills: ["Vue", "TS"],
-      remain: 1,
-      category: "앱 개발",
-      profile_image: "/assets/no-profile.svg",
-    },
-    {
-      id: 4,
-      title: "네 번째 나의 프로젝트",
-      description: "설명",
-      owner: "미리",
-      level: "시니어(5년 이상)",
-      members: 3,
-      period: "2.1-4.1",
-      duration: "2개월",
-      skills: ["Vue", "TS"],
-      remain: 1,
-      category: "앱 개발",
-      profile_image: "/assets/no-profile.svg",
-    },
-  ],
-  interestedProjects: [],
-  supportedProjects: [],
-  completedProjects: [],
-};
-
-export default function ProjectTabs() {
+export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
   const [activeTab, setActiveTab] = useState(TABS[0].key);
+  const [projects, setProjects] = useState<ProjectType[]>([]);
+  const [loading, setLoading] = useState(true);
+  useFavoriteStore();
 
-  const { favorites } = useFavoriteStore();
+  useEffect(() => {
+    const fetchProjects = async () => {
+      if (!userId) return;
 
-  // 모든 프로젝트를 하나의 배열로 통합
-  // new Map을 사용하여 중복된 id를 가진 프로젝트를 제거합니다.
-  const allProjects = Array.from(
-    new Map(
-      Object.values(mockProjectsData)
-        .flat()
-        .map((p) => [p.id, p]),
-    ).values(),
-  );
+      try {
+        setLoading(true);
 
-  // 현재 탭에 따라 보여줄 프로젝트 목록을 결정
-  const activeProjects = (() => {
-    // "관심 프로젝트" 탭이 활성화된 경우
-    if (activeTab === "interestedProjects") {
-      // 모든 프로젝트 중에서 favorites 배열에 id가 포함된 것만 필터링
-      return allProjects.filter((project) => favorites.includes(project.id));
-    }
-    // 다른 탭의 경우 기존 방식대로 데이터를 가져옴
-    return mockProjectsData[activeTab] || [];
-  })();
+        if (activeTab === "myProjects") {
+          const res = await supabase
+            .from("project_view")
+            .select("*")
+            .eq("owner_id", userId);
+
+          console.log("Raw project data:", res.data);
+          const data = res.data?.map((project) => ({
+            id: project.id,
+            title: project.name,
+            description: project.short_description,
+            owner: project.user_name,
+            level: project.career_name || "경력 없음",
+            members: project.position_count || 0,
+            period: project.deadline,
+            duration: project.expected_schedule,
+            skills: project.tech_stacks || [],
+            remain: project.remain_days || 0,
+            category: project.field_name,
+            status: project.status,
+            profile_image: project.profile_image || "/assets/no-profile.svg",
+          })) as ProjectType[] | null;
+          if (res.error) {
+            console.error("프로젝트 로딩 오류:", res.error);
+            setProjects([]);
+            return;
+          }
+          setProjects(data ?? []);
+          return;
+        }
+
+        if (activeTab === "interestedProjects") {
+          interface FavRow {
+            projects: ProjectType;
+          }
+          const res = await supabase
+            .from("favorite")
+            .select("project_id, projects(*)")
+            .eq("user_id", userId);
+          const data = res.data as unknown as FavRow[] | null;
+          if (res.error) {
+            console.error("관심 프로젝트 로딩 오류:", res.error);
+            setProjects([]);
+            return;
+          }
+          setProjects((data ?? []).map((r) => r.projects));
+          return;
+        }
+
+        if (activeTab === "supportedProjects") {
+          interface AppRow {
+            projects: ProjectType;
+          }
+          const res = await supabase
+            .from("applications")
+            .select("projects(*)")
+            .eq("user_id", userId)
+            .eq("projects.status", "모집중");
+          const data = res.data as unknown as AppRow[] | null;
+          if (res.error) {
+            console.error("지원한 프로젝트 로딩 오류:", res.error);
+            setProjects([]);
+            return;
+          }
+          setProjects((data ?? []).map((r) => r.projects));
+          return;
+        }
+
+        if (activeTab === "completedProjects") {
+          interface AppRow {
+            projects: ProjectType;
+          }
+          const today = new Date().toISOString();
+          const res = await supabase
+            .from("applications")
+            .select("projects(*)")
+            .eq("user_id", userId)
+            .lt("projects.expected_end_date", today);
+          const data = res.data as unknown as AppRow[] | null;
+          if (res.error) {
+            console.error("종료된 프로젝트 로딩 오류:", res.error);
+            setProjects([]);
+            return;
+          }
+          setProjects((data ?? []).map((r) => r.projects));
+          return;
+        }
+      } catch (err) {
+        console.error("프로젝트 로딩 중 오류 발생:", err);
+        setProjects([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void fetchProjects();
+  }, [activeTab, userId]);
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      if (!userId) return;
+      try {
+        const projRes = await supabase
+          .from("project_view")
+          .select("id")
+          .eq("owner_id", userId);
+
+        const favRes = await supabase
+          .from("favorite")
+          .select("id")
+          .eq("user_id", userId);
+
+        const appRes = await supabase
+          .from("applications")
+          .select("projects(expected_end_date,status)")
+          .eq("user_id", userId);
+
+        if (projRes.error || favRes.error || appRes.error) {
+          console.error(
+            "counts fetch err",
+            projRes.error || favRes.error || appRes.error,
+          );
+          return;
+        }
+
+        const myProjects = (projRes.data ?? []).length;
+        const interestedProjects = (favRes.data ?? []).length;
+        const appData = appRes.data as
+          | { projects?: { expected_end_date?: string; status?: string } }[]
+          | null;
+        const supportedProjects = (appData ?? []).filter(
+          (a) => a.projects?.status === "모집중",
+        ).length;
+        const completedProjects = (appData ?? []).filter((a) => {
+          const end = a.projects?.expected_end_date;
+          return end ? new Date(end) < new Date() : false;
+        }).length;
+
+        onProjectCountsChange?.({
+          myProjects,
+          interestedProjects,
+          supportedProjects,
+          completedProjects,
+        });
+      } catch (err) {
+        console.error("counts fetch err", err);
+      }
+    };
+
+    void fetchCounts();
+  }, [userId, onProjectCountsChange]);
+
+  const activeProjects = projects;
 
   return (
     <div className="w-[1620px] mx-auto my-12">
@@ -140,7 +212,11 @@ export default function ProjectTabs() {
 
       {/* 탭 콘텐츠 */}
       <div className="mt-15">
-        {activeProjects.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-20">
+            <p className="text-deep text-5">로딩 중...</p>
+          </div>
+        ) : activeProjects.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-15">
             {activeProjects.map((project) => (
               <ProjectCard key={project.id} {...project} />

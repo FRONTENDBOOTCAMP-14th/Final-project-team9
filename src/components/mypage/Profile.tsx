@@ -38,8 +38,8 @@ export interface UserProfileCardProps {
   email: string;
   bio: string;
   positions: string;
-  experience: string;
-  skills: string[];
+  careers: string;
+  tech_stacks: string[];
   projectCounts: ProjectCounts;
 }
 
@@ -53,8 +53,8 @@ export default function UserProfileCard(props: UserProfileCardProps) {
     email: "",
     bio: "",
     positions: "",
-    experience: "",
-    skills: [] as string[],
+    careers: "",
+    tech_stacks: [] as string[],
     projectCounts: {
       myProjects: 0,
       interestedProjects: 0,
@@ -131,7 +131,7 @@ export default function UserProfileCard(props: UserProfileCardProps) {
             <p className="text-5 text-deep font-bold">{userData.bio}</p>
             <div className="flex gap-3 text-5 text-gray-600">
               <span>{userData.positions}</span>
-              <span>{userData.experience}</span>
+              <span>{userData.careers}</span>
             </div>
           </div>
           <button
@@ -162,7 +162,7 @@ export default function UserProfileCard(props: UserProfileCardProps) {
         <hr className="border-t-2 border-zinc-300" />
 
         <div className="flex items-center gap-3">
-          {userData.skills.map((skill) => (
+          {userData.tech_stacks.map((skill) => (
             <span
               key={skill}
               className="bg-primary text-white text-6 font-bold py-1 px-5 rounded-full"
@@ -181,8 +181,8 @@ export default function UserProfileCard(props: UserProfileCardProps) {
             email: userData.email,
             bio: userData.bio,
             positions: userData.positions,
-            experience: userData.experience,
-            skills: userData.skills,
+            careers: userData.careers,
+            tech_stacks: userData.tech_stacks,
           }}
           onClose={handleCloseModal}
           onSave={handleSaveProfile}
