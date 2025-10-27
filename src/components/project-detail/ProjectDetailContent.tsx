@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import PreferenceTagList from "@/components/common/tag/PreferenceTagList";
 import TagList from "@/components/common/tag/TagList";
 import ApplyModal from "@/components/project-detail/ApplyModal";
@@ -22,6 +23,7 @@ export default function ProjectDetailContent({
   isOwner = false,
   onStatusChange,
 }: ProjectDetailContentProps) {
+  const router = useRouter();
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -71,6 +73,27 @@ export default function ProjectDetailContent({
       }
     } catch (error) {
       console.error("지원자 수 조회 실패:", error);
+    }
+  };
+
+  // 지원하기 버튼 클릭 핸들러
+  const handleApplyClick = async () => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        // 로그인되지 않은 경우 로그인 페이지로 이동
+        router.push("/login");
+        return;
+      }
+
+      // 로그인된 경우 모달 열기
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("로그인 상태 확인 실패:", error);
+      router.push("/login");
     }
   };
 
@@ -273,7 +296,7 @@ export default function ProjectDetailContent({
                   isOwner={isOwner}
                   hasApplied={hasApplied}
                   onCloseRecruitment={() => void handleCloseRecruitment()}
-                  onApply={() => setIsModalOpen(true)}
+                  onApply={() => void handleApplyClick()}
                   size="small"
                 />
               </div>
@@ -312,7 +335,7 @@ export default function ProjectDetailContent({
             isOwner={isOwner}
             hasApplied={hasApplied}
             onCloseRecruitment={() => void handleCloseRecruitment()}
-            onApply={() => setIsModalOpen(true)}
+            onApply={() => void handleApplyClick()}
             size="large"
           />
         </div>
