@@ -102,7 +102,7 @@ export default function RegisterProjectClient() {
               stack = data;
             }
             return { project_id: projectId, tech_stack_id: stack.id };
-          }),
+          })
         );
 
         await supabase.from("project_tech_stacks").insert(techStacksToInsert);
@@ -141,7 +141,8 @@ export default function RegisterProjectClient() {
         resetTeamForm();
         resetDetailForm();
         resetDropdown();
-        router.push("/register-project/complete");
+        // 등록한 프로젝트 ID를 URL 파라미터로 전달
+        router.push(`/register-project/complete?projectId=${projectId}`);
       }, 1500); // Toast가 보이는 시간을 확보
     } catch (error) {
       console.error("프로젝트 등록 실패:", error);
