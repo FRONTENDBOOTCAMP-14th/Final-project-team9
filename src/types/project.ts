@@ -2,7 +2,7 @@ import type { ProjectStatus } from "@/constants/project";
 
 // 프로젝트 상세 페이지에서 사용할 전체 프로젝트 정보
 export interface ProjectDetail {
-  id: number;
+  id: string;
   title: string;
   description: string;
   category: "앱 개발" | "웹 개발" | "게임" | "시스템" | "기타"; // 프로젝트 분야
@@ -47,7 +47,7 @@ export interface ProjectDetail {
 
 // 헤더에서 사용할 간소화된 타입
 export interface ProjectHeaderInfo {
-  id: number;
+  id: string;
   title: string;
   description: string;
   category: "앱 개발" | "웹 개발" | "게임" | "시스템" | "기타";
@@ -70,7 +70,7 @@ export interface ProjectHeaderInfo {
 // 프로젝트 카드에서 사용할 타입 (검색/목록 페이지)
 export interface ProjectCard {
   profile_image: string;
-  id: number;
+  id: string; // UUID
   title: string;
   description: string;
   owner: string;

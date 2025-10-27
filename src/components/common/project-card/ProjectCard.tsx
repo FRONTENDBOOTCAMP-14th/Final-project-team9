@@ -11,7 +11,7 @@ import {
 import { useFavoriteStore } from "@/store/favorite-store";
 
 interface ProjectCardProps {
-  id: number;
+  id: string; // UUID
   title: string;
   description: string;
   owner: string;
@@ -42,8 +42,12 @@ export default function ProjectCard({
   profile_image,
 }: ProjectCardProps) {
   const router = useRouter();
-  const { favorites, toggleFavorite } = useFavoriteStore();
-  const isFavorite = favorites.includes(id);
+  const { toggleFavorite, isFavorite: checkIsFavorite } = useFavoriteStore();
+  const isFavorite = checkIsFavorite(id);
+
+  const handleFavoriteClick = () => {
+    void toggleFavorite(id);
+  };
 
   return (
     <div className="flex flex-col w-[500px] h-[600px] bg-white rounded-[26px] shadow-lg p-[30px]">
@@ -57,7 +61,7 @@ export default function ProjectCard({
           <span className="text-deep text-5">{category}</span>
         </div>
 
-        <button onClick={() => toggleFavorite(id)}>
+        <button onClick={handleFavoriteClick}>
           <Heart
             className={`w-[30px] h-[30px] ${
               isFavorite ? "fill-red-500 stroke-red-500" : "stroke-gray-400"

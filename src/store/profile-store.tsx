@@ -15,7 +15,7 @@ interface ProfileActions {
   setInitialState: (initialData: UserProfileCardProps) => void;
   updateProfile: (
     updatedData: EditableProfileData,
-    imageFile: File | null,
+    imageFile: File | null
   ) => Promise<void>;
   openModal: () => void;
   closeModal: () => void;
@@ -82,22 +82,126 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
       }));
 
       try {
-        const { error: tableError } = await supabase
+        console.log("users 테이블 업데이트 시도:", {
+          user_id: user.id,
+          bio: updatedData.bio,
+          profile_image: finalImageUrl,
+          positions: updatedData.positions,
+          careers: updatedData.careers,
+        });
+
+        // 업데이트할 데이터 준비
+        const updateData: {
+          bio: string;
+          profile_image: string;
+        } = {
+          bio: updatedData.bio,
+          profile_image: finalImageUrl,
+        };
+
+        console.log("최종 업데이트 데이터:", updateData);
+
+        const { data: updateResult, error: tableError } = await supabase
           .from("users")
-          .update({
-            bio: updatedData.bio,
-            position_id: updatedData.positions,
-            tech_stacks: updatedData.tech_stacks,
-            profile_image: finalImageUrl,
-          })
-          .eq("id", user.id);
+          .update(updateData)
+          .eq("id", user.id)
+          .select();
+
+        console.log("users 테이블 업데이트 결과:", {
+          updateResult,
+          tableError,
+        });
 
         if (tableError) {
-          // users 테이블 컬럼 불일치 등으로 실패할 수 있음. 로그만 남기고 UI는 유지합니다.
-          console.warn("users 테이블 업데이트 경고:", tableError);
+          console.error("users 테이블 업데이트 실패:", tableError);
+          alert(`프로필 업데이트 실패: ${tableError.message}`);
+        } else {
+          console.log("users 테이블 업데이트 성공!");
+        }
+
+        // user_metadata에 positions와 careers 저장 (드롭다운 값 그대로 유지)
+        if (updatedData.positions || updatedData.careers) {
+          const { error: metadataError } = await supabase.auth.updateUser({
+            data: {
+              positions: updatedData.positions || "",
+              careers: updatedData.careers || "",
+            },
+          });
+
+          if (metadataError) {
+            console.error("user_metadata 업데이트 실패:", metadataError);
+          } else {
+            console.log("user_metadata 업데이트 성공!");
+          }
+        }
+
+        // 기술스택 업데이트
+        if (updatedData.tech_stacks && updatedData.tech_stacks.length > 0) {
+          console.log("기술스택 업데이트 시작:", updatedData.tech_stacks);
+
+          // 1. 기존 기술스택 삭제
+          const { error: deleteError } = await supabase
+            .from("user_tech_stacks")
+            .delete()
+            .eq("user_id", user.id);
+
+          if (deleteError) {
+            console.error("기존 기술스택 삭제 실패:", deleteError);
+          } else {
+            console.log("기존 기술스택 삭제 성공");
+          }
+
+          // 2. 기술스택 이름으로 ID 조회 (대소문자 구분 없이)
+          const { data: stacksData, error: stacksError } = await supabase
+            .from("tech_stacks")
+            .select("id, name")
+            .ilike("name", updatedData.tech_stacks.join("|"));
+
+          console.log("기술스택 ID 조회 결과:", { stacksData, stacksError });
+          console.log("검색한 기술스택 이름들:", updatedData.tech_stacks);
+
+          // 각 기술스택마다 개별적으로 검색
+          const stackIds: Array<{ id: number; name: string }> = [];
+          for (const stackName of updatedData.tech_stacks) {
+            const { data: foundStacks } = await supabase
+              .from("tech_stacks")
+              .select("id, name")
+              .ilike("name", stackName);
+
+            console.log(`"${stackName}" 검색 결과:`, foundStacks);
+
+            if (foundStacks && foundStacks.length > 0) {
+              stackIds.push(foundStacks[0]);
+            }
+          }
+
+          console.log("최종 찾은 기술스택 ID들:", stackIds);
+
+          if (stackIds.length > 0) {
+            // 3. 새로운 기술스택 삽입
+            const stacksToInsert = stackIds.map((stack) => ({
+              user_id: user.id,
+              tech_stack_id: stack.id,
+            }));
+
+            console.log("삽입할 기술스택:", stacksToInsert);
+
+            const { error: insertError } = await supabase
+              .from("user_tech_stacks")
+              .insert(stacksToInsert);
+
+            if (insertError) {
+              console.error("기술스택 삽입 실패:", insertError);
+            } else {
+              console.log("기술스택 삽입 성공!");
+            }
+          } else {
+            console.error("기술스택 ID를 찾을 수 없습니다!");
+          }
         }
       } catch (e) {
-        console.warn("users 테이블 업데이트 중 예외 발생:", e);
+        console.error("users 테이블 업데이트 중 예외 발생:", e);
+        alert("프로필 업데이트 중 오류가 발생했습니다.");
       }
 
       // 3. (이미 위에서 상태를 업데이트했으므로 추가 작업은 없습니다.)

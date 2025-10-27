@@ -69,6 +69,14 @@ export default function UserProfileCard(props: UserProfileCardProps) {
   });
   const blobUrlsRef = useRef<Set<string>>(new Set());
 
+  // props.projectCounts가 변경될 때마다 업데이트
+  useEffect(() => {
+    setUserData((prev) => ({
+      ...prev,
+      projectCounts: props.projectCounts,
+    }));
+  }, [props.projectCounts]);
+
   const handleSettingsClick = () => {
     setIsModalOpen(true);
   };
@@ -78,7 +86,7 @@ export default function UserProfileCard(props: UserProfileCardProps) {
   };
 
   const handleSaveProfile = (
-    updatedUser: Omit<UserProfileCardProps, "projectCounts">,
+    updatedUser: Omit<UserProfileCardProps, "projectCounts">
   ) => {
     // 실제 애플리케이션에서는 여기서 API 호출 등을 통해 서버에 데이터를 저장합니다.
     console.log("저장될 데이터:", updatedUser);

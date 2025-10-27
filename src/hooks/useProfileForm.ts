@@ -7,7 +7,7 @@ const MAX_INTRODUCTION_LENGTH = 100;
 
 export function useProfileForm(
   initialUser: Omit<UserProfileCardProps, "projectCounts">,
-  onSave: (updatedUser: Omit<UserProfileCardProps, "projectCounts">) => void,
+  onSave: (updatedUser: Omit<UserProfileCardProps, "projectCounts">) => void
 ) {
   // 기본값을 명시하여 런타임에 일부 필드가 없을 때 발생하는 에러를 방지
   const defaultInitial = {
@@ -16,17 +16,26 @@ export function useProfileForm(
     email: "",
     bio: "",
     positions: "",
-    experience: "",
-    skills: [] as string[],
+    careers: "",
+    tech_stacks: [] as string[],
   };
 
-  const [formData, setFormData] = useState(
-    () =>
-      ({
-        ...defaultInitial,
-        ...(initialUser as Partial<typeof defaultInitial>),
-      }) as unknown as Omit<UserProfileCardProps, "projectCounts">,
-  );
+  const [formData, setFormData] = useState(() => {
+    // initialUser의 tech_stacks를 명시적으로 복사
+    const merged = {
+      ...defaultInitial,
+      ...initialUser,
+      tech_stacks: Array.isArray(initialUser.tech_stacks)
+        ? [...initialUser.tech_stacks]
+        : [],
+    };
+    console.log("useProfileForm 초기화:", {
+      initialUser,
+      merged,
+      tech_stacks: merged.tech_stacks,
+    });
+    return merged as Omit<UserProfileCardProps, "projectCounts">;
+  });
   const [skillInput, setSkillInput] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
@@ -100,7 +109,7 @@ export function useProfileForm(
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));

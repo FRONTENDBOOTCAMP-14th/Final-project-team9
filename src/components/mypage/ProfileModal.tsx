@@ -27,8 +27,13 @@ const CloseIcon = () => (
 // 상수 분리
 const MAX_SKILLS = 3;
 const MAX_INTRODUCTION_LENGTH = 100;
-const FIELD_OPTIONS = ["프론트엔드", "백엔드", "디자이너", "기획자"];
-const EXPERIENCE_OPTIONS = ["신입", "1-3년", "3-5년", "5년 이상"];
+const FIELD_OPTIONS = ["프론트엔드", "백엔드", "기획자", "디자이너"];
+const EXPERIENCE_OPTIONS = [
+  "신입(1년 미만)",
+  "주니어(1~3년)",
+  "미들(3~5년)",
+  "시니어(5년 이상)",
+];
 
 export default function ProfileEditModal({
   user,
@@ -42,8 +47,17 @@ export default function ProfileEditModal({
   const modalRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // 3. 드롭다운 상태 관리
+  const { selectedValues, setSelected, resetAll } = useDropdownStore();
+
+  // 모달 닫기 핸들러 (Dropdown 스토어 리셋 포함)
+  const handleClose = () => {
+    resetAll(); // Dropdown 스토어 초기화
+    onClose();
+  };
+
   // 1. 모달 접근성 관련 로직
-  useModalAccessibility(modalRef, onClose);
+  useModalAccessibility(modalRef, handleClose);
 
   // 2. 폼 상태 및 핸들러 로직
   const {
@@ -58,9 +72,6 @@ export default function ProfileEditModal({
     handleChange,
     handleSubmit,
   } = useProfileForm(user, onSave);
-
-  // 3. 드롭다운 상태 관리
-  const { selectedValues, setSelected } = useDropdownStore();
 
   // Dropdown 초기값 설정
   useEffect(() => {
@@ -176,6 +187,9 @@ export default function ProfileEditModal({
               width="100%"
               height="48px"
               className="!border-0 !text-[16px] !text-gray"
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, positions: value }))
+              }
             />
           </div>
           {/* 경력 */}
@@ -192,6 +206,9 @@ export default function ProfileEditModal({
               width="100%"
               height="48px"
               className="!border-0 !text-[16px] !text-gray"
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, careers: value }))
+              }
             />
           </div>
           {/* 기술 스택 */}
@@ -237,14 +254,19 @@ export default function ProfileEditModal({
         <div className="flex justify-center gap-10 mt-4">
           <Button
             size="xl"
-            onClick={onClose}
+            onClick={handleClose}
             className="bg-gray-200 text-gray-700 rounded-lg"
           >
             <span>취소</span>
           </Button>
           <Button
             size="xl"
-            onClick={() => void handleSubmit()}
+            onClick={() => {
+              void (async () => {
+                await handleSubmit();
+                handleClose();
+              })();
+            }}
             className="border-"
           >
             <span>완료</span>

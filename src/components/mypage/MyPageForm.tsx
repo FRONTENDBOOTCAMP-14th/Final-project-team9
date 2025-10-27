@@ -6,6 +6,7 @@ import Loading from "@/app/loading";
 import UserProfileCard from "@/components/mypage/Profile";
 import Taps from "@/components/mypage/Taps";
 import { supabase } from "@/lib/supabase";
+import { useFavoriteStore } from "@/store/favorite-store";
 import type { UserData } from "@/types/project";
 
 type ExtendedUserData = UserData & { tech_stacks?: string[] };
@@ -14,6 +15,13 @@ export default function MyPageForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState<ExtendedUserData | null>(null);
+  const [projectCounts, setProjectCounts] = useState({
+    myProjects: 0,
+    interestedProjects: 0,
+    supportedProjects: 0,
+    completedProjects: 0,
+  });
+  const { loadFavorites } = useFavoriteStore();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -32,36 +40,76 @@ export default function MyPageForm() {
         .eq("id", user.id)
         .single();
 
+      // user_tech_stacks를 별도로 조회
+      const { data: userTechStacksData, error: techStackError } = await supabase
+        .from("user_tech_stacks")
+        .select("tech_stacks(name)")
+        .eq("user_id", user.id);
+
+      console.log("MyPageForm - userInfo:", userInfo);
+      console.log("MyPageForm - user.id:", user.id);
+      console.log("MyPageForm - userTechStacksData:", userTechStacksData);
+      console.log("MyPageForm - techStackError:", techStackError);
+
+      // user_tech_stacks 테이블에 데이터가 있는지 직접 확인
+      const { data: rawUserTechStacks, error: rawError } = await supabase
+        .from("user_tech_stacks")
+        .select("*")
+        .eq("user_id", user.id);
+
+      console.log(
+        "MyPageForm - user_tech_stacks 원본 데이터:",
+        rawUserTechStacks
+      );
+      console.log("MyPageForm - rawError:", rawError);
+
+      // tech_stacks 추출
+      const techStacks =
+        userTechStacksData && userTechStacksData.length > 0
+          ? (
+              userTechStacksData as unknown as Array<{
+                tech_stacks: { name: string } | null;
+              }>
+            )
+              .map((item) => item.tech_stacks?.name)
+              .filter((name): name is string => !!name)
+          : [];
+
+      console.log("MyPageForm - 추출된 techStacks:", techStacks);
+
       // Supabase Auth의 user.user_metadata에 저장된 값과 users 테이블의 값을 병합합니다.
-      // 일부 환경에서는 users 테이블에 프로필 컬럼이 없을 수 있으므로 metadata에 저장된 값을 우선 사용합니다.
+      // 프로필 이미지와 bio는 users 테이블 값을 우선 사용 (Storage URL이므로)
       const meta = (user.user_metadata as Record<string, unknown>) || {};
 
       const merged = {
         id: user.id,
         username: meta.username || userInfo?.username || "",
         email: user.email || userInfo?.email || "",
-        bio: meta.bio || userInfo?.bio || "",
-        profile_image: meta.profile_image || userInfo?.profile_image || "",
-        // positions/careers은 relation으로 객체일 수 있으므로 userInfo 우선, 없으면 metadata에서 문자열로 복원
-        positions:
-          userInfo?.positions ||
-          (meta.positions ? { name: String(meta.positions) } : null),
-        careers:
-          userInfo?.careers ||
-          (meta.careers ? { name: String(meta.careers) } : null),
-        // skills는 metadata나 users 테이블에 저장될 수 있으므로 둘 다 확인
-        skills:
-          (meta.skills as string[] | undefined) ||
-          (userInfo?.skills as string[] | undefined) ||
-          [],
-      } as UserData;
+        bio: userInfo?.bio || meta.bio || "",
+        profile_image: userInfo?.profile_image || meta.profile_image || "",
+        // positions/careers는 user_metadata의 텍스트 값을 우선 사용
+        positions: meta.positions
+          ? { name: String(meta.positions) }
+          : userInfo?.positions || null,
+        careers: meta.careers
+          ? { name: String(meta.careers) }
+          : userInfo?.careers || null,
+        // tech_stacks는 추출한 배열 사용
+        tech_stacks: techStacks,
+      } as ExtendedUserData;
+
+      console.log("MyPageForm - merged 데이터:", merged);
+      console.log("MyPageForm - merged.tech_stacks:", merged.tech_stacks);
 
       setUserData(merged);
       setLoading(false);
+
+      // 관심 프로젝트 목록 로드
+      await loadFavorites();
     };
 
     void fetchUser();
-  }, [router]);
+  }, [router, loadFavorites]);
 
   if (loading) return <Loading />;
   if (!userData) return null;
@@ -78,30 +126,12 @@ export default function MyPageForm() {
             positions={userData.positions?.name || ""}
             careers={userData.careers?.name || ""}
             tech_stacks={userData.tech_stacks || []}
-            projectCounts={{
-              myProjects: 0,
-              interestedProjects: 0,
-              supportedProjects: 0,
-              completedProjects: 0,
-            }}
+            projectCounts={projectCounts}
           />
           <Taps
             userId={userData.id}
             onProjectCountsChange={(counts) => {
-              // 프로젝트 수 업데이트
-              setUserData((prev) =>
-                prev
-                  ? {
-                      ...prev,
-                      projectCounts: {
-                        myProjects: counts.myProjects,
-                        interestedProjects: counts.interestedProjects,
-                        supportedProjects: counts.supportedProjects,
-                        completedProjects: counts.completedProjects,
-                      },
-                    }
-                  : null,
-              );
+              setProjectCounts(counts);
             }}
           />
         </>

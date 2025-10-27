@@ -4,7 +4,7 @@ import Image from "next/image";
 import { PROJECT_STATUS_LABEL } from "@/constants/project";
 
 interface MainPageProjectCardProps {
-  id: number;
+  id: string;
   title: string;
   owner: string;
   profile_image?: string;

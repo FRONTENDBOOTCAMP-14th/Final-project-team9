@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import PreferenceTagList from "@/components/common/tag/PreferenceTagList";
 import TagList from "@/components/common/tag/TagList";
@@ -27,8 +27,35 @@ export default function ProjectDetailContent({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClosed, setIsClosed] = useState(project.status === "false");
   const [applicantCount, setApplicantCount] = useState(
-    project.applicantCount || 0,
+    project.applicantCount || 0
   );
+  const [hasApplied, setHasApplied] = useState(false);
+
+  // 이미 지원했는지 확인
+  useEffect(() => {
+    const checkIfApplied = async () => {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) return;
+
+        const { data } = await supabase
+          .from("applications")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("project_id", project.id)
+          .single();
+
+        setHasApplied(!!data);
+      } catch (error) {
+        console.error("지원 여부 확인 실패:", error);
+      }
+    };
+
+    void checkIfApplied();
+  }, [project.id]);
 
   // 지원자 수 실시간 조회
   const fetchApplicantCount = async () => {
@@ -244,6 +271,7 @@ export default function ProjectDetailContent({
                 <RecruitmentButton
                   isClosed={isClosed}
                   isOwner={isOwner}
+                  hasApplied={hasApplied}
                   onCloseRecruitment={() => void handleCloseRecruitment()}
                   onApply={() => setIsModalOpen(true)}
                   size="small"
@@ -282,6 +310,7 @@ export default function ProjectDetailContent({
           <RecruitmentButton
             isClosed={isClosed}
             isOwner={isOwner}
+            hasApplied={hasApplied}
             onCloseRecruitment={() => void handleCloseRecruitment()}
             onApply={() => setIsModalOpen(true)}
             size="large"
@@ -305,6 +334,36 @@ export default function ProjectDetailContent({
             try {
               console.log("지원 데이터:", data);
 
+              // 현재 로그인한 사용자 확인
+              const {
+                data: { user },
+              } = await supabase.auth.getUser();
+
+              if (!user) {
+                alert("로그인이 필요합니다.");
+                return;
+              }
+
+              // applications 테이블에 지원 데이터 저장
+              const { error: insertError } = await supabase
+                .from("applications")
+                .insert({
+                  user_id: user.id,
+                  project_id: project.id,
+                  position: data.position,
+                  message: data.reason,
+                  status: "pending",
+                });
+
+              if (insertError) {
+                // 이미 지원한 경우 (UNIQUE 제약 위반)
+                if (insertError.code === "23505") {
+                  alert("이미 지원한 프로젝트입니다.");
+                  return;
+                }
+                throw insertError;
+              }
+
               // Supabase에서 applicant_count 증가
               const { data: currentProject, error: fetchError } = await supabase
                 .from("projects")
@@ -325,6 +384,9 @@ export default function ProjectDetailContent({
 
               // 최신 지원자 수 반영
               await fetchApplicantCount();
+
+              // 지원 완료 상태 업데이트
+              setHasApplied(true);
 
               setIsModalOpen(false);
               setToastMessage("지원이 완료되었습니다");
