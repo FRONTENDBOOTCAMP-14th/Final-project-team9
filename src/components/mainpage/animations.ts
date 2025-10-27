@@ -1,22 +1,22 @@
 // 서브 슬로건 위치 정보
 export const SLOGAN_POSITIONS = [
-  { top: "-100px", left: "38%", transform: "translateX(-50%)" }, // 상단 왼쪽으로 치우침
-  { top: "40px", left: "1%", transform: "translateX(0)" }, // 좌측 상단 끝쪽
-  { top: "160px", right: "20%", transform: "translateX(0)" }, // 우측 중간 살짝 아래
-  { top: "250px", left: "1%", transform: "translateX(0)" }, // 좌측 하단 끝
-  { top: "50px", right: "10%", transform: "translateX(0)" }, // 우측 상단 중간쯤
+  { top: "-150px", left: "40%", transform: "translateX(0)" }, // 상단 왼쪽으로 치우침
+  { top: "300px", right: "40%", transform: "translateX(0)" }, // 좌측 상단 끝쪽
+  { top: "-50px", right: "60%", transform: "translateX(0)" }, // 우측 중간 살짝 아래
+  { top: "180px", left: "30%", transform: "translateX(0)" }, // 좌측 하단 끝
+  { top: "50px", left: "70%", transform: "translateX(0)" }, // 우측 상단 중간쯤
 ];
 
 // 애니메이션 타이밍 상수
 export const ANIMATION_TIMING = {
   sloganDuration: 2.5, // 서브 슬로건 애니메이션 지속 시간 (초)
-  sloganDelay: 1.5, // 서브 슬로건 간격 (초)
-  joyinStart: 8.5, // JOYIN 시작 시간 (초)
-  joyinDuration: 3, // JOYIN 분리 애니메이션 지속 시간 (초)
-  whiteTextStart: 11.5, // 흰색 글자 시작 시간 (초)
-  whiteTextDuration: 1, // 흰색 글자 페이드인 지속 시간 (초)
-  subtitleStart: 12, // 서브타이틀 시작 시간 (초)
-  buttonStart: 12.3, // 버튼 시작 시간 (초)
+  sloganDelay: 0.4, // 서브 슬로건 간격 (초)
+  joyinStart: 3, // JOYIN 시작 시간 (초)
+  joyinDuration: 2, // JOYIN 분리 애니메이션 지속 시간 (초)
+  whiteTextStart: 4.9, // 흰색 글자 시작 시간 (초)
+  whiteTextDuration: 1.5, // 흰색 글자 페이드인 지속 시간 (초)
+  subtitleStart: 5.2, // 서브타이틀 시작 시간 (초)
+  buttonStart: 5.4, // 버튼 시작 시간 (초)
 } as const;
 
 // 슬로건 텍스트
@@ -148,13 +148,13 @@ export const ANIMATION_KEYFRAMES = `
       left: 50%;
       transform: translateX(-100%) scale(1);
     }
-    /* 40-60%: 중앙에 잠시 머무름 */
-    60% {
+    /* 40-80%: 중앙에 잠시 머무름 */
+    80% {
       opacity: 1;
       left: 50%;
       transform: translateX(-100%) scale(1);
     }
-    /* 60-100%: 오른쪽으로 이동 */
+    /* 80-100%: 오른쪽으로 이동 */
     100% {
       opacity: 1;
       left: calc(50% + 120px);
@@ -178,13 +178,13 @@ export const ANIMATION_KEYFRAMES = `
       left: 50%;
       transform: translateX(0) scale(1);
     }
-    /* 40-60%: 중앙에 잠시 머무름 */
-    60% {
+    /* 40-80%: 중앙에 잠시 머무름 */
+    80% {
       opacity: 1;
       left: 50%;
       transform: translateX(0) scale(1);
     }
-    /* 60-100%: 왼쪽으로 이동 */
+    /* 80-100%: 왼쪽으로 이동 */
     100% {
       opacity: 1;
       left: calc(50% - 360px);
