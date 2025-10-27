@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { PROJECT_STATUS_LABEL } from "@/constants/project";
 
 interface MainPageProjectCardProps {
   id: number;
@@ -35,9 +36,9 @@ export default function MainPageProjectCard({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-[30px]">
           <span
-            className={`text-white text-5 px-[15px] py-1 rounded-[10px] ${status === "모집완료" ? "bg-gray" : "bg-primary"}`}
+            className={`text-white text-5 px-[15px] py-1 rounded-[10px] ${status === "false" ? "bg-gray" : "bg-primary"}`}
           >
-            {status}
+            {PROJECT_STATUS_LABEL[status] || "모집중"}
           </span>
           <span className="text-deep text-5">{category}</span>
         </div>
