@@ -45,7 +45,7 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
       if (imageFile) {
         const fileExt = imageFile.name.split(".").pop();
         const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-        const filePath = `profiles/${fileName}`;
+        const filePath = `profiles/${user.id}/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from("profile-images")
