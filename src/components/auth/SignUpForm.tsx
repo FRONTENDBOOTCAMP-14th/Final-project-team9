@@ -62,7 +62,6 @@ const SignUpForm = () => {
     !isIdValid ||
     !isPasswordValid ||
     !!confirmError ||
-    !email ||
     !passwordConfirm ||
     isCheckingId;
 
@@ -77,7 +76,8 @@ const SignUpForm = () => {
       reason = passwordError || "비밀번호를 올바르게 입력해주세요.";
     else if (!passwordConfirm) reason = "비밀번호 확인을 입력해주세요.";
     else if (confirmError) reason = confirmError;
-    else if (!email) reason = "이메일을 입력해주세요.";
+    else if (!email)
+      reason = "이메일을 입력해주세요."; // 이유는 그대로 둠 (Submit 버튼용)
     else if (!isVerified) reason = "이메일 인증을 완료해주세요.";
     else reason = "다음 단계로 진행하세요.";
 
