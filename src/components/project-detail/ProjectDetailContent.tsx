@@ -26,6 +26,26 @@ export default function ProjectDetailContent({
   const [toastMessage, setToastMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClosed, setIsClosed] = useState(project.status === "false");
+  const [applicantCount, setApplicantCount] = useState(
+    project.applicantCount || 0
+  );
+
+  // 지원자 수 실시간 조회
+  const fetchApplicantCount = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("projects")
+        .select("applicant_count")
+        .eq("id", project.id)
+        .single();
+
+      if (!error && data) {
+        setApplicantCount(data.applicant_count || 0);
+      }
+    } catch (error) {
+      console.error("지원자 수 조회 실패:", error);
+    }
+  };
 
   const handleCloseRecruitment = async () => {
     try {
@@ -96,13 +116,19 @@ export default function ProjectDetailContent({
               </h2>
               {/* project.requirements: string[] 에서 맵핑 */}
               <div className="space-y-4 mb-15">
-                {project.requirements?.map((req, idx) => (
-                  <div key={idx}>
-                    <h3 className="text-lg font-semibold text-deep mb-2">
-                      • {req}
-                    </h3>
-                  </div>
-                ))}
+                {project.requirements && project.requirements.length > 0 ? (
+                  project.requirements.map((req, idx) => (
+                    <div key={idx}>
+                      <h3 className="text-lg font-semibold text-deep mb-2">
+                        • {req}
+                      </h3>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-lg">
+                    등록된 요구사항이 없습니다.
+                  </p>
+                )}
               </div>
 
               {/* 우대사항 */}
@@ -111,7 +137,13 @@ export default function ProjectDetailContent({
                   우대사항 <span aria-hidden="true">⭐</span>
                 </h2>
                 {/* project.preferences: string[] 에서 맵핑 */}
-                <PreferenceTagList items={project.preferences ?? []} />
+                {project.preferences && project.preferences.length > 0 ? (
+                  <PreferenceTagList items={project.preferences} />
+                ) : (
+                  <p className="text-gray-500 text-lg">
+                    등록된 우대사항이 없습니다.
+                  </p>
+                )}
               </div>
             </section>
           </div>
@@ -203,10 +235,7 @@ export default function ProjectDetailContent({
                 지원 <span aria-hidden="true">🎉</span>
               </h2>
               <p className="text-xl text-gray mb-6">
-                현재{" "}
-                <strong className="font-bold">
-                  {project.applicantCount || 0}명
-                </strong>{" "}
+                현재 <strong className="font-bold">{applicantCount}명</strong>{" "}
                 지원했습니다.
               </p>
 
@@ -272,9 +301,39 @@ export default function ProjectDetailContent({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={(data) => {
-          console.log("지원 데이터:", data);
-          // TODO: Supabase에 지원 데이터 저장
-          setIsModalOpen(false);
+          void (async () => {
+            try {
+              console.log("지원 데이터:", data);
+
+              // Supabase에서 applicant_count 증가
+              const { data: currentProject, error: fetchError } = await supabase
+                .from("projects")
+                .select("applicant_count")
+                .eq("id", project.id)
+                .single();
+
+              if (fetchError) throw fetchError;
+
+              const newCount = (currentProject.applicant_count || 0) + 1;
+
+              const { error: updateError } = await supabase
+                .from("projects")
+                .update({ applicant_count: newCount })
+                .eq("id", project.id);
+
+              if (updateError) throw updateError;
+
+              // 최신 지원자 수 반영
+              await fetchApplicantCount();
+
+              setIsModalOpen(false);
+              setToastMessage("지원이 완료되었습니다");
+              setShowToast(true);
+            } catch (error) {
+              console.error("지원 실패:", error);
+              alert("지원에 실패했습니다. 다시 시도해주세요.");
+            }
+          })();
         }}
       />
     </div>
