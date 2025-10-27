@@ -81,7 +81,9 @@ export default function ProjectDetailHeader({
             </div>
 
             <button
-              onClick={() => toggleFavorite(project.id)}
+              onClick={() => {
+                void toggleFavorite(project.id);
+              }}
               aria-label={
                 isFavorite
                   ? `${project.title} 찜 해제`
