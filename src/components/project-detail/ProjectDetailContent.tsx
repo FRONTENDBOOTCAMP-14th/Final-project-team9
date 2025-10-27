@@ -27,7 +27,7 @@ export default function ProjectDetailContent({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClosed, setIsClosed] = useState(project.status === "false");
   const [applicantCount, setApplicantCount] = useState(
-    project.applicantCount || 0
+    project.applicantCount || 0,
   );
 
   // 지원자 수 실시간 조회
