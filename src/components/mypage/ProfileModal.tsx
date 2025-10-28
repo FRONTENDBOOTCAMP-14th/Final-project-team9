@@ -1,11 +1,12 @@
-import React, { useEffect, useRef } from "react";
-import Button from "@/components/common/Button";
-import Dropdown from "@/components/common/input/Dropdown";
-import { useModalAccessibility } from "@/hooks/useModalAccessibility";
-import { useProfileForm } from "@/hooks/useProfileForm";
-import { useDropdownStore } from "@/store/dropdown-store";
-import ProfileImageUploader from "./ProfileImageUploader";
-import type { UserProfileCardProps } from "./Profile";
+import React, { useEffect, useRef, useState, KeyboardEvent } from 'react'
+import Button from '@/components/common/Button'
+import Dropdown from '@/components/common/input/Dropdown'
+import { useModalAccessibility } from '@/hooks/useModalAccessibility'
+import { useProfileForm } from '@/hooks/useProfileForm'
+import { useDropdownStore } from '@/store/dropdown-store'
+import ProfileImageUploader from './ProfileImageUploader'
+import type { UserProfileCardProps } from './Profile'
+import { useFetchStacks } from '@/hooks/useFetchStacks'
 
 const CloseIcon = () => (
   <svg
@@ -22,42 +23,42 @@ const CloseIcon = () => (
     <line x1="18" y1="6" x2="6" y2="18" />
     <line x1="6" y1="6" x2="18" y2="18" />
   </svg>
-);
+)
 
 // 상수 분리
-const MAX_SKILLS = 3;
-const MAX_INTRODUCTION_LENGTH = 100;
-const FIELD_OPTIONS = ["프론트엔드", "백엔드", "기획자", "디자이너"];
+const MAX_SKILLS = 3
+const MAX_INTRODUCTION_LENGTH = 100
+const FIELD_OPTIONS = ['프론트엔드', '백엔드', '기획자', '디자이너']
 const EXPERIENCE_OPTIONS = [
-  "신입(1년 미만)",
-  "주니어(1~3년)",
-  "미들(3~5년)",
-  "시니어(5년 이상)",
-];
+  '신입(1년 미만)',
+  '주니어(1~3년)',
+  '미들(3~5년)',
+  '시니어(5년 이상)',
+]
 
 export default function ProfileEditModal({
   user,
   onClose,
   onSave,
 }: {
-  user: Omit<UserProfileCardProps, "projectCounts">;
-  onClose: () => void;
-  onSave: (updatedUser: Omit<UserProfileCardProps, "projectCounts">) => void;
+  user: Omit<UserProfileCardProps, 'projectCounts'>
+  onClose: () => void
+  onSave: (updatedUser: Omit<UserProfileCardProps, 'projectCounts'>) => void
 }) {
-  const modalRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 3. 드롭다운 상태 관리
-  const { selectedValues, setSelected, resetAll } = useDropdownStore();
+  const { selectedValues, setSelected, resetAll } = useDropdownStore()
 
   // 모달 닫기 핸들러 (Dropdown 스토어 리셋 포함)
   const handleClose = () => {
-    resetAll(); // Dropdown 스토어 초기화
-    onClose();
-  };
+    resetAll() // Dropdown 스토어 초기화
+    onClose()
+  }
 
   // 1. 모달 접근성 관련 로직
-  useModalAccessibility(modalRef, handleClose);
+  useModalAccessibility(modalRef, handleClose)
 
   // 2. 폼 상태 및 핸들러 로직
   const {
@@ -67,30 +68,84 @@ export default function ProfileEditModal({
     setSkillInput,
     errors,
     handleImageChange,
-    handleSkillAdd,
-    handleSkillRemove,
     handleChange,
     handleSubmit,
-  } = useProfileForm(user, onSave);
+  } = useProfileForm(user, onSave)
 
   // Dropdown 초기값 설정
   useEffect(() => {
-    setSelected("분야", user.positions);
-    setSelected("경력", user.careers);
-  }, [user.positions, user.careers, setSelected]);
+    setSelected('분야', user.positions)
+    setSelected('경력', user.careers)
+  }, [user.positions, user.careers, setSelected])
 
   // Dropdown 값이 변경될 때 formData 업데이트
   useEffect(() => {
-    const field = selectedValues["분야"];
-    const careers = selectedValues["경력"];
+    const field = selectedValues['분야']
+    const careers = selectedValues['경력']
 
     if (field && field !== formData.positions) {
-      setFormData((prev) => ({ ...prev, positions: field }));
+      setFormData((prev) => ({ ...prev, positions: field }))
     }
     if (careers && careers !== formData.careers) {
-      setFormData((prev) => ({ ...prev, careers }));
+      setFormData((prev) => ({ ...prev, careers }))
     }
-  }, [selectedValues, formData.positions, formData.careers, setFormData]);
+  }, [selectedValues, formData.positions, formData.careers, setFormData])
+
+  const { stacks: allStacksFromDB, loading, error } = useFetchStacks()
+  const [filteredStacks, setFilteredStacks] = useState<string[]>([])
+  const [activeIndex, setActiveIndex] = useState(-1)
+
+  useEffect(() => {
+    const searchTerm = skillInput.trim()
+    if (searchTerm && !loading && !error) {
+      setFilteredStacks(
+        allStacksFromDB.filter(
+          (stack) =>
+            stack.toLowerCase().includes(searchTerm.toLowerCase()) &&
+            !formData.tech_stacks.includes(stack),
+        ),
+      )
+    } else {
+      setFilteredStacks([])
+    }
+    setActiveIndex(-1)
+  }, [skillInput, formData.tech_stacks, allStacksFromDB, loading, error])
+
+  const handleSkillKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (filteredStacks.length === 0) return
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setActiveIndex((prev) => (prev + 1) % filteredStacks.length)
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setActiveIndex(
+        (prev) => (prev - 1 + filteredStacks.length) % filteredStacks.length,
+      )
+    } else if (e.key === 'Enter' && activeIndex >= 0) {
+      e.preventDefault()
+      addSkill(filteredStacks[activeIndex])
+    } else if (e.key === 'Escape') setSkillInput('')
+  }
+
+  const addSkill = (skill: string) => {
+    if (
+      formData.tech_stacks.length >= MAX_SKILLS ||
+      formData.tech_stacks.includes(skill)
+    )
+      return
+    setFormData((prev) => ({
+      ...prev,
+      tech_stacks: [...prev.tech_stacks, skill],
+    }))
+    setSkillInput('')
+  }
+
+  const removeSkill = (skill: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      tech_stacks: prev.tech_stacks.filter((s) => s !== skill),
+    }))
+  }
 
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/50">
@@ -224,10 +279,23 @@ export default function ProfileEditModal({
               type="text"
               value={skillInput}
               onChange={(e) => setSkillInput(e.target.value)}
-              onKeyDown={handleSkillAdd}
+              onKeyDown={handleSkillKeyDown}
               placeholder="기술 스택을 검색하고 Enter를 누르세요"
               className="w-full p-3 bg-white rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
             />
+            {filteredStacks.length > 0 && (
+              <ul className="border border-gray-300 bg-white rounded-md mt-1 max-h-40 overflow-y-auto z-10 absolute w-105">
+                {filteredStacks.map((stack, idx) => (
+                  <li
+                    key={stack}
+                    className={`px-4 py-2 cursor-pointer ${idx === activeIndex ? 'bg-gray-100' : 'hover:bg-gray-100'}`}
+                    onClick={() => addSkill(stack)}
+                  >
+                    {stack}
+                  </li>
+                ))}
+              </ul>
+            )}
             {errors.skills && (
               <p className="text-red-500 text-sm mt-1">{errors.skills}</p>
             )}
@@ -239,7 +307,7 @@ export default function ProfileEditModal({
                 >
                   <span>{skill}</span>
                   <button
-                    onClick={() => handleSkillRemove(skill)}
+                    onClick={() => removeSkill(skill)}
                     className="text-white hover:bg-deep rounded-full p-0.5"
                     aria-label={`${skill} 제거`}
                   >
@@ -263,9 +331,9 @@ export default function ProfileEditModal({
             size="xl"
             onClick={() => {
               void (async () => {
-                await handleSubmit();
-                handleClose();
-              })();
+                await handleSubmit()
+                handleClose()
+              })()
             }}
             className="border-"
           >
@@ -274,5 +342,5 @@ export default function ProfileEditModal({
         </div>
       </div>
     </div>
-  );
+  )
 }
