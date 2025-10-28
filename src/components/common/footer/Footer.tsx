@@ -26,11 +26,11 @@ export default function Footer() {
                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
                   <div>
                     <p>상호명 : Joyin</p>
-                    <p>주소 : 지구 어딘가</p>
+                    <p>주소 : 경기도 성남시 분당구</p>
                   </div>
                   <div>
                     <p>대표 : 남도현</p>
-                    <p>사업자 번호 : 임자있음</p>
+                    <p>사업자 번호 : 010 2367 7688</p>
                   </div>
                   <div>
                     <p>

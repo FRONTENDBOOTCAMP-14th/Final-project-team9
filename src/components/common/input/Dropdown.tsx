@@ -103,7 +103,7 @@ export default function Dropdown({
           `flex items-center justify-between
            px-[30px] border border-gray
            text-left text-7 bg-white
-           hover:border-primary`,
+           hover:border-primary cursor-pointer`,
           isOpen
             ? `rounded-t-[10px] border-b-2 border-b-[#9c9c9c]`
             : `rounded-[10px]`,
