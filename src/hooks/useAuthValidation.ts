@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { sanitizeHTML, normalizeWhitespace } from "@/utils/sanitize";
 import { useDebounce } from "./useDebounce";
 
 const ID_REGEX = /^[a-z0-9]{4,30}$/;
@@ -49,7 +50,10 @@ export const useIdValidation = (initialValue = "") => {
   }, [debouncedValue]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
+    const rawValue = e.target.value;
+    // 살균처리: HTML 태그 제거, 공백 정규화
+    const sanitized = normalizeWhitespace(sanitizeHTML(rawValue));
+    setValue(sanitized);
   };
 
   return {
@@ -71,7 +75,7 @@ export const usePasswordValidation = (initialValue = "") => {
     setValue(newValue);
     if (!PW_REGEX.test(newValue)) {
       setError(
-        "비밀번호는 8자 이상, 대/소문자, 숫자, 특수문자를 포함해야 합니다.",
+        "비밀번호는 8자 이상, 대/소문자, 숫자, 특수문자를 포함해야 합니다."
       );
     } else {
       setError(null);

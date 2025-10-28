@@ -4,6 +4,7 @@ import { useState } from "react";
 import Button from "@/components/common/Button";
 import LabeledInput from "@/components/common/LabeledInput";
 import { supabase } from "@/lib/supabase";
+import { sanitizeHTML, normalizeWhitespace } from "@/utils/sanitize";
 import type { User, Session } from "@supabase/supabase-js";
 // 'VerifyOtpResponse' 대신 User와 Session을 직접 import 합니다.
 
@@ -138,7 +139,10 @@ const EmailVerification = ({
           label="이메일을 입력하세요"
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            const sanitized = normalizeWhitespace(sanitizeHTML(e.target.value));
+            setEmail(sanitized);
+          }}
           containerClassName="flex-grow h-[80px]"
           disabled={totalDisabled || isAuthCodeSent || isVerified}
         />
@@ -159,7 +163,12 @@ const EmailVerification = ({
             label="인증번호"
             type="text"
             value={authCode}
-            onChange={(e) => setAuthCode(e.target.value)}
+            onChange={(e) => {
+              const sanitized = normalizeWhitespace(
+                sanitizeHTML(e.target.value)
+              );
+              setAuthCode(sanitized);
+            }}
             containerClassName="flex-grow h-[80px]"
             disabled={totalDisabled || isVerified}
           />
