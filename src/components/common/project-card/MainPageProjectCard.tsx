@@ -38,7 +38,7 @@ export default function MainPageProjectCard({
           <span
             className={`text-white text-5 px-[15px] py-1 rounded-[10px] ${status === "false" ? "bg-gray" : "bg-primary"}`}
           >
-            {PROJECT_STATUS_LABEL[status] || "모집중"}
+            {PROJECT_STATUS_LABEL[status as string] || "모집중"}
           </span>
           <span className="text-deep text-5">{category}</span>
         </div>

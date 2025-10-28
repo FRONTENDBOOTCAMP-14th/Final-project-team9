@@ -222,6 +222,7 @@ export default function ProjectDetailContent({
                     width={120}
                     height={120}
                     className="w-full h-full object-cover"
+                    priority
                   />
                 </div>
 

@@ -4,7 +4,7 @@ import type { SearchFilters } from "@/store/search-filter-store";
 import type { ProjectCard } from "@/types/project";
 
 export async function fetchProjects(
-  filters: SearchFilters,
+  filters: SearchFilters
 ): Promise<ProjectCard[]> {
   try {
     let query = supabase.from("project_view").select("*");
@@ -12,7 +12,7 @@ export async function fetchProjects(
     if (filters.searchQuery) {
       const search = `%${filters.searchQuery}%`;
       query = query.or(
-        `name.ilike.${search},short_description.ilike.${search},expected_schedule.ilike.${search},detail_plan.ilike.${search},user_name.ilike.${search}`,
+        `name.ilike.${search},short_description.ilike.${search},expected_schedule.ilike.${search},detail_plan.ilike.${search},user_name.ilike.${search}`
       );
     }
 
@@ -60,7 +60,7 @@ export async function fetchProjects(
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const overDateProject = projectData
+    const overDateProject = (projectData ?? [])
       .filter((p) => new Date(p.deadline) < today)
       .map((p) => p.id);
 
@@ -129,8 +129,9 @@ export async function fetchProjects(
         careers?.find((c) => c.id === owner?.career_id)?.name ?? "경력 없음";
       const memberCount =
         p.project_positions?.reduce(
-          (sum, pos) => sum + (pos.recruit_count ?? 0),
-          0,
+          (sum: number, pos: { recruit_count?: number }) =>
+            sum + (pos.recruit_count ?? 0),
+          0
         ) ?? 0;
 
       const skills =
@@ -158,7 +159,7 @@ export async function fetchProjects(
         id: p.id,
         title: p.name,
         description: p.short_description,
-        owner: p.user_name || "",
+        owner: owner?.nickname || p.user_name || "",
         profile_image: p.user_profile_image || "/assets/no-profile.svg",
         level: careerName,
         members: memberCount,

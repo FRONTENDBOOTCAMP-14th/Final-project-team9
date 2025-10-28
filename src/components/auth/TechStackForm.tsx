@@ -7,6 +7,7 @@ import Button from "@/components/common/Button";
 import TagList from "@/components/common/tag/TagList";
 import { useFetchStacks } from "@/hooks/useFetchStacks";
 import { supabase } from "@/lib/supabase";
+import { sanitizeHTML, normalizeWhitespace } from "@/utils/sanitize";
 
 const MAX_STACK_COUNT = 3;
 
@@ -138,7 +139,12 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
             <input
               type="text"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                const sanitized = normalizeWhitespace(
+                  sanitizeHTML(e.target.value),
+                );
+                setSearchTerm(sanitized);
+              }}
               onKeyDown={handleKeyDown}
               placeholder={placeholderText}
               disabled={isMaxSelected}

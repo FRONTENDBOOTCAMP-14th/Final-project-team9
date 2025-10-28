@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { sanitizeHTML, normalizeWhitespace } from "@/utils/sanitize";
 import { useDebounce } from "./useDebounce";
 
 const ID_REGEX = /^[a-z0-9]{4,30}$/;
@@ -49,7 +50,10 @@ export const useIdValidation = (initialValue = "") => {
   }, [debouncedValue]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
+    const rawValue = e.target.value;
+    // 살균처리: HTML 태그 제거, 공백 정규화
+    const sanitized = normalizeWhitespace(sanitizeHTML(rawValue));
+    setValue(sanitized);
   };
 
   return {

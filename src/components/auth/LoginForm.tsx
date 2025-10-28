@@ -6,6 +6,7 @@ import Button from "@/components/common/Button";
 import LabeledInput from "@/components/common/LabeledInput";
 import PasswordInput from "@/components/common/PasswordInput";
 import { supabase } from "@/lib/supabase";
+import { sanitizeHTML, normalizeWhitespace } from "@/utils/sanitize";
 
 const LoginForm = () => {
   const router = useRouter();
@@ -62,7 +63,10 @@ const LoginForm = () => {
           label="아이디를 입력하세요"
           type="text"
           value={id}
-          onChange={(e) => setId(e.target.value)}
+          onChange={(e) => {
+            const sanitized = normalizeWhitespace(sanitizeHTML(e.target.value));
+            setId(sanitized);
+          }}
           containerClassName="w-full h-[80px]"
         />
 

@@ -10,6 +10,7 @@ import Dropdown from "@/components/common/input/Dropdown"; // 팀원의 드롭�
 import LabeledInput from "@/components/common/LabeledInput";
 import { supabase } from "@/lib/supabase";
 import { useDropdownStore } from "@/store/dropdown-store";
+import { sanitizeHTML, sanitizeDescription } from "@/utils/sanitize";
 
 const ProfileForm = () => {
   const router = useRouter();
@@ -213,7 +214,10 @@ const ProfileForm = () => {
           required
           type="text"
           value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
+          onChange={(e) => {
+            const sanitized = sanitizeHTML(e.target.value).slice(0, 20);
+            setNickname(sanitized);
+          }}
           containerClassName="w-full h-[80px]"
         />
 
@@ -241,7 +245,10 @@ const ProfileForm = () => {
           label="한줄 소개"
           type="text"
           value={introduction}
-          onChange={(e) => setIntroduction(e.target.value)}
+          onChange={(e) => {
+            const sanitized = sanitizeDescription(e.target.value, 100);
+            setIntroduction(sanitized);
+          }}
           containerClassName="w-full h-[80px]"
         />
 

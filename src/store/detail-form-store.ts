@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { sanitizeDescription, meetsMinLength } from "@/utils/sanitize";
 
 export interface DetailData {
   plan: string;
@@ -33,11 +34,15 @@ export const useDetailFormStore = create<DetailFormState>((set, get) => ({
   errors: {},
 
   // 기본 액션들
-  updateDetailData: (field, value) =>
+  updateDetailData: (field, value) => {
+    // 입력값 살균처리 - HTML 태그 제거, 과도한 줄바꿈 정리
+    const sanitizedValue = sanitizeDescription(value, 1000);
+
     set((state) => ({
-      detailData: { ...state.detailData, [field]: value },
+      detailData: { ...state.detailData, [field]: sanitizedValue },
       errors: { ...state.errors, [field]: "" }, // 입력 시 에러 제거
-    })),
+    }));
+  },
 
   setErrors: (errors) => set({ errors }),
 
@@ -53,13 +58,14 @@ export const useDetailFormStore = create<DetailFormState>((set, get) => ({
     let hasError = false;
 
     // 프로젝트 상세 계획 검증
-    if (!detailData.plan.trim()) {
+    const trimmedPlan = detailData.plan.trim();
+    if (!trimmedPlan) {
       newErrors.plan = "프로젝트 상세 계획을 입력해주세요";
       hasError = true;
-    } else if (detailData.plan.length < 50) {
+    } else if (!meetsMinLength(trimmedPlan, 50)) {
       newErrors.plan = "프로젝트 상세 계획을 50자 이상 입력해주세요";
       hasError = true;
-    } else if (detailData.plan.length > 1000) {
+    } else if (trimmedPlan.length > 1000) {
       newErrors.plan = "프로젝트 상세 계획은 1000자 이하로 입력해주세요";
       hasError = true;
     }

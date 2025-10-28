@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 export function useModalAccessibility(
-  modalRef: React.RefObject<HTMLElement>,
+  modalRef: React.RefObject<HTMLElement | null>,
   onClose: () => void,
 ) {
   const previousFocusElement = useRef<HTMLElement | null>(null);

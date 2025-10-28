@@ -1,6 +1,8 @@
-import React, { useEffect, useRef } from "react";
+import type { KeyboardEvent } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Button from "@/components/common/Button";
 import Dropdown from "@/components/common/input/Dropdown";
+import { useFetchStacks } from "@/hooks/useFetchStacks";
 import { useModalAccessibility } from "@/hooks/useModalAccessibility";
 import { useProfileForm } from "@/hooks/useProfileForm";
 import { useDropdownStore } from "@/store/dropdown-store";
@@ -51,10 +53,10 @@ export default function ProfileEditModal({
   const { selectedValues, setSelected, resetAll } = useDropdownStore();
 
   // 모달 닫기 핸들러 (Dropdown 스토어 리셋 포함)
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     resetAll(); // Dropdown 스토어 초기화
     onClose();
-  };
+  }, [onClose, resetAll]);
 
   // 1. 모달 접근성 관련 로직
   useModalAccessibility(modalRef, handleClose);
@@ -67,8 +69,6 @@ export default function ProfileEditModal({
     setSkillInput,
     errors,
     handleImageChange,
-    handleSkillAdd,
-    handleSkillRemove,
     handleChange,
     handleSubmit,
   } = useProfileForm(user, onSave);
@@ -91,6 +91,62 @@ export default function ProfileEditModal({
       setFormData((prev) => ({ ...prev, careers }));
     }
   }, [selectedValues, formData.positions, formData.careers, setFormData]);
+
+  const { stacks: allStacksFromDB, loading, error } = useFetchStacks();
+  const [filteredStacks, setFilteredStacks] = useState<string[]>([]);
+  const [activeIndex, setActiveIndex] = useState(-1);
+
+  useEffect(() => {
+    const searchTerm = skillInput.trim();
+    if (searchTerm && !loading && !error) {
+      setFilteredStacks(
+        allStacksFromDB.filter(
+          (stack) =>
+            stack.toLowerCase().includes(searchTerm.toLowerCase()) &&
+            !formData.tech_stacks.includes(stack),
+        ),
+      );
+    } else {
+      setFilteredStacks([]);
+    }
+    setActiveIndex(-1);
+  }, [skillInput, formData.tech_stacks, allStacksFromDB, loading, error]);
+
+  const handleSkillKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (filteredStacks.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((prev) => (prev + 1) % filteredStacks.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex(
+        (prev) => (prev - 1 + filteredStacks.length) % filteredStacks.length,
+      );
+    } else if (e.key === "Enter" && activeIndex >= 0) {
+      e.preventDefault();
+      addSkill(filteredStacks[activeIndex]);
+    } else if (e.key === "Escape") setSkillInput("");
+  };
+
+  const addSkill = (skill: string) => {
+    if (
+      formData.tech_stacks.length >= MAX_SKILLS ||
+      formData.tech_stacks.includes(skill)
+    )
+      return;
+    setFormData((prev) => ({
+      ...prev,
+      tech_stacks: [...prev.tech_stacks, skill],
+    }));
+    setSkillInput("");
+  };
+
+  const removeSkill = (skill: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      tech_stacks: prev.tech_stacks.filter((s) => s !== skill),
+    }));
+  };
 
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/50">
@@ -118,45 +174,65 @@ export default function ProfileEditModal({
       `}</style>
       <div
         ref={modalRef}
-        className="bg-[#e9fafe] rounded-2xl px-[90px] py-10 shadow-2xl w-full max-w-[600px] flex flex-col gap-6 relative"
+        className="bg-[#e9fafe] rounded-2xl px-[90px] py-8 shadow-2xl w-full max-w-[600px] flex flex-col relative max-h-[90vh] overflow-y-auto"
       >
         <ProfileImageUploader
           profile_image={formData.profile_image}
-          username={formData.username}
+          username={formData.nickname || formData.username}
           fileInputRef={fileInputRef}
           onImageChange={handleImageChange}
         />
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* 아이디 */}
           <div>
-            <label className="block text-sm font-medium text-gray mb-1">
+            <label className="block text-sm font-medium text-gray mb-0.5">
               아이디
             </label>
             <input
               type="text"
               value={formData.username}
               disabled
-              className="w-full p-3 bg-[#e9fafe] rounded-md border border-gray text-gray-500 cursor-not-allowed"
+              className="w-full p-2.5 bg-[#e9fafe] rounded-md border border-gray text-gray-500 cursor-not-allowed text-sm"
             />
           </div>
           {/* 이메일 */}
           <div>
-            <label className="block text-sm font-medium text-gray mb-1">
+            <label className="block text-sm font-medium text-gray mb-0.5">
               이메일
             </label>
             <input
               type="email"
               value={formData.email}
               disabled
-              className="w-full p-3 bg-[#e9fafe] rounded-md border border-gray text-gray-500 cursor-not-allowed"
+              className="w-full p-2.5 bg-[#e9fafe] rounded-md border border-gray text-gray-500 cursor-not-allowed text-sm"
             />
+          </div>
+          {/* 닉네임 */}
+          <div>
+            <label
+              htmlFor="nickname"
+              className="block text-sm font-medium text-gray mb-0.5"
+            >
+              닉네임
+            </label>
+            <input
+              id="nickname"
+              name="nickname"
+              type="text"
+              value={formData.nickname}
+              onChange={handleChange}
+              className="w-full p-2.5 bg-white rounded-md focus:ring-2 focus:ring-primary focus:border-primary text-sm"
+            />
+            {errors.nickname && (
+              <p className="text-red-500 text-sm mt-1">{errors.nickname}</p>
+            )}
           </div>
           {/* 한 줄 소개 */}
           <div>
             <label
               htmlFor="bio"
-              className="block text-sm font-medium text-gray mb-1"
+              className="block text-sm font-medium text-gray mb-0.5"
             >
               한 줄 소개 ({formData.bio.length}/{MAX_INTRODUCTION_LENGTH})
             </label>
@@ -167,7 +243,7 @@ export default function ProfileEditModal({
               value={formData.bio}
               onChange={handleChange}
               maxLength={MAX_INTRODUCTION_LENGTH}
-              className="w-full p-3 bg-white rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
+              className="w-full p-2.5 bg-white rounded-md focus:ring-2 focus:ring-primary focus:border-primary text-sm"
             />
             {errors.bio && (
               <p className="text-red-500 text-sm mt-1">{errors.bio}</p>
@@ -177,7 +253,7 @@ export default function ProfileEditModal({
           <div>
             <label
               htmlFor="positions"
-              className="block text-sm font-medium text-gray mb-1"
+              className="block text-sm font-medium text-gray mb-0.5"
             >
               분야
             </label>
@@ -185,8 +261,8 @@ export default function ProfileEditModal({
               options={FIELD_OPTIONS}
               placeholder="분야"
               width="100%"
-              height="48px"
-              className="!border-0 !text-[16px] !text-gray"
+              height="40px"
+              className="!border-0 !text-sm !text-gray"
               onChange={(value) =>
                 setFormData((prev) => ({ ...prev, positions: value }))
               }
@@ -196,7 +272,7 @@ export default function ProfileEditModal({
           <div>
             <label
               htmlFor="experience"
-              className="block text-sm font-medium text-gray mb-1"
+              className="block text-sm font-medium text-gray mb-0.5"
             >
               경력
             </label>
@@ -204,8 +280,8 @@ export default function ProfileEditModal({
               options={EXPERIENCE_OPTIONS}
               placeholder="경력"
               width="100%"
-              height="48px"
-              className="!border-0 !text-[16px] !text-gray"
+              height="40px"
+              className="!border-0 !text-sm !text-gray"
               onChange={(value) =>
                 setFormData((prev) => ({ ...prev, careers: value }))
               }
@@ -215,7 +291,7 @@ export default function ProfileEditModal({
           <div>
             <label
               htmlFor="skills"
-              className="block text-sm font-medium text-gray mb-1"
+              className="block text-sm font-medium text-gray mb-0.5"
             >
               기술 스택 (최대 {MAX_SKILLS}개)
             </label>
@@ -224,14 +300,27 @@ export default function ProfileEditModal({
               type="text"
               value={skillInput}
               onChange={(e) => setSkillInput(e.target.value)}
-              onKeyDown={handleSkillAdd}
+              onKeyDown={handleSkillKeyDown}
               placeholder="기술 스택을 검색하고 Enter를 누르세요"
-              className="w-full p-3 bg-white rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
+              className="w-full p-2.5 bg-white rounded-md focus:ring-2 focus:ring-primary focus:border-primary text-sm"
             />
+            {filteredStacks.length > 0 && (
+              <ul className="border border-gray-300 bg-white rounded-md mt-1 max-h-40 overflow-y-auto z-10 absolute w-105">
+                {filteredStacks.map((stack, idx) => (
+                  <li
+                    key={stack}
+                    className={`px-4 py-2 cursor-pointer ${idx === activeIndex ? "bg-gray-100" : "hover:bg-gray-100"}`}
+                    onClick={() => addSkill(stack)}
+                  >
+                    {stack}
+                  </li>
+                ))}
+              </ul>
+            )}
             {errors.skills && (
               <p className="text-red-500 text-sm mt-1">{errors.skills}</p>
             )}
-            <div className="flex gap-2 mt-3 flex-wrap">
+            <div className="flex gap-2 mt-2 flex-wrap">
               {formData.tech_stacks.map((skill) => (
                 <div
                   key={skill}
@@ -239,7 +328,7 @@ export default function ProfileEditModal({
                 >
                   <span>{skill}</span>
                   <button
-                    onClick={() => handleSkillRemove(skill)}
+                    onClick={() => removeSkill(skill)}
                     className="text-white hover:bg-deep rounded-full p-0.5"
                     aria-label={`${skill} 제거`}
                   >
@@ -255,7 +344,7 @@ export default function ProfileEditModal({
           <Button
             size="xl"
             onClick={handleClose}
-            className="bg-gray-200 text-gray-700 rounded-lg"
+            className="bg-gray-300 text-gray-700 !h-[70px]"
           >
             <span>취소</span>
           </Button>
@@ -267,7 +356,7 @@ export default function ProfileEditModal({
                 handleClose();
               })();
             }}
-            className="border-"
+            className="border- !h-[70px]"
           >
             <span>완료</span>
           </Button>
