@@ -108,7 +108,7 @@ export default function TechStackSection({
           disabled={techStack.length >= MAX_STACK_COUNT}
         />
         {filteredStacks.length > 0 && (
-          <div className="absolute top-full left-0 mt-2 bg-white border border-gray-300 rounded-[10px] z-10 w-full max-h-60 overflow-y-auto">
+          <div className="absolute top-full left-0 -mt-4 bg-white border border-gray-300 rounded-[10px] z-10 w-[1335px] max-h-60 overflow-y-auto">
             <ul>
               {filteredStacks.map((stack, index) => (
                 <li
