@@ -104,7 +104,7 @@ const SignUpForm = () => {
           value={id}
           onChange={handleIdChange}
           containerClassName="w-full"
-          error={idError}
+          error={idError ?? ""}
           disabled={isVerified}
         />
         <div className="mt-[20px]">
@@ -114,7 +114,7 @@ const SignUpForm = () => {
             value={password}
             onChange={handlePasswordChange}
             containerClassName="w-full"
-            error={passwordError}
+            error={passwordError ?? ""}
             disabled={isVerified}
           />
         </div>
@@ -125,7 +125,7 @@ const SignUpForm = () => {
             value={passwordConfirm}
             onChange={handleConfirmChange}
             containerClassName="w-full"
-            error={confirmError}
+            error={confirmError ?? ""}
             disabled={isVerified}
           />
         </div>

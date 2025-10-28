@@ -61,7 +61,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       clsx(
         baseStyles,
         variantStyles[variant],
-        variant === "icon" ? iconButtonSizeStyles[size] : sizeStyles[size],
+        variant === "icon"
+          ? (iconButtonSizeStyles[size as keyof typeof iconButtonSizeStyles] ??
+              "")
+          : sizeStyles[size],
         { "opacity-50": isDisabled },
         className,
       ),

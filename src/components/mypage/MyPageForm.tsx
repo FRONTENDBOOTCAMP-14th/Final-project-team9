@@ -59,7 +59,7 @@ export default function MyPageForm() {
 
       console.log(
         "MyPageForm - user_tech_stacks 원본 데이터:",
-        rawUserTechStacks
+        rawUserTechStacks,
       );
       console.log("MyPageForm - rawError:", rawError);
 
@@ -122,7 +122,7 @@ export default function MyPageForm() {
             profile_image={userData.profile_image || "/assets/no-profile.svg"}
             username={userData.username}
             email={userData.email}
-            bio={userData.bio}
+            bio={userData.bio ?? ""}
             positions={userData.positions?.name || ""}
             careers={userData.careers?.name || ""}
             tech_stacks={userData.tech_stacks || []}

@@ -38,6 +38,7 @@ export default function SearchResultsSection({
                 category={project.category}
                 profile_image={project.profile_image}
                 status={project.status}
+                isPriority={index === 0}
               />
             </li>
           ))}

@@ -1,4 +1,9 @@
 import { create } from "zustand";
+import {
+  sanitizeHTML,
+  normalizeWhitespace,
+  sanitizeArray,
+} from "@/utils/sanitize";
 
 export interface TeamData {
   domain: string;
@@ -132,11 +137,17 @@ export const useTeamFormStore = create<TeamFormState>((set, _get) => ({
   // 기술 스택 관리
   addTechStack: (tech) =>
     set((state) => {
-      if (tech.trim() && !state.teamData.techStack.includes(tech.trim())) {
+      // 입력값 살균처리
+      const sanitizedTech = normalizeWhitespace(sanitizeHTML(tech));
+
+      if (sanitizedTech && !state.teamData.techStack.includes(sanitizedTech)) {
         return {
           teamData: {
             ...state.teamData,
-            techStack: [...state.teamData.techStack, tech.trim()],
+            techStack: sanitizeArray([
+              ...state.teamData.techStack,
+              sanitizedTech,
+            ]),
           },
           techStackInput: "",
           errors: { ...state.errors, techStack: "" },
@@ -182,8 +193,10 @@ export const useTeamFormStore = create<TeamFormState>((set, _get) => ({
 
   updatePositionRole: (index, role) =>
     set((state) => {
+      // 역할명 살균처리
+      const sanitizedRole = normalizeWhitespace(sanitizeHTML(role));
       const newPositions = [...state.teamData.positions];
-      newPositions[index] = { ...newPositions[index], role };
+      newPositions[index] = { ...newPositions[index], role: sanitizedRole };
       return {
         teamData: { ...state.teamData, positions: newPositions },
         errors: { ...state.errors, positions: "" },
@@ -213,8 +226,10 @@ export const useTeamFormStore = create<TeamFormState>((set, _get) => ({
 
   updateRequirement: (index, value) =>
     set((state) => {
+      // 요구사항 살균처리
+      const sanitizedValue = sanitizeHTML(value);
       const newRequirements = [...state.teamData.requirements];
-      newRequirements[index] = value;
+      newRequirements[index] = sanitizedValue;
       return {
         teamData: { ...state.teamData, requirements: newRequirements },
       };
@@ -223,14 +238,20 @@ export const useTeamFormStore = create<TeamFormState>((set, _get) => ({
   // 우대사항 관리
   addPreference: (preference) =>
     set((state) => {
+      // 우대사항 살균처리
+      const sanitizedPreference = normalizeWhitespace(sanitizeHTML(preference));
+
       if (
-        preference.trim() &&
-        !state.teamData.preferences.includes(preference.trim())
+        sanitizedPreference &&
+        !state.teamData.preferences.includes(sanitizedPreference)
       ) {
         return {
           teamData: {
             ...state.teamData,
-            preferences: [...state.teamData.preferences, preference.trim()],
+            preferences: sanitizeArray([
+              ...state.teamData.preferences,
+              sanitizedPreference,
+            ]),
           },
           preferencesInput: "",
         };

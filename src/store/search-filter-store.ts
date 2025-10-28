@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { sanitizeHTML, normalizeWhitespace } from "@/utils/sanitize";
 
 export interface SearchFilters {
   searchQuery: string; // 검색어
@@ -43,7 +44,10 @@ export const useSearchFilterStore = create<SearchFilterState>((set) => ({
 
   setSearchQuery: (query) =>
     set((state) => ({
-      filters: { ...state.filters, searchQuery: query },
+      filters: {
+        ...state.filters,
+        searchQuery: normalizeWhitespace(sanitizeHTML(query)),
+      },
     })),
 
   setPosition: (position) =>
@@ -67,12 +71,18 @@ export const useSearchFilterStore = create<SearchFilterState>((set) => ({
     })),
 
   addTag: (tag) =>
-    set((state) => ({
-      filters: {
-        ...state.filters,
-        tags: [...state.filters.tags, tag],
-      },
-    })),
+    set((state) => {
+      const sanitizedTag = normalizeWhitespace(sanitizeHTML(tag));
+      if (sanitizedTag && !state.filters.tags.includes(sanitizedTag)) {
+        return {
+          filters: {
+            ...state.filters,
+            tags: [...state.filters.tags, sanitizedTag],
+          },
+        };
+      }
+      return state;
+    }),
 
   removeTag: (tag) =>
     set((state) => ({
