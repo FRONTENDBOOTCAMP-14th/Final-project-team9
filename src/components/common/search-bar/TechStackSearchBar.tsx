@@ -1,13 +1,13 @@
-'use client'
+"use client";
 
-import React from 'react'
+import React from "react";
 
 interface TechStackSearchBarProps {
-  value: string
-  onChange: (value: string) => void
-  onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void
-  placeholder?: string
-  disabled: boolean
+  value: string;
+  onChange: (value: string) => void;
+  onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  disabled: boolean;
 }
 
 /**
@@ -18,7 +18,7 @@ export default function TechStackSearchBar({
   value,
   onChange,
   onKeyDown,
-  placeholder = '최대 10개까지 선택 가능합니다',
+  placeholder = "최대 10개까지 선택 가능합니다",
   disabled = false,
 }: TechStackSearchBarProps) {
   return (
@@ -66,5 +66,5 @@ export default function TechStackSearchBar({
         className="w-full h-full text-[length:var(--text-7)] placeholder-gray placeholder:text-[length:var(--text-7)] focus:outline-none"
       />
     </div>
-  )
+  );
 }

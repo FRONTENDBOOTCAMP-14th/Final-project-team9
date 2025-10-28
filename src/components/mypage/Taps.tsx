@@ -97,7 +97,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 techStackData
                   ?.map(
                     (pts: { tech_stacks: { name: string }[] }) =>
-                      pts.tech_stacks?.[0]?.name || ""
+                      pts.tech_stacks?.[0]?.name || "",
                   )
                   .filter(Boolean) || [];
 
@@ -110,14 +110,14 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
               const totalMembers =
                 positionsData?.reduce(
                   (sum, pos) => sum + (pos.recruit_count || 0),
-                  0
+                  0,
                 ) || 0;
 
               // 마감일 계산
               const today = new Date();
               const deadline = new Date(project.deadline);
               const remainDays = Math.ceil(
-                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
               );
 
               return {
@@ -136,7 +136,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 profile_image:
                   userData?.profile_image || "/assets/no-profile.svg",
               } as ProjectType;
-            })
+            }),
           );
 
           // 모집중(status="true")인 프로젝트를 먼저, 모집완료(status="false")를 나중에 정렬
@@ -224,7 +224,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 techStackData
                   ?.map(
                     (pts: { tech_stacks: { name: string }[] }) =>
-                      pts.tech_stacks?.[0]?.name || ""
+                      pts.tech_stacks?.[0]?.name || "",
                   )
                   .filter(Boolean) || [];
 
@@ -237,14 +237,14 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
               const totalMembers =
                 positionsData?.reduce(
                   (sum, pos) => sum + (pos.recruit_count || 0),
-                  0
+                  0,
                 ) || 0;
 
               // 마감일 계산
               const today = new Date();
               const deadline = new Date(project.deadline);
               const remainDays = Math.ceil(
-                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
               );
 
               return {
@@ -263,7 +263,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 profile_image:
                   ownerData?.profile_image || "/assets/no-profile.svg",
               } as ProjectType;
-            })
+            }),
           );
 
           setProjects(formattedProjects);
@@ -345,7 +345,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 techStackData
                   ?.map(
                     (pts: { tech_stacks: { name: string }[] }) =>
-                      pts.tech_stacks?.[0]?.name || ""
+                      pts.tech_stacks?.[0]?.name || "",
                   )
                   .filter(Boolean) || [];
 
@@ -358,14 +358,14 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
               const totalMembers =
                 positionsData?.reduce(
                   (sum, pos) => sum + (pos.recruit_count || 0),
-                  0
+                  0,
                 ) || 0;
 
               // 마감일 계산
               const today = new Date();
               const deadline = new Date(project.deadline);
               const remainDays = Math.ceil(
-                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
               );
 
               return {
@@ -384,7 +384,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 profile_image:
                   ownerData?.profile_image || "/assets/no-profile.svg",
               } as ProjectType;
-            })
+            }),
           );
 
           setProjects(formattedProjects);
@@ -449,7 +449,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 techStackData
                   ?.map(
                     (pts: { tech_stacks: { name: string }[] }) =>
-                      pts.tech_stacks?.[0]?.name || ""
+                      pts.tech_stacks?.[0]?.name || "",
                   )
                   .filter(Boolean) || [];
 
@@ -461,13 +461,13 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
               const totalMembers =
                 positionsData?.reduce(
                   (sum, pos) => sum + (pos.recruit_count || 0),
-                  0
+                  0,
                 ) || 0;
 
               const today = new Date();
               const deadline = new Date(project.deadline);
               const remainDays = Math.ceil(
-                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
               );
 
               return {
@@ -486,7 +486,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 profile_image:
                   userData?.profile_image || "/assets/no-profile.svg",
               } as ProjectType;
-            })
+            }),
           );
 
           setProjects(formattedProjects);

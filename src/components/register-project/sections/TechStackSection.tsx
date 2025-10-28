@@ -1,19 +1,20 @@
-import { useEffect, useState, KeyboardEvent } from 'react'
-import { supabase } from '@/lib/supabase'
-import TechStackSearchBar from '@/components/common/search-bar/TechStackSearchBar'
-import TagList from '@/components/common/tag/TagList'
-import FormCard from '../FormCard'
+import type { KeyboardEvent } from "react";
+import { useEffect, useState } from "react";
+import TechStackSearchBar from "@/components/common/search-bar/TechStackSearchBar";
+import TagList from "@/components/common/tag/TagList";
+import { supabase } from "@/lib/supabase";
+import FormCard from "../FormCard";
 
 interface TechStackSectionProps {
-  techStack: string[]
-  techStackInput: string
-  error?: string
-  onInputChange: (value: string) => void
-  onAddTechStack: (tech: string) => void
-  onRemoveTechStack: (tech: string) => void
+  techStack: string[];
+  techStackInput: string;
+  error?: string;
+  onInputChange: (value: string) => void;
+  onAddTechStack: (tech: string) => void;
+  onRemoveTechStack: (tech: string) => void;
 }
 
-const MAX_STACK_COUNT = 10
+const MAX_STACK_COUNT = 10;
 
 export default function TechStackSection({
   techStack,
@@ -23,68 +24,68 @@ export default function TechStackSection({
   onAddTechStack,
   onRemoveTechStack,
 }: TechStackSectionProps) {
-  const [allStacks, setAllStacks] = useState<string[]>([])
-  const [filteredStacks, setFilteredStacks] = useState<string[]>([])
-  const [activeIndex, setActiveIndex] = useState(-1)
+  const [allStacks, setAllStacks] = useState<string[]>([]);
+  const [filteredStacks, setFilteredStacks] = useState<string[]>([]);
+  const [activeIndex, setActiveIndex] = useState(-1);
 
   useEffect(() => {
     const fetchTechStacks = async () => {
-      const { data, error } = await supabase.from('tech_stacks').select('name')
+      const { data, error } = await supabase.from("tech_stacks").select("name");
       if (!error && data) {
-        setAllStacks(data.map((item) => item.name))
+        setAllStacks(data.map((item) => item.name));
       }
-    }
-    void fetchTechStacks()
-  }, [])
+    };
+    void fetchTechStacks();
+  }, []);
 
   useEffect(() => {
-    if (techStackInput.trim() === '') {
-      setFilteredStacks([])
-      setActiveIndex(-1)
-      return
+    if (techStackInput.trim() === "") {
+      setFilteredStacks([]);
+      setActiveIndex(-1);
+      return;
     }
 
     const filtered = allStacks.filter(
       (stack) =>
         stack.toLowerCase().includes(techStackInput.toLowerCase()) &&
         !techStack.includes(stack),
-    )
+    );
 
-    setFilteredStacks(filtered)
-    setActiveIndex(-1)
-  }, [techStackInput, allStacks, techStack])
+    setFilteredStacks(filtered);
+    setActiveIndex(-1);
+  }, [techStackInput, allStacks, techStack]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (filteredStacks.length === 0) return
+    if (filteredStacks.length === 0) return;
 
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      setActiveIndex((prev) => (prev + 1) % filteredStacks.length)
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((prev) => (prev + 1) % filteredStacks.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
       setActiveIndex(
         (prev) => (prev - 1 + filteredStacks.length) % filteredStacks.length,
-      )
-    } else if (e.key === 'Enter') {
-      e.preventDefault()
+      );
+    } else if (e.key === "Enter") {
+      e.preventDefault();
       if (activeIndex >= 0) {
-        handleSelectStack(filteredStacks[activeIndex])
+        handleSelectStack(filteredStacks[activeIndex]);
       } else {
-        handleSelectStack(techStackInput)
+        handleSelectStack(techStackInput);
       }
-    } else if (e.key === 'Escape') {
-      setFilteredStacks([])
+    } else if (e.key === "Escape") {
+      setFilteredStacks([]);
     }
-  }
+  };
 
   const handleSelectStack = (stack: string) => {
-    if (!stack.trim()) return
-    if (techStack.includes(stack)) return
-    if (techStack.length >= MAX_STACK_COUNT) return
-    onAddTechStack(stack)
-    onInputChange('')
-    setFilteredStacks([])
-  }
+    if (!stack.trim()) return;
+    if (techStack.includes(stack)) return;
+    if (techStack.length >= MAX_STACK_COUNT) return;
+    onAddTechStack(stack);
+    onInputChange("");
+    setFilteredStacks([]);
+  };
 
   return (
     <FormCard
@@ -103,7 +104,7 @@ export default function TechStackSection({
           placeholder={
             techStack.length >= MAX_STACK_COUNT
               ? `최대 ${MAX_STACK_COUNT}개까지 선택 가능합니다`
-              : '기술 스택 검색'
+              : "기술 스택 검색"
           }
           disabled={techStack.length >= MAX_STACK_COUNT}
         />
@@ -115,7 +116,7 @@ export default function TechStackSection({
                   key={stack}
                   onClick={() => handleSelectStack(stack)}
                   className={`px-6 py-3 cursor-pointer text-lg ${
-                    index === activeIndex ? 'bg-gray-100' : 'hover:bg-gray-100'
+                    index === activeIndex ? "bg-gray-100" : "hover:bg-gray-100"
                   }`}
                 >
                   {stack}
@@ -135,5 +136,5 @@ export default function TechStackSection({
         </div>
       </div>
     </FormCard>
-  )
+  );
 }
