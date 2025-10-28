@@ -22,7 +22,7 @@ export default function SearchResultsSection({
           className="mt-[50px] grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"
           role="list"
         >
-          {results.map((project) => (
+          {results.map((project, index) => (
             <li key={project.id}>
               <ProjectCard
                 id={project.id}
@@ -38,6 +38,7 @@ export default function SearchResultsSection({
                 category={project.category}
                 profile_image={project.profile_image}
                 status={project.status}
+                isPriority={index === 0}
               />
             </li>
           ))}

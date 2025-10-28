@@ -86,7 +86,7 @@ export default function UserProfileCard(props: UserProfileCardProps) {
   };
 
   const handleSaveProfile = (
-    updatedUser: Omit<UserProfileCardProps, "projectCounts">
+    updatedUser: Omit<UserProfileCardProps, "projectCounts">,
   ) => {
     // 실제 애플리케이션에서는 여기서 API 호출 등을 통해 서버에 데이터를 저장합니다.
     console.log("저장될 데이터:", updatedUser);

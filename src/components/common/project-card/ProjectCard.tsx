@@ -24,6 +24,7 @@ interface ProjectCardProps {
   category: string;
   status?: ProjectStatus;
   profile_image: string;
+  isPriority?: boolean;
 }
 
 export default function ProjectCard({
@@ -40,6 +41,7 @@ export default function ProjectCard({
   category,
   status = "true",
   profile_image,
+  isPriority = false,
 }: ProjectCardProps) {
   const router = useRouter();
   const { toggleFavorite, isFavorite: checkIsFavorite } = useFavoriteStore();
@@ -82,6 +84,7 @@ export default function ProjectCard({
           width={100}
           height={100}
           className="rounded-full aspect-square"
+          priority={isPriority}
         />
         <div className="flex flex-col gap-2.5">
           <div className="font-bold text-deep text-6">{owner}</div>

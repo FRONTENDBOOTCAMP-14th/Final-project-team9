@@ -64,6 +64,7 @@ export default function ProfileImageUploader({
           height={128}
           className="w-full h-full object-cover"
           unoptimized={shouldUnoptimized}
+          priority
         />
       </div>
       <div className="absolute -bottom-1 -right-1 w-10 h-10 bg-[color:var(--color-deep)] rounded-full flex justify-center items-center group-hover:bg-primary transition-colors shadow-lg">
