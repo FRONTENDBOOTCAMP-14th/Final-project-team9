@@ -40,9 +40,12 @@ export default function RegisterProjectClient() {
     setIsSubmitting(true);
 
     try {
-      const baseData = baseFormRef.current.getData();
-      const teamData = teamFormRef.current.getData();
-      const detailData = detailFormRef.current.getData();
+      const baseData = baseFormRef.current?.getData();
+      if (!baseData) return;
+      const teamData = teamFormRef.current?.getData();
+      if (!teamData) return;
+      const detailData = detailFormRef.current?.getData();
+      if (!detailData) return;
 
       const {
         data: { user },
@@ -99,8 +102,9 @@ export default function RegisterProjectClient() {
                 .select()
                 .single();
               if (error) throw error;
-              stack = data;
+              stack = data as { id: number; name: string };
             }
+
             return { project_id: projectId, tech_stack_id: stack.id };
           }),
         );
