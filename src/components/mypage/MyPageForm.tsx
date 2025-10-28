@@ -9,7 +9,10 @@ import { supabase } from "@/lib/supabase";
 import { useFavoriteStore } from "@/store/favorite-store";
 import type { UserData } from "@/types/project";
 
-type ExtendedUserData = UserData & { tech_stacks?: string[] };
+type ExtendedUserData = UserData & {
+  tech_stacks?: string[];
+  nickname?: string;
+};
 
 export default function MyPageForm() {
   const router = useRouter();
@@ -36,7 +39,7 @@ export default function MyPageForm() {
 
       const { data: userInfo } = await supabase
         .from("users")
-        .select("*, positions(name), careers(name)")
+        .select("*, nickname, positions(name), careers(name)")
         .eq("id", user.id)
         .single();
 
@@ -83,7 +86,13 @@ export default function MyPageForm() {
 
       const merged = {
         id: user.id,
-        username: meta.username || userInfo?.username || "",
+        username: userInfo?.username || meta.username || user.email || "",
+        nickname:
+          userInfo?.nickname ||
+          meta.nickname ||
+          userInfo?.username ||
+          meta.username ||
+          "",
         email: user.email || userInfo?.email || "",
         bio: userInfo?.bio || meta.bio || "",
         profile_image: userInfo?.profile_image || meta.profile_image || "",
@@ -121,6 +130,7 @@ export default function MyPageForm() {
           <UserProfileCard
             profile_image={userData.profile_image || "/assets/no-profile.svg"}
             username={userData.username}
+            nickname={userData.nickname || ""}
             email={userData.email}
             bio={userData.bio ?? ""}
             positions={userData.positions?.name || ""}

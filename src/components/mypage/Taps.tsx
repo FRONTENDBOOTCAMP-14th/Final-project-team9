@@ -58,7 +58,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
           // 2. 사용자 정보 가져오기
           const { data: userData } = await supabase
             .from("users")
-            .select("username, profile_image, career_id")
+            .select("username, nickname, profile_image, career_id")
             .eq("id", userId)
             .single();
 
@@ -97,7 +97,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 techStackData
                   ?.map(
                     (pts: { tech_stacks: { name: string }[] }) =>
-                      pts.tech_stacks?.[0]?.name || "",
+                      pts.tech_stacks?.[0]?.name || ""
                   )
                   .filter(Boolean) || [];
 
@@ -110,21 +110,21 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
               const totalMembers =
                 positionsData?.reduce(
                   (sum, pos) => sum + (pos.recruit_count || 0),
-                  0,
+                  0
                 ) || 0;
 
               // 마감일 계산
               const today = new Date();
               const deadline = new Date(project.deadline);
               const remainDays = Math.ceil(
-                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
               );
 
               return {
                 id: project.id,
                 title: project.name,
                 description: project.short_description,
-                owner: userData?.username || "알 수 없음",
+                owner: userData?.nickname || userData?.username || "알 수 없음",
                 level: careerName,
                 members: totalMembers,
                 period: project.deadline,
@@ -136,7 +136,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 profile_image:
                   userData?.profile_image || "/assets/no-profile.svg",
               } as ProjectType;
-            }),
+            })
           );
 
           // 모집중(status="true")인 프로젝트를 먼저, 모집완료(status="false")를 나중에 정렬
@@ -189,7 +189,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
               // 프로젝트 소유자 정보
               const { data: ownerData } = await supabase
                 .from("users")
-                .select("username, profile_image, career_id")
+                .select("username, nickname, profile_image, career_id")
                 .eq("id", project.owner_id)
                 .single();
 
@@ -224,7 +224,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 techStackData
                   ?.map(
                     (pts: { tech_stacks: { name: string }[] }) =>
-                      pts.tech_stacks?.[0]?.name || "",
+                      pts.tech_stacks?.[0]?.name || ""
                   )
                   .filter(Boolean) || [];
 
@@ -237,21 +237,22 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
               const totalMembers =
                 positionsData?.reduce(
                   (sum, pos) => sum + (pos.recruit_count || 0),
-                  0,
+                  0
                 ) || 0;
 
               // 마감일 계산
               const today = new Date();
               const deadline = new Date(project.deadline);
               const remainDays = Math.ceil(
-                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
               );
 
               return {
                 id: project.id,
                 title: project.name,
                 description: project.short_description,
-                owner: ownerData?.username || "알 수 없음",
+                owner:
+                  ownerData?.nickname || ownerData?.username || "알 수 없음",
                 level: careerName,
                 members: totalMembers,
                 period: project.deadline,
@@ -263,7 +264,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 profile_image:
                   ownerData?.profile_image || "/assets/no-profile.svg",
               } as ProjectType;
-            }),
+            })
           );
 
           setProjects(formattedProjects);
@@ -310,7 +311,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
               // 프로젝트 소유자 정보
               const { data: ownerData } = await supabase
                 .from("users")
-                .select("username, profile_image, career_id")
+                .select("username, nickname, profile_image, career_id")
                 .eq("id", project.owner_id)
                 .single();
 
@@ -345,7 +346,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 techStackData
                   ?.map(
                     (pts: { tech_stacks: { name: string }[] }) =>
-                      pts.tech_stacks?.[0]?.name || "",
+                      pts.tech_stacks?.[0]?.name || ""
                   )
                   .filter(Boolean) || [];
 
@@ -358,21 +359,22 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
               const totalMembers =
                 positionsData?.reduce(
                   (sum, pos) => sum + (pos.recruit_count || 0),
-                  0,
+                  0
                 ) || 0;
 
               // 마감일 계산
               const today = new Date();
               const deadline = new Date(project.deadline);
               const remainDays = Math.ceil(
-                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
               );
 
               return {
                 id: project.id,
                 title: project.name,
                 description: project.short_description,
-                owner: ownerData?.username || "알 수 없음",
+                owner:
+                  ownerData?.nickname || ownerData?.username || "알 수 없음",
                 level: careerName,
                 members: totalMembers,
                 period: project.deadline,
@@ -384,7 +386,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 profile_image:
                   ownerData?.profile_image || "/assets/no-profile.svg",
               } as ProjectType;
-            }),
+            })
           );
 
           setProjects(formattedProjects);
@@ -413,7 +415,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
           // 사용자 정보
           const { data: userData } = await supabase
             .from("users")
-            .select("username, profile_image, career_id")
+            .select("username, nickname, profile_image, career_id")
             .eq("id", userId)
             .single();
 
@@ -449,7 +451,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 techStackData
                   ?.map(
                     (pts: { tech_stacks: { name: string }[] }) =>
-                      pts.tech_stacks?.[0]?.name || "",
+                      pts.tech_stacks?.[0]?.name || ""
                   )
                   .filter(Boolean) || [];
 
@@ -461,20 +463,20 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
               const totalMembers =
                 positionsData?.reduce(
                   (sum, pos) => sum + (pos.recruit_count || 0),
-                  0,
+                  0
                 ) || 0;
 
               const today = new Date();
               const deadline = new Date(project.deadline);
               const remainDays = Math.ceil(
-                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
               );
 
               return {
                 id: project.id,
                 title: project.name,
                 description: project.short_description,
-                owner: userData?.username || "알 수 없음",
+                owner: userData?.nickname || userData?.username || "알 수 없음",
                 level: careerName,
                 members: totalMembers,
                 period: project.deadline,
@@ -486,7 +488,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 profile_image:
                   userData?.profile_image || "/assets/no-profile.svg",
               } as ProjectType;
-            }),
+            })
           );
 
           setProjects(formattedProjects);

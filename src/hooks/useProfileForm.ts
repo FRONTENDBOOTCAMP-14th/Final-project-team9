@@ -18,6 +18,7 @@ export function useProfileForm(
   const defaultInitial = {
     profile_image: "",
     username: "",
+    nickname: "",
     email: "",
     bio: "",
     positions: "",
