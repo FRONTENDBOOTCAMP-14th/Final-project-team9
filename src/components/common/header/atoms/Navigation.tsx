@@ -17,7 +17,7 @@ interface NavLinkProps {
 function NavLink({
   href,
   children,
-  className = "",
+  className = "cursor-pointer",
   isActive = false,
   isAuth = false,
 }: NavLinkProps) {

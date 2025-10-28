@@ -86,7 +86,7 @@ export default function UserProfileCard(props: UserProfileCardProps) {
   };
 
   const handleSaveProfile = (
-    updatedUser: Omit<UserProfileCardProps, "projectCounts">
+    updatedUser: Omit<UserProfileCardProps, "projectCounts">,
   ) => {
     // 실제 애플리케이션에서는 여기서 API 호출 등을 통해 서버에 데이터를 저장합니다.
     console.log("저장될 데이터:", updatedUser);
@@ -113,71 +113,73 @@ export default function UserProfileCard(props: UserProfileCardProps) {
 
   return (
     <>
-      <div className="w-[1620px] h-[400px] bg-white rounded-4xl py-9 px-20 shadow-lg flex flex-col justify-between relative mx-auto box-border">
-        <div className="flex items-center">
-          <div className="w-[167px] h-[167px] rounded-full overflow-hidden mr-8 bg-gray-300 relative">
-            <Image
-              src={userData.profile_image || "/assets/no-profile.svg"}
-              alt={`${userData.username}'s profile`}
-              width={167}
-              height={167}
-              className="object-cover"
-              unoptimized={
-                userData.profile_image?.startsWith("blob:") ||
-                userData.profile_image?.endsWith(".svg") ||
-                !userData.profile_image
-              }
-            />
-          </div>
-          <div className="flex flex-col gap-2 flex-grow">
-            <div className="flex items-center gap-4">
-              <h2 className="text-8 text-deep font-extrabold">
-                {userData.username}
-              </h2>
-              <span className="text-5 text-gray">{userData.email}</span>
+      <div className="px-36">
+        <div className="min-w-[950px] max-w-[1620px] h-[400px] bg-white rounded-4xl py-9 px-20 shadow-lg flex flex-col justify-between relative mx-auto box-border">
+          <div className="flex items-center">
+            <div className="w-[167px] h-[167px] rounded-full overflow-hidden mr-8 bg-gray-300 relative">
+              <Image
+                src={userData.profile_image || "/assets/no-profile.svg"}
+                alt={`${userData.username}'s profile`}
+                width={167}
+                height={167}
+                className="object-cover"
+                unoptimized={
+                  userData.profile_image?.startsWith("blob:") ||
+                  userData.profile_image?.endsWith(".svg") ||
+                  !userData.profile_image
+                }
+              />
             </div>
-            <p className="text-5 text-deep font-bold">{userData.bio}</p>
-            <div className="flex gap-3 text-5 text-gray-600">
-              <span>{userData.positions}</span>
-              <span>{userData.careers}</span>
+            <div className="flex flex-col gap-2 flex-grow">
+              <div className="flex items-center gap-4">
+                <h2 className="text-8 text-deep font-extrabold">
+                  {userData.username}
+                </h2>
+                <span className="text-5 text-gray">{userData.email}</span>
+              </div>
+              <p className="text-5 text-deep font-bold">{userData.bio}</p>
+              <div className="flex gap-3 text-5 text-gray-600">
+                <span>{userData.positions}</span>
+                <span>{userData.careers}</span>
+              </div>
             </div>
-          </div>
-          <button
-            onClick={handleSettingsClick}
-            aria-label="프로필 수정"
-            className="absolute top-10 right-10 text-gray-500 hover:text-gray-800"
-          >
-            <SettingsIcon />
-          </button>
-        </div>
-
-        <div className="flex justify-end gap-5">
-          {Object.entries({
-            "나의 프로젝트": userData.projectCounts.myProjects,
-            "관심 프로젝트": userData.projectCounts.interestedProjects,
-            "지원한 프로젝트": userData.projectCounts.supportedProjects,
-            "종료된 프로젝트": userData.projectCounts.completedProjects,
-          }).map(([label, count]) => (
             <button
-              key={label}
-              className="bg-white border-1 rounded-[10px] text-gray text-5 font-bold py-1 px-5"
+              onClick={handleSettingsClick}
+              aria-label="프로필 수정"
+              className="absolute top-10 right-10 text-gray-500 hover:text-gray-800 cursor-pointer"
             >
-              {label} {count}
+              <SettingsIcon />
             </button>
-          ))}
-        </div>
+          </div>
 
-        <hr className="border-t-2 border-zinc-300" />
+          <div className="flex justify-end gap-5">
+            {Object.entries({
+              "나의 프로젝트": userData.projectCounts.myProjects,
+              "관심 프로젝트": userData.projectCounts.interestedProjects,
+              "지원한 프로젝트": userData.projectCounts.supportedProjects,
+              "종료된 프로젝트": userData.projectCounts.completedProjects,
+            }).map(([label, count]) => (
+              <button
+                key={label}
+                className="bg-white border-1 rounded-[10px] text-gray text-5 font-bold py-1 px-5"
+              >
+                {label} {count}
+              </button>
+            ))}
+          </div>
 
-        <div className="flex items-center gap-3">
-          {userData.tech_stacks.map((skill) => (
-            <span
-              key={skill}
-              className="bg-primary text-white text-6 font-bold py-1 px-5 rounded-full"
-            >
-              {skill}
-            </span>
-          ))}
+          <hr className="border-t-2 border-zinc-300" />
+
+          <div className="flex items-center gap-3">
+            {userData.tech_stacks.map((skill) => (
+              <span
+                key={skill}
+                className="bg-primary text-white text-6 font-bold py-1 px-5 rounded-full"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 
