@@ -22,7 +22,7 @@ export default function SearchResultsSection({
           className="mt-[50px] grid grid-cols-1 min-[1280px]:grid-cols-2 min-[1750px]:grid-cols-3 gap-14"
           role="list"
         >
-          {results.map((project) => (
+          {results.map((project, index) => (
             <li key={project.id} className="w-[500px]">
               <ProjectCard
                 id={project.id}
