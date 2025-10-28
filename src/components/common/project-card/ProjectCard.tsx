@@ -65,7 +65,7 @@ export default function ProjectCard({
 
         <button onClick={handleFavoriteClick}>
           <Heart
-            className={`w-[30px] h-[30px] ${
+            className={`w-[30px] h-[30px] cursor-pointer ${
               isFavorite ? "fill-red-500 stroke-red-500" : "stroke-gray-400"
             }`}
           />
@@ -136,7 +136,7 @@ export default function ProjectCard({
           )}
         </span>
         <button
-          className="bg-primary text-white px-[15px] py-[6px] rounded-[10px] text-5 hover:bg-blue-700"
+          className="bg-primary text-white px-[15px] py-[6px] rounded-[10px] text-5 hover:bg-blue-700 cursor-pointer"
           onClick={() => router.push(`/project-detail/${id}`)}
         >
           자세히보기

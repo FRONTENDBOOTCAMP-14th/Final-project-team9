@@ -10,7 +10,7 @@ export default function SearchResultsSection({
 }: SearchResultsSectionProps) {
   return (
     <section
-      className="w-full max-w-[1620px] mt-[140px] ml-[160px] self-start"
+      className="w-full mt-[140px] px-36 mx-auto flex flex-col items-center"
       aria-label="검색 결과"
     >
       <h2 className="text-8 font-bold text-deep">
@@ -19,11 +19,11 @@ export default function SearchResultsSection({
 
       {results.length > 0 ? (
         <ul
-          className="mt-[50px] grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"
+          className="mt-[50px] grid grid-cols-1 min-[1280px]:grid-cols-2 min-[1750px]:grid-cols-3 gap-14"
           role="list"
         >
           {results.map((project, index) => (
-            <li key={project.id}>
+            <li key={project.id} className="w-[500px]">
               <ProjectCard
                 id={project.id}
                 title={project.title}

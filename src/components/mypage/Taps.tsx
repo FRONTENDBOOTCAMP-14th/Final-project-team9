@@ -97,7 +97,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 techStackData
                   ?.map(
                     (pts: { tech_stacks: { name: string }[] }) =>
-                      pts.tech_stacks?.[0]?.name || ""
+                      pts.tech_stacks?.[0]?.name || "",
                   )
                   .filter(Boolean) || [];
 
@@ -110,14 +110,14 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
               const totalMembers =
                 positionsData?.reduce(
                   (sum, pos) => sum + (pos.recruit_count || 0),
-                  0
+                  0,
                 ) || 0;
 
               // 마감일 계산
               const today = new Date();
               const deadline = new Date(project.deadline);
               const remainDays = Math.ceil(
-                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
               );
 
               return {
@@ -136,7 +136,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 profile_image:
                   userData?.profile_image || "/assets/no-profile.svg",
               } as ProjectType;
-            })
+            }),
           );
 
           // 모집중(status="true")인 프로젝트를 먼저, 모집완료(status="false")를 나중에 정렬
@@ -224,7 +224,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 techStackData
                   ?.map(
                     (pts: { tech_stacks: { name: string }[] }) =>
-                      pts.tech_stacks?.[0]?.name || ""
+                      pts.tech_stacks?.[0]?.name || "",
                   )
                   .filter(Boolean) || [];
 
@@ -237,14 +237,14 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
               const totalMembers =
                 positionsData?.reduce(
                   (sum, pos) => sum + (pos.recruit_count || 0),
-                  0
+                  0,
                 ) || 0;
 
               // 마감일 계산
               const today = new Date();
               const deadline = new Date(project.deadline);
               const remainDays = Math.ceil(
-                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
               );
 
               return {
@@ -264,7 +264,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 profile_image:
                   ownerData?.profile_image || "/assets/no-profile.svg",
               } as ProjectType;
-            })
+            }),
           );
 
           setProjects(formattedProjects);
@@ -346,7 +346,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 techStackData
                   ?.map(
                     (pts: { tech_stacks: { name: string }[] }) =>
-                      pts.tech_stacks?.[0]?.name || ""
+                      pts.tech_stacks?.[0]?.name || "",
                   )
                   .filter(Boolean) || [];
 
@@ -359,14 +359,14 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
               const totalMembers =
                 positionsData?.reduce(
                   (sum, pos) => sum + (pos.recruit_count || 0),
-                  0
+                  0,
                 ) || 0;
 
               // 마감일 계산
               const today = new Date();
               const deadline = new Date(project.deadline);
               const remainDays = Math.ceil(
-                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
               );
 
               return {
@@ -386,7 +386,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 profile_image:
                   ownerData?.profile_image || "/assets/no-profile.svg",
               } as ProjectType;
-            })
+            }),
           );
 
           setProjects(formattedProjects);
@@ -451,7 +451,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 techStackData
                   ?.map(
                     (pts: { tech_stacks: { name: string }[] }) =>
-                      pts.tech_stacks?.[0]?.name || ""
+                      pts.tech_stacks?.[0]?.name || "",
                   )
                   .filter(Boolean) || [];
 
@@ -463,13 +463,13 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
               const totalMembers =
                 positionsData?.reduce(
                   (sum, pos) => sum + (pos.recruit_count || 0),
-                  0
+                  0,
                 ) || 0;
 
               const today = new Date();
               const deadline = new Date(project.deadline);
               const remainDays = Math.ceil(
-                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+                (deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
               );
 
               return {
@@ -488,7 +488,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
                 profile_image:
                   userData?.profile_image || "/assets/no-profile.svg",
               } as ProjectType;
-            })
+            }),
           );
 
           setProjects(formattedProjects);
@@ -558,14 +558,14 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
   const activeProjects = projects;
 
   return (
-    <div className="w-[1620px] mx-auto my-12">
+    <div className=" mx-auto px-30 my-12">
       {/* 탭 네비게이션 */}
       <div className="flex pt-[60px] pl-[50px] gap-[50px]">
         {TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`py-3 text-7 transition-colors duration-300 ${
+            className={`py-3 text-7 transition-colors duration-300 cursor-pointer ${
               activeTab === tab.key
                 ? "font-black text-primary border-b-2 border-primary"
                 : "font-medium text-gray hover:text-primary"
@@ -577,19 +577,15 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
       </div>
 
       {/* 탭 콘텐츠 */}
-      <div className="mt-15">
+      <div className="mt-15 mx-auto max-[1279px]:justify-center">
         {loading ? (
           <div className="text-center py-20">
             <p className="text-deep text-5">로딩 중...</p>
           </div>
         ) : activeProjects.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-15">
-            {activeProjects.map((project, index) => (
-              <ProjectCard
-                key={project.id}
-                {...project}
-                isPriority={index === 0}
-              />
+          <div className="grid grid-cols-1 max-[1279px]:justify-items-center min-[1280px]:grid-cols-2 min-[1750px]:grid-cols-3 gap-15">
+            {activeProjects.map((project) => (
+              <ProjectCard key={project.id} {...project} />
             ))}
           </div>
         ) : (

@@ -54,7 +54,7 @@ export default function LoginButton({ className = "" }: Props) {
         onClick={() => void handleLogout()}
         role="button"
         aria-label="로그아웃"
-        className={`${baseStyles} ${variantStyles} ${jalnan.className} text-[length:var(--text-5)] ${className}`}
+        className={`${baseStyles} ${variantStyles} ${jalnan.className} cursor-pointer text-[length:var(--text-5)] ${className}`}
       >
         로그아웃
       </button>
@@ -66,7 +66,7 @@ export default function LoginButton({ className = "" }: Props) {
       href="/login"
       role="button"
       aria-label="로그인 페이지로 이동"
-      className={`${baseStyles} ${variantStyles} ${jalnan.className} text-[length:var(--text-5)] ${className}`}
+      className={`${baseStyles} ${variantStyles} ${jalnan.className} cursor-pointer text-[length:var(--text-5)] ${className}`}
     >
       로그인
     </Link>

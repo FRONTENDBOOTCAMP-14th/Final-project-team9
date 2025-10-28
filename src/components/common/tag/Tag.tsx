@@ -21,7 +21,7 @@ export default function Tag({
         .join(" ")}
     >
       <span
-        className={["text-6 text-black", labelClassName]
+        className={["text-6 text-black cursor-default", labelClassName]
           .filter(Boolean)
           .join(" ")}
       >
@@ -30,7 +30,7 @@ export default function Tag({
       {onRemove && (
         <button
           onClick={onRemove}
-          className="text-gray-400 hover:text-gray-600 focus:outline-none"
+          className="text-gray-400 hover:text-black cursor-pointer focus:outline-none"
           aria-label={`${label} 삭제`}
         >
           ✕

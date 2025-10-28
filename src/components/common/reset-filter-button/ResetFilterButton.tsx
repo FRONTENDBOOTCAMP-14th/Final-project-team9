@@ -27,7 +27,7 @@ export default function ResetFilterButton() {
       aria-label="필터 초기화"
       size="filter"
       variant="secondary"
-      className="text-gray rounded-[10px]"
+      className="text-gray rounded-[10px] cursor-pointer"
       onClick={handleReset}
     >
       <div className="flex items-center gap-3">
