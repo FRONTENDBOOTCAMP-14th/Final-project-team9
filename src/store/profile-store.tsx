@@ -94,10 +94,16 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
         const updateData: {
           bio: string;
           profile_image: string;
+          nickname?: string;
         } = {
           bio: updatedData.bio,
           profile_image: finalImageUrl,
         };
+
+        // nickname이 있으면 추가
+        if (updatedData.nickname) {
+          updateData.nickname = updatedData.nickname;
+        }
 
         console.log("최종 업데이트 데이터:", updateData);
 
