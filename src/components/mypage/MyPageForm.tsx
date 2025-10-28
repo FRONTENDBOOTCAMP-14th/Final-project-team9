@@ -59,7 +59,7 @@ export default function MyPageForm() {
 
       console.log(
         "MyPageForm - user_tech_stacks 원본 데이터:",
-        rawUserTechStacks
+        rawUserTechStacks,
       );
       console.log("MyPageForm - rawError:", rawError);
 
