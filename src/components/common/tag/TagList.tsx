@@ -35,7 +35,7 @@ export default function TagList({
       )
     : Object.entries(selectedValues)
         .filter(([, value]) => value)
-        .map(([key, value]) => ({ label: value, value: key }));
+        .map(([key, value]) => ({ label: value ?? "", value: key }));
 
   const handleRemove = (value: string) => {
     if (onRemove) {

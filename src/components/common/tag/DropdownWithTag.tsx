@@ -39,7 +39,11 @@ export default function DropdownWithTag() {
       {Object.entries(selectedValues)
         .filter(([_, value]) => value)
         .map(([key, value]) => (
-          <Tag key={key} label={value} onRemove={() => handleRemove(key)} />
+          <Tag
+            key={key}
+            label={value ?? ""}
+            onRemove={() => handleRemove(key)}
+          />
         ))}
     </div>
   );

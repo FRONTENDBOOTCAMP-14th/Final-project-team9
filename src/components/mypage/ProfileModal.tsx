@@ -1,6 +1,8 @@
-import React, { useEffect, useRef } from "react";
+import type { KeyboardEvent } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Button from "@/components/common/Button";
 import Dropdown from "@/components/common/input/Dropdown";
+import { useFetchStacks } from "@/hooks/useFetchStacks";
 import { useModalAccessibility } from "@/hooks/useModalAccessibility";
 import { useProfileForm } from "@/hooks/useProfileForm";
 import { useDropdownStore } from "@/store/dropdown-store";
@@ -67,8 +69,6 @@ export default function ProfileEditModal({
     setSkillInput,
     errors,
     handleImageChange,
-    handleSkillAdd,
-    handleSkillRemove,
     handleChange,
     handleSubmit,
   } = useProfileForm(user, onSave);
@@ -91,6 +91,62 @@ export default function ProfileEditModal({
       setFormData((prev) => ({ ...prev, careers }));
     }
   }, [selectedValues, formData.positions, formData.careers, setFormData]);
+
+  const { stacks: allStacksFromDB, loading, error } = useFetchStacks();
+  const [filteredStacks, setFilteredStacks] = useState<string[]>([]);
+  const [activeIndex, setActiveIndex] = useState(-1);
+
+  useEffect(() => {
+    const searchTerm = skillInput.trim();
+    if (searchTerm && !loading && !error) {
+      setFilteredStacks(
+        allStacksFromDB.filter(
+          (stack) =>
+            stack.toLowerCase().includes(searchTerm.toLowerCase()) &&
+            !formData.tech_stacks.includes(stack),
+        ),
+      );
+    } else {
+      setFilteredStacks([]);
+    }
+    setActiveIndex(-1);
+  }, [skillInput, formData.tech_stacks, allStacksFromDB, loading, error]);
+
+  const handleSkillKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (filteredStacks.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((prev) => (prev + 1) % filteredStacks.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex(
+        (prev) => (prev - 1 + filteredStacks.length) % filteredStacks.length,
+      );
+    } else if (e.key === "Enter" && activeIndex >= 0) {
+      e.preventDefault();
+      addSkill(filteredStacks[activeIndex]);
+    } else if (e.key === "Escape") setSkillInput("");
+  };
+
+  const addSkill = (skill: string) => {
+    if (
+      formData.tech_stacks.length >= MAX_SKILLS ||
+      formData.tech_stacks.includes(skill)
+    )
+      return;
+    setFormData((prev) => ({
+      ...prev,
+      tech_stacks: [...prev.tech_stacks, skill],
+    }));
+    setSkillInput("");
+  };
+
+  const removeSkill = (skill: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      tech_stacks: prev.tech_stacks.filter((s) => s !== skill),
+    }));
+  };
 
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/50">
@@ -224,10 +280,23 @@ export default function ProfileEditModal({
               type="text"
               value={skillInput}
               onChange={(e) => setSkillInput(e.target.value)}
-              onKeyDown={handleSkillAdd}
+              onKeyDown={handleSkillKeyDown}
               placeholder="기술 스택을 검색하고 Enter를 누르세요"
               className="w-full p-3 bg-white rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
             />
+            {filteredStacks.length > 0 && (
+              <ul className="border border-gray-300 bg-white rounded-md mt-1 max-h-40 overflow-y-auto z-10 absolute w-105">
+                {filteredStacks.map((stack, idx) => (
+                  <li
+                    key={stack}
+                    className={`px-4 py-2 cursor-pointer ${idx === activeIndex ? "bg-gray-100" : "hover:bg-gray-100"}`}
+                    onClick={() => addSkill(stack)}
+                  >
+                    {stack}
+                  </li>
+                ))}
+              </ul>
+            )}
             {errors.skills && (
               <p className="text-red-500 text-sm mt-1">{errors.skills}</p>
             )}
@@ -239,7 +308,7 @@ export default function ProfileEditModal({
                 >
                   <span>{skill}</span>
                   <button
-                    onClick={() => handleSkillRemove(skill)}
+                    onClick={() => removeSkill(skill)}
                     className="text-white hover:bg-deep rounded-full p-0.5"
                     aria-label={`${skill} 제거`}
                   >

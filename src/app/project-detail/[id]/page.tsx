@@ -89,7 +89,7 @@ export default async function ProjectDetailPage({
     .from("tech_stacks")
     .select("*")
     .in("id", project.project_tech_stacks);
-  const techStackNames: string[] = techStack?.map((t) => t.name);
+  const techStackNames: string[] = techStack?.map((t) => t.name) ?? [];
 
   // 모집 기간 포맷팅: created_at ~ deadline (M.D~M.D 형식)
   const formatDate = (dateString: string) => {
@@ -121,7 +121,8 @@ export default async function ProjectDetailPage({
     status: project.status || "true", // "true" = 모집중, "false" = 모집완료
     teamSize:
       project.project_positions.reduce(
-        (sum, pos) => sum + (pos.recruit_count || 0),
+        (sum: number, pos: { recruit_count?: number }) =>
+          sum + (pos.recruit_count || 0),
         0,
       ) || 0,
   };

@@ -60,7 +60,7 @@ export async function fetchProjects(
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const overDateProject = projectData
+    const overDateProject = (projectData ?? [])
       .filter((p) => new Date(p.deadline) < today)
       .map((p) => p.id);
 
@@ -129,7 +129,8 @@ export async function fetchProjects(
         careers?.find((c) => c.id === owner?.career_id)?.name ?? "경력 없음";
       const memberCount =
         p.project_positions?.reduce(
-          (sum, pos) => sum + (pos.recruit_count ?? 0),
+          (sum: number, pos: { recruit_count?: number }) =>
+            sum + (pos.recruit_count ?? 0),
           0,
         ) ?? 0;
 
