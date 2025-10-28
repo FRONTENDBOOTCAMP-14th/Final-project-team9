@@ -1,5 +1,5 @@
 import type { KeyboardEvent } from "react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Button from "@/components/common/Button";
 import Dropdown from "@/components/common/input/Dropdown";
 import { useFetchStacks } from "@/hooks/useFetchStacks";
@@ -53,10 +53,10 @@ export default function ProfileEditModal({
   const { selectedValues, setSelected, resetAll } = useDropdownStore();
 
   // 모달 닫기 핸들러 (Dropdown 스토어 리셋 포함)
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     resetAll(); // Dropdown 스토어 초기화
     onClose();
-  };
+  }, [onClose, resetAll]);
 
   // 1. 모달 접근성 관련 로직
   useModalAccessibility(modalRef, handleClose);
