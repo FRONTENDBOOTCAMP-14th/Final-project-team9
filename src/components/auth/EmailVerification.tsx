@@ -63,7 +63,7 @@ const EmailVerification = ({
       // --- 회원가입 인증 코드 요청 ---
       const { error: signUpError } = await supabase.auth.signUp({
         email,
-        password,
+        password: password ?? "",
         options: {
           data: { username },
         },
