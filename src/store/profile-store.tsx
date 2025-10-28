@@ -15,7 +15,7 @@ interface ProfileActions {
   setInitialState: (initialData: UserProfileCardProps) => void;
   updateProfile: (
     updatedData: EditableProfileData,
-    imageFile: File | null
+    imageFile: File | null,
   ) => Promise<void>;
   openModal: () => void;
   closeModal: () => void;

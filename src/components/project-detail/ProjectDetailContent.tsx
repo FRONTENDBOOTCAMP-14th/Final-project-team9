@@ -29,7 +29,7 @@ export default function ProjectDetailContent({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClosed, setIsClosed] = useState(project.status === "false");
   const [applicantCount, setApplicantCount] = useState(
-    project.applicantCount || 0
+    project.applicantCount || 0,
   );
   const [hasApplied, setHasApplied] = useState(false);
 
