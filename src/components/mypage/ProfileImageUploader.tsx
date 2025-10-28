@@ -21,7 +21,7 @@ const PlusIcon = () => (
 interface ProfileImageUploaderProps {
   profile_image: string;
   username: string;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 

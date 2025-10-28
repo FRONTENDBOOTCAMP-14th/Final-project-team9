@@ -15,11 +15,16 @@ interface SearchFilterSectionProps {
 export default function SearchFilterSection({
   onSearch,
 }: SearchFilterSectionProps) {
-  const [options, setOptions] = useState({
+  const [options, setOptions] = useState<{
+    positions: string[];
+    fields: string[];
+    domains: string[];
+  }>({
     positions: [],
     fields: [],
     domains: [],
   });
+
   const filters = useSearchFilterStore((state) => state.filters);
   const setPosition = useSearchFilterStore((state) => state.setPosition);
   const setDuration = useSearchFilterStore((state) => state.setDuration);
