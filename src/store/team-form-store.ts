@@ -38,7 +38,7 @@ interface TeamFormState {
   // 액션들
   updateTeamData: (
     field: keyof TeamData,
-    value: TeamData[keyof TeamData]
+    value: TeamData[keyof TeamData],
   ) => void;
   setTechStackInput: (value: string) => void;
   setPreferencesInput: (value: string) => void;
@@ -184,7 +184,7 @@ export const useTeamFormStore = create<TeamFormState>((set, _get) => ({
             positions: state.teamData.positions.filter((_, i) => i !== index),
           },
           positionDropdownOpen: state.positionDropdownOpen.filter(
-            (_, i) => i !== index
+            (_, i) => i !== index,
           ),
         };
       }

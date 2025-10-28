@@ -140,5 +140,5 @@ export const useRegisterProjectStore = create<RegisterProjectState>(
         formData: initialFormData,
         errors: initialErrors,
       }),
-  })
+  }),
 );

@@ -165,7 +165,7 @@ const EmailVerification = ({
             value={authCode}
             onChange={(e) => {
               const sanitized = normalizeWhitespace(
-                sanitizeHTML(e.target.value)
+                sanitizeHTML(e.target.value),
               );
               setAuthCode(sanitized);
             }}
