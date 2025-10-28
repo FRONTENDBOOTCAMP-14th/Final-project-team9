@@ -1,4 +1,11 @@
 import { create } from "zustand";
+import {
+  sanitizeProjectName,
+  sanitizeDescription,
+  normalizeWhitespace,
+  isValidFutureDate,
+  meetsMinLength,
+} from "@/utils/sanitize";
 
 export interface FormData {
   projectName: string;
@@ -57,17 +64,23 @@ export const useRegisterProjectStore = create<RegisterProjectState>(
     updateField: (field, value) => {
       const state = get();
 
-      // 글자 수 제한 검증
-      if (field === "projectName" && value.length > 30) {
-        return;
-      }
-      if (field === "description" && value.length > 100) {
-        return;
+      // 입력값 살균처리
+      let sanitizedValue = value;
+
+      if (field === "projectName") {
+        // 프로젝트 이름: HTML 태그 제거, 공백 정규화, 길이 제한
+        sanitizedValue = sanitizeProjectName(value, 30);
+      } else if (field === "description") {
+        // 설명: HTML 태그 제거, 과도한 줄바꿈 제거, 길이 제한
+        sanitizedValue = sanitizeDescription(value, 100);
+      } else if (field === "category") {
+        // 카테고리: 공백 정규화
+        sanitizedValue = normalizeWhitespace(value);
       }
 
       // 필드 업데이트 및 해당 오류 메시지 초기화
       set({
-        formData: { ...state.formData, [field]: value },
+        formData: { ...state.formData, [field]: sanitizedValue },
         errors: { ...state.errors, [field]: "" },
       });
     },
@@ -88,8 +101,12 @@ export const useRegisterProjectStore = create<RegisterProjectState>(
       };
 
       // 프로젝트 이름 검증
-      if (formData.projectName.trim() === "") {
+      const trimmedProjectName = formData.projectName.trim();
+      if (trimmedProjectName === "") {
         newErrors.projectName = "프로젝트 이름을 입력해주세요";
+        hasError = true;
+      } else if (trimmedProjectName.length < 2) {
+        newErrors.projectName = "프로젝트 이름은 최소 2자 이상이어야 합니다";
         hasError = true;
       }
 
@@ -103,10 +120,13 @@ export const useRegisterProjectStore = create<RegisterProjectState>(
       if (formData.deadline === "") {
         newErrors.deadline = "모집 마감일을 선택해주세요";
         hasError = true;
+      } else if (!isValidFutureDate(formData.deadline)) {
+        newErrors.deadline = "마감일은 오늘 이후의 날짜여야 합니다";
+        hasError = true;
       }
 
       // 프로젝트 간단 소개 최소 글자 수 검증
-      if (formData.description.length < 10) {
+      if (!meetsMinLength(formData.description, 10)) {
         newErrors.description = "최소 10자 이상 입력해주세요";
         hasError = true;
       }
@@ -120,5 +140,5 @@ export const useRegisterProjectStore = create<RegisterProjectState>(
         formData: initialFormData,
         errors: initialErrors,
       }),
-  }),
+  })
 );
