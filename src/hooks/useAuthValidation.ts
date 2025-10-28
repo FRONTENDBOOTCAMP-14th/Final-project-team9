@@ -75,7 +75,7 @@ export const usePasswordValidation = (initialValue = "") => {
     setValue(newValue);
     if (!PW_REGEX.test(newValue)) {
       setError(
-        "비밀번호는 8자 이상, 대/소문자, 숫자, 특수문자를 포함해야 합니다."
+        "비밀번호는 8자 이상, 대/소문자, 숫자, 특수문자를 포함해야 합니다.",
       );
     } else {
       setError(null);

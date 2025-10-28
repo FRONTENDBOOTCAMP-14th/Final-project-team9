@@ -33,7 +33,7 @@ interface UseSanitizedInputOptions {
  */
 export function useSanitizedInput(
   initialValue = "",
-  options: UseSanitizedInputOptions = {}
+  options: UseSanitizedInputOptions = {},
 ) {
   const { mode = "text", maxLength, minLength, onValidationError } = options;
 
@@ -62,7 +62,7 @@ export function useSanitizedInput(
           return normalizeWhitespace(sanitizeHTML(input));
       }
     },
-    [mode, maxLength]
+    [mode, maxLength],
   );
 
   const validate = useCallback(
@@ -79,14 +79,14 @@ export function useSanitizedInput(
 
       return "";
     },
-    [minLength, maxLength]
+    [minLength, maxLength],
   );
 
   const handleChange = useCallback(
     (
       e:
         | React.ChangeEvent<HTMLInputElement>
-        | React.ChangeEvent<HTMLTextAreaElement>
+        | React.ChangeEvent<HTMLTextAreaElement>,
     ) => {
       const rawValue = e.target.value;
       const sanitized = sanitize(rawValue);
@@ -100,7 +100,7 @@ export function useSanitizedInput(
         onValidationError(validationError);
       }
     },
-    [sanitize, validate, onValidationError]
+    [sanitize, validate, onValidationError],
   );
 
   const reset = useCallback(() => {
@@ -132,7 +132,7 @@ export function sanitizeOnChange(
     | React.ChangeEvent<HTMLInputElement>
     | React.ChangeEvent<HTMLTextAreaElement>,
   mode: SanitizeMode = "text",
-  maxLength?: number
+  maxLength?: number,
 ): string {
   const value = e.target.value;
 

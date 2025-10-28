@@ -17,7 +17,7 @@ export function sanitizeHTML(input: string): string {
   // 스크립트 관련 위험한 문자열 제거
   sanitized = sanitized.replace(
     /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-    ""
+    "",
   );
 
   // 이벤트 핸들러 속성 제거 (onclick, onerror 등)
@@ -146,7 +146,7 @@ export function sanitizeArray<T>(items: T[]): T[] {
 export function isValidNumber(
   value: number,
   min: number,
-  max: number
+  max: number,
 ): boolean {
   return !isNaN(value) && value >= min && value <= max;
 }
