@@ -1,5 +1,5 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image'
+import Link from 'next/link'
 
 export default function Logo() {
   return (
@@ -10,7 +10,8 @@ export default function Logo() {
         width={127}
         height={42}
         priority
+        className="h-auto w-auto"
       />
     </Link>
-  );
+  )
 }

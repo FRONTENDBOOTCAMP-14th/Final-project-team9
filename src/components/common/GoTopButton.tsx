@@ -1,14 +1,14 @@
-"use client";
+'use client'
 
-import Image from "next/image";
+import Image from 'next/image'
 
 export default function GoTopButton() {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth",
-    });
-  };
+      behavior: 'smooth',
+    })
+  }
 
   return (
     <button
@@ -17,7 +17,13 @@ export default function GoTopButton() {
       className="fixed bottom-[50px] right-[50px] w-[80px] h-[80px] bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 focus:outline-none flex items-center justify-center cursor-pointer"
       type="button"
     >
-      <Image src="/assets/go-top.svg" alt="위로 이동" width={58} height={50} />
+      <Image
+        src="/assets/go-top.svg"
+        alt="위로 이동"
+        width={58}
+        height={50}
+        className="w-14.5 h-12.5"
+      />
     </button>
-  );
+  )
 }
