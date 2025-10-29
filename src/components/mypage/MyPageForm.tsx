@@ -7,8 +7,8 @@ import UserProfileCard from "@/components/mypage/Profile";
 import Taps from "@/components/mypage/Taps";
 import { supabase } from "@/lib/supabase";
 import { useFavoriteStore } from "@/store/favorite-store";
-import type { UserData } from "@/types/project";
 import { useToastStore } from "@/store/toast-store";
+import type { UserData } from "@/types/project";
 
 type ExtendedUserData = UserData & {
   tech_stacks?: string[];

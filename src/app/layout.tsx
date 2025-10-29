@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "@/styles/main.css";
-import { minSans } from "@/fonts";
 import GlobalToast from "@/components/common/GlobalToast";
+import { minSans } from "@/fonts";
 
 export const metadata: Metadata = {
   title: "Create Next App",

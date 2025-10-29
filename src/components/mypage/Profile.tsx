@@ -2,8 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import useScrollLock from "@/hooks/useScrollLock";
-import ProfileEditModal from "./ProfileModal";
 import { useToastStore } from "@/store/toast-store";
+import ProfileEditModal from "./ProfileModal";
 
 // SVG 아이콘 컴포넌트들
 const SettingsIcon = () => (
@@ -90,7 +90,7 @@ export default function UserProfileCard(props: UserProfileCardProps) {
   };
 
   const handleSaveProfile = (
-    updatedUser: Omit<UserProfileCardProps, "projectCounts">
+    updatedUser: Omit<UserProfileCardProps, "projectCounts">,
   ) => {
     // 실제 애플리케이션에서는 여기서 API 호출 등을 통해 서버에 데이터를 저장합니다.
     showToast("프로필이 성공적으로 저장되었습니다.", "success");

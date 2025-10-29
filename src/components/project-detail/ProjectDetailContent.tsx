@@ -9,8 +9,8 @@ import ApplyModal from "@/components/project-detail/ApplyModal";
 import RecruitmentButton from "@/components/project-detail/RecruitmentButton";
 import type { ProjectStatus } from "@/constants/project";
 import { supabase } from "@/lib/supabase";
-import type { ProjectDetail } from "@/types/project";
 import { useToastStore } from "@/store/toast-store";
+import type { ProjectDetail } from "@/types/project";
 
 interface ProjectDetailContentProps {
   project: ProjectDetail;
@@ -28,7 +28,7 @@ export default function ProjectDetailContent({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClosed, setIsClosed] = useState(project.status === "false");
   const [applicantCount, setApplicantCount] = useState(
-    project.applicantCount || 0
+    project.applicantCount || 0,
   );
   const [hasApplied, setHasApplied] = useState(false);
 

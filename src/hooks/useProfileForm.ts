@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
 import type { UserProfileCardProps } from "@/components/mypage/Profile";
 import useProfileStore from "@/store/profile-store";
+import { useToastStore } from "@/store/toast-store";
 import {
   sanitizeHTML,
   sanitizeDescription,
   normalizeWhitespace,
 } from "@/utils/sanitize";
-import { useToastStore } from "@/store/toast-store";
 
 const MAX_SKILLS = 3;
 const MAX_INTRODUCTION_LENGTH = 100;
 
 export function useProfileForm(
   initialUser: Omit<UserProfileCardProps, "projectCounts">,
-  onSave: (updatedUser: Omit<UserProfileCardProps, "projectCounts">) => void
+  onSave: (updatedUser: Omit<UserProfileCardProps, "projectCounts">) => void,
 ) {
   // 기본값을 명시하여 런타임에 일부 필드가 없을 때 발생하는 에러를 방지
   const defaultInitial = {
@@ -114,7 +114,7 @@ export function useProfileForm(
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     // 살균처리 적용

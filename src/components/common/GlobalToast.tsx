@@ -1,7 +1,7 @@
 "use client";
 
-import { useToastStore } from "@/store/toast-store";
 import SuccessToast from "@/components/project-detail/SuccessToast";
+import { useToastStore } from "@/store/toast-store";
 // (옵션) 나중에 에러 토스트도 만들면 여기서 분기 처리
 // import ErrorToast from "@/components/common/ErrorToast";
 

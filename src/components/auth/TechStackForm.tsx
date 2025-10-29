@@ -7,8 +7,8 @@ import Button from "@/components/common/Button";
 import TagList from "@/components/common/tag/TagList";
 import { useFetchStacks } from "@/hooks/useFetchStacks";
 import { supabase } from "@/lib/supabase";
-import { sanitizeHTML, normalizeWhitespace } from "@/utils/sanitize";
 import { useToastStore } from "@/store/toast-store";
+import { sanitizeHTML, normalizeWhitespace } from "@/utils/sanitize";
 
 const MAX_STACK_COUNT = 3;
 
@@ -31,7 +31,7 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
       const filtered = allStacksFromDB.filter(
         (stack) =>
           stack.toLowerCase().includes(searchTerm.toLowerCase()) &&
-          !selectedStacks.includes(stack)
+          !selectedStacks.includes(stack),
       );
       setFilteredStacks(filtered);
     } else {
@@ -52,7 +52,7 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
 
   const handleRemoveStack = (stackToRemove: string) => {
     setSelectedStacks(
-      selectedStacks.filter((stack) => stack !== stackToRemove)
+      selectedStacks.filter((stack) => stack !== stackToRemove),
     );
   };
 
@@ -64,7 +64,7 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setActiveIndex(
-        (prev) => (prev - 1 + filteredStacks.length) % filteredStacks.length
+        (prev) => (prev - 1 + filteredStacks.length) % filteredStacks.length,
       );
     } else if (e.key === "Enter" && activeIndex >= 0) {
       e.preventDefault();
@@ -145,7 +145,7 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
               value={searchTerm}
               onChange={(e) => {
                 const sanitized = normalizeWhitespace(
-                  sanitizeHTML(e.target.value)
+                  sanitizeHTML(e.target.value),
                 );
                 setSearchTerm(sanitized);
               }}

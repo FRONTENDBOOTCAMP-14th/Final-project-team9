@@ -6,8 +6,8 @@ import Button from "@/components/common/Button";
 import LabeledInput from "@/components/common/LabeledInput";
 import PasswordInput from "@/components/common/PasswordInput";
 import { supabase } from "@/lib/supabase";
-import { sanitizeHTML, normalizeWhitespace } from "@/utils/sanitize";
 import { useToastStore } from "@/store/toast-store";
+import { sanitizeHTML, normalizeWhitespace } from "@/utils/sanitize";
 
 const LoginForm = () => {
   const router = useRouter();

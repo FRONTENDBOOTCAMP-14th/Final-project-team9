@@ -15,7 +15,7 @@ interface ProfileActions {
   setInitialState: (initialData: UserProfileCardProps) => void;
   updateProfile: (
     updatedData: EditableProfileData,
-    imageFile: File | null
+    imageFile: File | null,
   ) => Promise<void>;
   openModal: () => void;
   closeModal: () => void;
@@ -151,7 +151,7 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
               if (!careerData) {
                 const normalizedCareer = dbCareerName.replace(/\s/g, "");
                 careerData = allCareers.find(
-                  (c) => c.name.replace(/\s/g, "") === normalizedCareer
+                  (c) => c.name.replace(/\s/g, "") === normalizedCareer,
                 );
               }
             }
