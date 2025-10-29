@@ -29,7 +29,15 @@ const CloseIcon = () => (
 // 상수 분리
 const MAX_SKILLS = 3;
 const MAX_INTRODUCTION_LENGTH = 100;
-const FIELD_OPTIONS = ["프론트엔드", "백엔드", "기획자", "디자이너"];
+const FIELD_OPTIONS = [
+  "프론트엔드",
+  "백엔드",
+  "기획자",
+  "디자이너",
+  "풀스택",
+  "PM",
+  "기타",
+];
 const EXPERIENCE_OPTIONS = [
   "신입(1년 미만)",
   "주니어(1~3년)",
