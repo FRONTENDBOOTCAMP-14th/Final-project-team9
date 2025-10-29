@@ -133,7 +133,7 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
       <form onSubmit={(e) => void handleSubmit(e)} className="flex flex-col">
         <div className="relative">
           <div className="w-full h-[80px] rounded-[10px] border border-gray-300 bg-white flex items-center justify-between px-[30px]">
-            <span className="text-black text-[24px] flex-shrink-0 mr-4">
+            <span className="text-deep text-[24px] flex-shrink-0 mr-4 cursor-default">
               Tech Stack
             </span>
             <input
@@ -148,7 +148,7 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
               onKeyDown={handleKeyDown}
               placeholder={placeholderText}
               disabled={isMaxSelected}
-              className="flex-grow h-full bg-transparent text-[24px] text-black placeholder:text-[#D9D9D9] focus:outline-none disabled:bg-transparent"
+              className="flex-grow h-full bg-transparent text-[24px] text-black placeholder:text-gray focus:outline-none disabled:bg-transparent"
               autoComplete="off"
             />
           </div>

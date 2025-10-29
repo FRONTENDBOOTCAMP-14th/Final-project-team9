@@ -89,7 +89,7 @@ const LoginForm = () => {
         <Button
           type="submit"
           size="lg"
-          className="w-full h-[80px] text-[24px] mt-[40px]"
+          className="w-full h-[80px] text-[24px] mt-[40px] cursor-pointer"
         >
           로그인
         </Button>

@@ -149,7 +149,7 @@ const EmailVerification = ({
         <Button
           type="button"
           variant="secondary"
-          className="h-[80px] w-[104px] rounded-[10px] border-[1px] border-white text-[#DBDBDB] text-[24px]"
+          className="h-[80px] w-[104px] rounded-[10px] border-[1px] border-white text-gray text-[24px] cursor-pointer"
           onClick={() => void sendAuthCode()}
           disabled={totalDisabled || isAuthCodeSent || isVerified}
         >
@@ -175,7 +175,7 @@ const EmailVerification = ({
           <Button
             type="button"
             variant="secondary"
-            className="h-[80px] w-[104px] rounded-[10px] border-[1px] border-[white] text-[#DBDBDB] text-[18px]"
+            className="h-[80px] w-[104px] rounded-[10px] border-[1px] border-[white] text-gray text-[18px] cursor-pointer"
             onClick={() => void verifyAuthCode()}
             disabled={totalDisabled || isVerified}
           >

@@ -174,7 +174,7 @@ export default function ProfileEditModal({
       `}</style>
       <div
         ref={modalRef}
-        className="bg-[#e9fafe] rounded-2xl px-[90px] py-8 shadow-2xl w-full max-w-[600px] flex flex-col relative max-h-[90vh] overflow-y-auto"
+        className="bg-[#e9fafe] rounded-2xl px-[90px] py-7 shadow-2xl w-full max-w-[600px] flex flex-col relative max-h-[95vh] overflow-y-auto"
       >
         <ProfileImageUploader
           profile_image={formData.profile_image}
@@ -320,16 +320,16 @@ export default function ProfileEditModal({
             {errors.skills && (
               <p className="text-red-500 text-sm mt-1">{errors.skills}</p>
             )}
-            <div className="flex gap-2 mt-2 flex-wrap">
+            <div className="flex gap-2 mt-3 flex-wrap">
               {formData.tech_stacks.map((skill) => (
                 <div
                   key={skill}
-                  className="bg-primary text-white text-sm font-bold px-3 py-1 rounded-full flex items-center gap-2"
+                  className="bg-primary text-white text-sm font-bold px-3 py-1 rounded-full flex items-center gap-2 cursor-default"
                 >
                   <span>{skill}</span>
                   <button
                     onClick={() => removeSkill(skill)}
-                    className="text-white hover:bg-deep rounded-full p-0.5"
+                    className="text-white hover:bg-deep rounded-full p-0.5 cursor-pointer"
                     aria-label={`${skill} 제거`}
                   >
                     <CloseIcon />
@@ -344,7 +344,7 @@ export default function ProfileEditModal({
           <Button
             size="xl"
             onClick={handleClose}
-            className="bg-gray-300 text-gray-700 !h-[70px]"
+            className="bg-gray-300 text-gray-700 !h-[70px] cursor-pointer"
           >
             <span>취소</span>
           </Button>
@@ -356,7 +356,7 @@ export default function ProfileEditModal({
                 handleClose();
               })();
             }}
-            className="border- !h-[70px]"
+            className="border- !h-[70px] cursor-pointer"
           >
             <span>완료</span>
           </Button>

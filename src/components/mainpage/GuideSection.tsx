@@ -31,7 +31,7 @@ export default function GuideSection() {
       className="bg-[#E9fbff] pt-[300px] pb-[100px]"
       aria-labelledby="guide-section-heading"
     >
-      <div className="max-w-[1920px] mx-auto px-8">
+      <div className="max-w-[1920px] mx-auto px-16">
         <h2
           id="guide-section-heading"
           className={`text-center text-[length:var(--text-12)] font-bold text-[color:var(--color-primary)] mb-[24px] ${jalnan.className}`}
