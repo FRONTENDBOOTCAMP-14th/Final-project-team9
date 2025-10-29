@@ -19,15 +19,17 @@ import { useDetailFormStore } from "@/store/detail-form-store";
 import { useDropdownStore } from "@/store/dropdown-store";
 import { useRegisterProjectStore } from "@/store/register-project-store";
 import { useTeamFormStore } from "@/store/team-form-store";
+import { useToastStore } from "@/store/toast-store";
 
 export default function RegisterProjectClient() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [showToast, setShowToast] = useState(false);
+
   const router = useRouter();
   const baseFormRef = useRef<BaseFormRef>(null);
   const teamFormRef = useRef<TeamFormRef>(null);
   const detailFormRef = useRef<DetailFormRef>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const showToast = useToastStore((state) => state.showToast);
 
   // Store reset functions
   const resetBaseForm = useRegisterProjectStore((state) => state.resetForm);
@@ -53,7 +55,7 @@ export default function RegisterProjectClient() {
       } = await supabase.auth.getUser();
 
       if (userError || !user) {
-        alert("로그인이 필요합니다.");
+        showToast("로그인이 필요합니다.", "error");
         setIsSubmitting(false);
         return;
       }
@@ -106,7 +108,7 @@ export default function RegisterProjectClient() {
             }
 
             return { project_id: projectId, tech_stack_id: stack.id };
-          }),
+          })
         );
 
         await supabase.from("project_tech_stacks").insert(techStacksToInsert);
@@ -137,8 +139,7 @@ export default function RegisterProjectClient() {
         await supabase.from("project_preferences").insert(preferences);
       }
 
-      setShowToast(true);
-      // Toast가 보여진 후 완료 페이지로 이동
+      showToast("프로젝트가 성공적으로 등록되었습니다!", "success");
       setTimeout(() => {
         // 페이지 이동 전에 폼 데이터 초기화
         resetBaseForm();
@@ -149,8 +150,9 @@ export default function RegisterProjectClient() {
         router.push(`/register-project/complete?projectId=${projectId}`);
       }, 1500); // Toast가 보이는 시간을 확보
     } catch (error) {
-      console.error("프로젝트 등록 실패:", error);
-      alert("프로젝트 등록에 실패했습니다.");
+      const errorMessage =
+        error instanceof Error ? error.message : "알 수 없는 오류 발생";
+      showToast("프로젝트 등록 실패: " + errorMessage, "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -184,12 +186,6 @@ export default function RegisterProjectClient() {
 
   return (
     <>
-      <SuccessToast
-        isVisible={showToast}
-        onClose={() => setShowToast(false)}
-        message="프로젝트가 성공적으로 등록되었습니다!"
-      />
-
       {/* 스텝바 영역 - 555px 여백 */}
       <div className="px-[555px]">
         <Stepbar currentStep={currentStep} />
