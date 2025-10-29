@@ -29,7 +29,7 @@ const LoginForm = () => {
 
       const email = users.email;
 
-      const { data, error: signInError } =
+      const { data: _data, error: signInError } =
         await supabase.auth.signInWithPassword({
           email,
           password,
@@ -39,7 +39,7 @@ const LoginForm = () => {
 
       showToast("로그인되었습니다.", "success");
       router.push("/");
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       showToast("아이디 또는 비밀번호가 잘못되었습니다.", "error");
     }
   };

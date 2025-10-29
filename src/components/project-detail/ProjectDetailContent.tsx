@@ -50,7 +50,7 @@ export default function ProjectDetailContent({
           .single();
 
         setHasApplied(!!data);
-      } catch (error) {
+      } catch (_error) {
         showToast("지원 여부를 확인하는 데 실패했습니다.", "error");
       }
     };
@@ -70,7 +70,7 @@ export default function ProjectDetailContent({
       if (!error && data) {
         setApplicantCount(data.applicant_count || 0);
       }
-    } catch (error) {}
+    } catch (_error) {}
   };
 
   // 지원하기 버튼 클릭 핸들러
@@ -88,7 +88,7 @@ export default function ProjectDetailContent({
 
       // 로그인된 경우 모달 열기
       setIsModalOpen(true);
-    } catch (error) {
+    } catch (_error) {
       showToast("로그인 상태 확인에 실패했습니다.", "error");
       router.push("/login");
     }
@@ -111,7 +111,7 @@ export default function ProjectDetailContent({
       if (onStatusChange) {
         onStatusChange("false");
       }
-    } catch (error) {
+    } catch (_error) {
       showToast("모집 마감에 실패했습니다. 다시 시도해주세요.", "error");
     }
   };
@@ -125,7 +125,7 @@ export default function ProjectDetailContent({
     try {
       await navigator.clipboard.writeText(project.ownerEmail);
       showToast("이메일이 클립보드에 복사되었습니다", "success");
-    } catch (err) {
+    } catch (_err) {
       showToast("이메일 복사에 실패했습니다. 다시 시도해주세요.", "error");
     }
   };
@@ -398,7 +398,7 @@ export default function ProjectDetailContent({
 
               setIsModalOpen(false);
               showToast("지원이 완료되었습니다", "success");
-            } catch (error) {
+            } catch (_error) {
               showToast("지원에 실패했습니다. 다시 시도해주세요.", "error");
             }
           })();
