@@ -74,7 +74,7 @@ export default function MainPageButton() {
         <button
           key={button.href}
           onClick={() => void handleClick(button)}
-          className={`${jalnan.className} ${buttonBaseStyles}`}
+          className={`${jalnan.className} ${buttonBaseStyles}  cursor-pointer`}
           aria-label={button.ariaLabel}
         >
           <span>{button.text}</span>

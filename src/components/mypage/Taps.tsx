@@ -558,7 +558,7 @@ export default function ProjectTabs({ userId, onProjectCountsChange }: Props) {
   const activeProjects = projects;
 
   return (
-    <div className=" mx-auto px-30 my-12">
+    <div className=" mx-auto px-36 mt-12 mb-20">
       {/* 탭 네비게이션 */}
       <div className="flex pt-[60px] pl-[50px] gap-[50px]">
         {TABS.map((tab) => (

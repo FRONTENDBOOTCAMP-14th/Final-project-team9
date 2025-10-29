@@ -153,7 +153,7 @@ const ProfileForm = () => {
 
   return (
     <div className="w-full max-w-[615px]">
-      <div className="flex justify-center mb-[50px]">
+      <div className="flex justify-center mb-[48px]">
         {/* 프로필 사진 업로드 부분 */}
         <button
           type="button"

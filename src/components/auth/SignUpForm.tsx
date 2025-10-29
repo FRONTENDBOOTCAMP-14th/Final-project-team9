@@ -107,7 +107,7 @@ const SignUpForm = () => {
           error={idError ?? ""}
           disabled={isVerified}
         />
-        <div className="mt-[20px]">
+        <div className="mt-[18px]">
           <PasswordInput
             id="signup-password"
             label="비밀번호"
@@ -118,7 +118,7 @@ const SignUpForm = () => {
             disabled={isVerified}
           />
         </div>
-        <div className="mt-[20px]">
+        <div className="mt-[18px]">
           <PasswordInput
             id="signup-password-confirm"
             label="비밀번호 확인"
@@ -129,7 +129,7 @@ const SignUpForm = () => {
             disabled={isVerified}
           />
         </div>
-        <div className="mt-[20px]">
+        <div className="mt-[18px]">
           <EmailVerification
             email={email}
             setEmail={setEmail}

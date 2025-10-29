@@ -159,10 +159,10 @@ export default async function ProjectSection() {
       className="bg-[#E9fbff] py-[100px]"
       aria-labelledby="project-section-heading"
     >
-      <div className="max-w-[1920px] mx-auto px-8">
+      <div className="max-w-[1920px] mx-auto px-12">
         <h2
           id="project-section-heading"
-          className={`text-center text-[length:var(--text-12)] font-bold text-[color:var(--color-primary)] mt-[150px] mb-[30px] ${jalnan.className}`}
+          className={`text-center text-[length:var(--text-12)] font-bold text-[color:var(--color-primary)] mt-[150px] mb-[10px] ${jalnan.className}`}
         >
           진행중인 프로젝트
         </h2>
@@ -179,7 +179,7 @@ export default async function ProjectSection() {
           {statsData.map((stat, index) => (
             <article
               key={index}
-              className="bg-white rounded-[20px] w-[300px] h-[200px] flex flex-col items-center pt-[27px]"
+              className="bg-white shadow-lg rounded-[20px] w-[300px] h-[200px] flex flex-col items-center pt-[27px]"
               role="listitem"
             >
               <div className="flex items-center justify-center w-[43px] h-[43px] mb-[16px]">
@@ -206,7 +206,7 @@ export default async function ProjectSection() {
 
         {/* 프로젝트 카드 그리드 */}
         <div
-          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-[30px] gap-y-[30px] max-w-[2100px] mx-auto"
+          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-y-[30px] max-w-[2100px] mx-auto justify-items-center"
           role="list"
           aria-label="프로젝트 목록"
         >

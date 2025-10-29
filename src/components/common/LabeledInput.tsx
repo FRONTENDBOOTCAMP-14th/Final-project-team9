@@ -40,10 +40,10 @@ const LabeledInput = ({
   );
 
   const labelStyles = twMerge(
-    "absolute left-[30px] text-[#DBDBDB] transition-all duration-200 ease-in-out pointer-events-none",
+    "absolute left-[30px] text-gray transition-all duration-200 ease-in-out pointer-events-none",
     "top-[24px] text-[24px]",
-    "peer-focus:top-[12px] peer-focus:text-[16px] peer-focus:text-[#DBDBDB]",
-    "peer-[:not(:placeholder-shown)]:top-[12px] peer-[:not(:placeholder-shown)]:text-[16px] peer-[:not(:placeholder-shown)]:text-[#DBDBDB]",
+    "peer-focus:top-[12px] peer-focus:text-[16px] peer-focus:text-gray",
+    "peer-[:not(:placeholder-shown)]:top-[12px] peer-[:not(:placeholder-shown)]:text-[16px] peer-[:not(:placeholder-shown)]:text-gray",
   );
 
   return (
