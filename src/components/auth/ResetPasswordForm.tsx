@@ -25,7 +25,7 @@ const ResetPasswordForm = () => {
       if (!data.user) {
         showToast(
           "잘못된 접근입니다. 비밀번호 찾기를 다시 시도해주세요.",
-          "error"
+          "error",
         );
         router.replace("/find-password");
       }
@@ -83,7 +83,7 @@ const ResetPasswordForm = () => {
       await supabase.auth.signOut();
       showToast(
         "비밀번호가 성공적으로 변경되었습니다. 다시 로그인해주세요.",
-        "success"
+        "success",
       );
       router.push("/login");
     }

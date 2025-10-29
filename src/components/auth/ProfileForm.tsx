@@ -10,8 +10,8 @@ import Dropdown from "@/components/common/input/Dropdown"; // 팀원의 드롭�
 import LabeledInput from "@/components/common/LabeledInput";
 import { supabase } from "@/lib/supabase";
 import { useDropdownStore } from "@/store/dropdown-store";
-import { sanitizeHTML, sanitizeDescription } from "@/utils/sanitize";
 import { useToastStore } from "@/store/toast-store";
+import { sanitizeHTML, sanitizeDescription } from "@/utils/sanitize";
 
 const ProfileForm = () => {
   const router = useRouter();
@@ -20,7 +20,7 @@ const ProfileForm = () => {
   const [introduction, setIntroduction] = useState("");
   const { selectedValues } = useDropdownStore();
   const [profileImage, setProfileImage] = useState<string>(
-    "/assets/no-profile.svg"
+    "/assets/no-profile.svg",
   );
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -92,7 +92,7 @@ const ProfileForm = () => {
     if (userError || !user) {
       showToast(
         "사용자 정보를 불러오는데 실패했습니다. 다시 시도해주세요.",
-        "error"
+        "error",
       );
       return;
     }
@@ -126,7 +126,7 @@ const ProfileForm = () => {
       if (uploadError) {
         showToast(
           "프로필 이미지 업로드에 실패했습니다: " + uploadError.message,
-          "error"
+          "error",
         );
         return;
       }

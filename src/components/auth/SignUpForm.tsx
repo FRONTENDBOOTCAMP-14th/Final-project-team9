@@ -9,8 +9,8 @@ import {
   useIdValidation,
   usePasswordValidation,
 } from "@/hooks/useAuthValidation";
-import EmailVerification from "./EmailVerification";
 import { useToastStore } from "@/store/toast-store";
+import EmailVerification from "./EmailVerification";
 
 const SignUpForm = () => {
   const router = useRouter();
