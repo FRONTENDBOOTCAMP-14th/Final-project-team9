@@ -10,6 +10,7 @@ import Dropdown from "@/components/common/input/Dropdown"; // 팀원의 드롭�
 import LabeledInput from "@/components/common/LabeledInput";
 import { supabase } from "@/lib/supabase";
 import { useDropdownStore } from "@/store/dropdown-store";
+import { useToastStore } from "@/store/toast-store";
 import { sanitizeHTML, sanitizeDescription } from "@/utils/sanitize";
 
 const ProfileForm = () => {
@@ -19,10 +20,11 @@ const ProfileForm = () => {
   const [introduction, setIntroduction] = useState("");
   const { selectedValues } = useDropdownStore();
   const [profileImage, setProfileImage] = useState<string>(
-    "/assets/no-profile.svg"
+    "/assets/no-profile.svg",
   );
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const showToast = useToastStore((state) => state.showToast);
 
   // 드롭다운에 표시될 옵션들
   const positionOptions = [
@@ -50,13 +52,13 @@ const ProfileForm = () => {
     if (file) {
       // 이미지 파일인지 확인
       if (!file.type.startsWith("image/")) {
-        alert("이미지 파일만 업로드 가능합니다.");
+        showToast("이미지 파일만 업로드 가능합니다.", "error");
         return;
       }
 
       // 파일 크기 제한 (10MB)
       if (file.size > 10 * 1024 * 1024) {
-        alert("파일 크기는 10MB 이하여야 합니다.");
+        showToast("파일 크기는 10MB 이하여야 합니다.", "error");
         return;
       }
 
@@ -77,7 +79,10 @@ const ProfileForm = () => {
     const position = selectedValues["포지션"];
     const career = selectedValues["경력"];
 
-    if (!position || !career) return alert("포지션과 경력을 선택해주세요.");
+    if (!position || !career) {
+      showToast("포지션과 경력을 선택해주세요.", "error");
+      return;
+    }
 
     const {
       data: { user },
@@ -85,7 +90,10 @@ const ProfileForm = () => {
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      alert("회원가입을 다시 해주세요!");
+      showToast(
+        "사용자 정보를 불러오는데 실패했습니다. 다시 시도해주세요.",
+        "error",
+      );
       return;
     }
 
@@ -116,8 +124,10 @@ const ProfileForm = () => {
         .upload(filePath, profileImageFile);
 
       if (uploadError) {
-        console.error("이미지 업로드 실패:", uploadError);
-        alert("프로필 이미지 업로드에 실패했습니다.");
+        showToast(
+          "프로필 이미지 업로드에 실패했습니다: " + uploadError.message,
+          "error",
+        );
         return;
       }
 
@@ -141,8 +151,7 @@ const ProfileForm = () => {
     });
 
     if (insertError) {
-      console.error(insertError);
-      alert("프로필 등록에 실패했습니다.");
+      showToast("프로필 등록에 실패했습니다: " + insertError.message, "error");
       return;
     }
 
@@ -155,7 +164,7 @@ const ProfileForm = () => {
       });
     }
 
-    alert("프로필 등록 완료!");
+    showToast("프로필 등록 완료!", "success");
     router.push("/onboarding/tech-stack");
   };
 

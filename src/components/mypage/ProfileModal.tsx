@@ -111,8 +111,8 @@ export default function ProfileEditModal({
         allStacksFromDB.filter(
           (stack) =>
             stack.toLowerCase().includes(searchTerm.toLowerCase()) &&
-            !formData.tech_stacks.includes(stack)
-        )
+            !formData.tech_stacks.includes(stack),
+        ),
       );
     } else {
       setFilteredStacks([]);
@@ -128,7 +128,7 @@ export default function ProfileEditModal({
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setActiveIndex(
-        (prev) => (prev - 1 + filteredStacks.length) % filteredStacks.length
+        (prev) => (prev - 1 + filteredStacks.length) % filteredStacks.length,
       );
     } else if (e.key === "Enter" && activeIndex >= 0) {
       e.preventDefault();

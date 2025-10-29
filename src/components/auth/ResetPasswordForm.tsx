@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import PasswordInput from "@/components/common/PasswordInput";
 import { supabase } from "@/lib/supabase";
+import { useToastStore } from "@/store/toast-store";
 
 const ResetPasswordForm = () => {
   const router = useRouter();
@@ -14,7 +15,7 @@ const ResetPasswordForm = () => {
   const [confirmError, setConfirmError] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
-  const [formMessage, setFormMessage] = useState<string | null>(null);
+  const showToast = useToastStore((state) => state.showToast);
 
   const [disabledReason, setDisabledReason] = useState("");
 
@@ -22,7 +23,10 @@ const ResetPasswordForm = () => {
     const checkUser = async () => {
       const { data } = await supabase.auth.getUser();
       if (!data.user) {
-        alert("잘못된 접근입니다. 비밀번호 찾기를 다시 시도해주세요.");
+        showToast(
+          "잘못된 접근입니다. 비밀번호 찾기를 다시 시도해주세요.",
+          "error",
+        );
         router.replace("/find-password");
       }
     };
@@ -56,14 +60,13 @@ const ResetPasswordForm = () => {
 
   const handleResetSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setFormMessage(null);
 
     if (newPassword !== confirmPassword) {
       setConfirmError("비밀번호가 일치하지 않습니다");
       return;
     }
     if (passwordError || confirmError || !newPassword) {
-      alert("입력값을 확인해주세요.");
+      showToast("입력값을 확인해주세요.", "error");
       return;
     }
 
@@ -74,14 +77,14 @@ const ResetPasswordForm = () => {
     });
 
     if (error) {
-      setFormMessage("오류: " + error.message);
+      showToast("오류: " + error.message, "error");
       setIsLoading(false);
     } else {
-      setFormMessage(
-        "비밀번호가 성공적으로 변경되었습니다. 다시 로그인해주세요.",
-      );
       await supabase.auth.signOut();
-      alert("비밀번호가 성공적으로 변경되었습니다. 다시 로그인해주세요.");
+      showToast(
+        "비밀번호가 성공적으로 변경되었습니다. 다시 로그인해주세요.",
+        "success",
+      );
       router.push("/login");
     }
   };
@@ -131,18 +134,6 @@ const ResetPasswordForm = () => {
             disabled={isLoading}
           />
         </div>
-
-        {formMessage && (
-          <p
-            className={
-              formMessage.includes("오류")
-                ? "text-red-500 mt-2"
-                : "text-green-500 mt-2"
-            }
-          >
-            {formMessage}
-          </p>
-        )}
 
         <span id="reset-pw-disabled-reason" className="sr-only">
           {disabledReason}

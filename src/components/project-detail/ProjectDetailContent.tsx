@@ -7,9 +7,9 @@ import PreferenceTagList from "@/components/common/tag/PreferenceTagList";
 import TagList from "@/components/common/tag/TagList";
 import ApplyModal from "@/components/project-detail/ApplyModal";
 import RecruitmentButton from "@/components/project-detail/RecruitmentButton";
-import SuccessToast from "@/components/project-detail/SuccessToast";
 import type { ProjectStatus } from "@/constants/project";
 import { supabase } from "@/lib/supabase";
+import { useToastStore } from "@/store/toast-store";
 import type { ProjectDetail } from "@/types/project";
 
 interface ProjectDetailContentProps {
@@ -24,8 +24,7 @@ export default function ProjectDetailContent({
   onStatusChange,
 }: ProjectDetailContentProps) {
   const router = useRouter();
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
+  const showToast = useToastStore((state) => state.showToast);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClosed, setIsClosed] = useState(project.status === "false");
   const [applicantCount, setApplicantCount] = useState(
@@ -51,13 +50,13 @@ export default function ProjectDetailContent({
           .single();
 
         setHasApplied(!!data);
-      } catch (error) {
-        console.error("지원 여부 확인 실패:", error);
+      } catch (_error) {
+        showToast("지원 여부를 확인하는 데 실패했습니다.", "error");
       }
     };
 
     void checkIfApplied();
-  }, [project.id]);
+  }, [project.id, showToast]);
 
   // 지원자 수 실시간 조회
   const fetchApplicantCount = async () => {
@@ -71,9 +70,7 @@ export default function ProjectDetailContent({
       if (!error && data) {
         setApplicantCount(data.applicant_count || 0);
       }
-    } catch (error) {
-      console.error("지원자 수 조회 실패:", error);
-    }
+    } catch (_error) {}
   };
 
   // 지원하기 버튼 클릭 핸들러
@@ -91,8 +88,8 @@ export default function ProjectDetailContent({
 
       // 로그인된 경우 모달 열기
       setIsModalOpen(true);
-    } catch (error) {
-      console.error("로그인 상태 확인 실패:", error);
+    } catch (_error) {
+      showToast("로그인 상태 확인에 실패했습니다.", "error");
       router.push("/login");
     }
   };
@@ -108,32 +105,28 @@ export default function ProjectDetailContent({
       if (error) throw error;
 
       setIsClosed(true);
-      setToastMessage("마감 완료 되었습니다");
-      setShowToast(true);
+      showToast("마감 완료 되었습니다", "success");
 
       // 부모 컴포넌트에 상태 변경 알림
       if (onStatusChange) {
         onStatusChange("false");
       }
-    } catch (error) {
-      console.error("모집 마감 실패:", error);
-      alert("모집 마감에 실패했습니다. 다시 시도해주세요.");
+    } catch (_error) {
+      showToast("모집 마감에 실패했습니다. 다시 시도해주세요.", "error");
     }
   };
 
   const handleCopyEmail = async () => {
     if (!project.ownerEmail) {
-      console.error("이메일 주소가 없습니다.");
+      showToast("복사할 이메일 주소가 없습니다.", "error");
       return;
     }
 
     try {
       await navigator.clipboard.writeText(project.ownerEmail);
-      setToastMessage("이메일이 클립보드에 복사되었습니다");
-      setShowToast(true);
-    } catch (err) {
-      console.error("이메일 복사 실패:", err);
-      alert("이메일 복사에 실패했습니다. 다시 시도해주세요.");
+      showToast("이메일이 클립보드에 복사되었습니다", "success");
+    } catch (_err) {
+      showToast("이메일 복사에 실패했습니다. 다시 시도해주세요.", "error");
     }
   };
 
@@ -342,13 +335,6 @@ export default function ProjectDetailContent({
         </div>
       </div>
 
-      {/* 이메일 복사 성공 토스트 */}
-      <SuccessToast
-        isVisible={showToast}
-        onClose={() => setShowToast(false)}
-        message={toastMessage}
-      />
-
       {/* 지원하기 모달 */}
       <ApplyModal
         isOpen={isModalOpen}
@@ -356,15 +342,13 @@ export default function ProjectDetailContent({
         onSubmit={(data) => {
           void (async () => {
             try {
-              console.log("지원 데이터:", data);
-
               // 현재 로그인한 사용자 확인
               const {
                 data: { user },
               } = await supabase.auth.getUser();
 
               if (!user) {
-                alert("로그인이 필요합니다.");
+                showToast("로그인이 필요합니다.", "error");
                 return;
               }
 
@@ -382,7 +366,7 @@ export default function ProjectDetailContent({
               if (insertError) {
                 // 이미 지원한 경우 (UNIQUE 제약 위반)
                 if (insertError.code === "23505") {
-                  alert("이미 지원한 프로젝트입니다.");
+                  showToast("이미 지원한 프로젝트입니다.", "error");
                   return;
                 }
                 throw insertError;
@@ -413,11 +397,9 @@ export default function ProjectDetailContent({
               setHasApplied(true);
 
               setIsModalOpen(false);
-              setToastMessage("지원이 완료되었습니다");
-              setShowToast(true);
-            } catch (error) {
-              console.error("지원 실패:", error);
-              alert("지원에 실패했습니다. 다시 시도해주세요.");
+              showToast("지원이 완료되었습니다", "success");
+            } catch (_error) {
+              showToast("지원에 실패했습니다. 다시 시도해주세요.", "error");
             }
           })();
         }}

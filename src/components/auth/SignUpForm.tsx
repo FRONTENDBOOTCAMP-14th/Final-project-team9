@@ -9,6 +9,7 @@ import {
   useIdValidation,
   usePasswordValidation,
 } from "@/hooks/useAuthValidation";
+import { useToastStore } from "@/store/toast-store";
 import EmailVerification from "./EmailVerification";
 
 const SignUpForm = () => {
@@ -35,6 +36,7 @@ const SignUpForm = () => {
   const [isVerified, setIsVerified] = useState(false);
 
   const [submitDisabledReason, setSubmitDisabledReason] = useState("");
+  const showToast = useToastStore((state) => state.showToast);
 
   const handleConfirmChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -53,7 +55,10 @@ const SignUpForm = () => {
       setConfirmError("비밀번호가 일치하지 않습니다.");
       return;
     }
-    if (!isVerified) return alert("이메일 인증을 완료해주세요!");
+    if (!isVerified) {
+      showToast("이메일 인증을 완료해주세요!", "error");
+      return;
+    }
 
     router.push("/onboarding/profile");
   };

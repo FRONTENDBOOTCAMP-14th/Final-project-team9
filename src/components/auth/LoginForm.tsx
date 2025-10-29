@@ -6,13 +6,14 @@ import Button from "@/components/common/Button";
 import LabeledInput from "@/components/common/LabeledInput";
 import PasswordInput from "@/components/common/PasswordInput";
 import { supabase } from "@/lib/supabase";
+import { useToastStore } from "@/store/toast-store";
 import { sanitizeHTML, normalizeWhitespace } from "@/utils/sanitize";
 
 const LoginForm = () => {
   const router = useRouter();
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const showToast = useToastStore((state) => state.showToast);
 
   const handleLogin = async (username: string, password: string) => {
     try {
@@ -28,7 +29,7 @@ const LoginForm = () => {
 
       const email = users.email;
 
-      const { data, error: signInError } =
+      const { data: _data, error: signInError } =
         await supabase.auth.signInWithPassword({
           email,
           password,
@@ -36,17 +37,15 @@ const LoginForm = () => {
 
       if (signInError) throw signInError;
 
-      console.log("로그인 성공", data);
+      showToast("로그인되었습니다.", "success");
       router.push("/");
-    } catch (error: unknown) {
-      console.error(error);
-      setError("아이디 또는 비밀번호가 잘못되었습니다.");
+    } catch (_error: unknown) {
+      showToast("아이디 또는 비밀번호가 잘못되었습니다.", "error");
     }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
     await handleLogin(id, password);
   };
 
@@ -79,12 +78,6 @@ const LoginForm = () => {
             containerClassName="w-full h-[80px]"
           />
         </div>
-
-        {error && (
-          <p className="text-red-500 text-center mt-[10px] text-[16px]">
-            {error}
-          </p>
-        )}
 
         <Button
           type="submit"

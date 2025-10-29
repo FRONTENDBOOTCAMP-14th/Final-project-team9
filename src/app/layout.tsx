@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "@/styles/main.css";
+import GlobalToast from "@/components/common/GlobalToast";
 import { minSans } from "@/fonts";
 
 export const metadata: Metadata = {
@@ -14,7 +15,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${minSans.className} font-medium`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <GlobalToast />
+      </body>
     </html>
   );
 }
