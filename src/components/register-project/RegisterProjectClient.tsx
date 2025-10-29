@@ -3,7 +3,6 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
-import SuccessToast from "@/components/project-detail/SuccessToast";
 import BaseForm, {
   type BaseFormRef,
 } from "@/components/register-project/BaseForm";

@@ -61,16 +61,14 @@ const eslintConfig = [
       "react-hooks/exhaustive-deps": "warn",
 
       // 오류 방지 규칙
-      // 나중에 ? 줄에서 log 제거
       "no-duplicate-imports": "off",
       "no-console": isProductionMode
-        ? ["error", { allow: ["log", "warn", "error"] }]
+        ? ["error", { allow: ["warn", "error"] }]
         : ["warn", { allow: ["log", "warn", "error"] }],
 
       // Prettier 통합
       // 나중에 아랫줄 제거
-      // "prettier/prettier": "error",
-      "prettier/prettier": "warn",
+      "prettier/prettier": "error",
 
       // import 순서 관련 규칙
       "import/order": [

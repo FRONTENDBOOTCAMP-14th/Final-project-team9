@@ -1,5 +1,5 @@
-import Image from 'next/image'
-import { jalnan } from '@/fonts'
+import Image from "next/image";
+import { jalnan } from "@/fonts";
 
 export default function StartPromptSection() {
   return (
@@ -41,5 +41,5 @@ export default function StartPromptSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

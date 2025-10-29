@@ -1,4 +1,4 @@
-import type { NextConfig } from 'next'
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -7,10 +7,10 @@ const nextConfig: NextConfig = {
     qualities: [75, 100],
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'lxsrrjbliquipxytgnna.supabase.co',
-        port: '',
-        pathname: '/storage/v1/object/public/**',
+        protocol: "https",
+        hostname: "lxsrrjbliquipxytgnna.supabase.co",
+        port: "",
+        pathname: "/storage/v1/object/public/**",
       },
     ],
   },
@@ -22,6 +22,6 @@ const nextConfig: NextConfig = {
     // ignoreBuildErrors: true,
   },
   turbopack: {},
-}
+};
 
-export default nextConfig
+export default nextConfig;
