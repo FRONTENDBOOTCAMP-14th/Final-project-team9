@@ -1,29 +1,29 @@
-import Image from 'next/image'
-import { jalnan } from '@/fonts'
-import type { GuideStepData } from './types'
+import Image from "next/image";
+import { jalnan } from "@/fonts";
+import type { GuideStepData } from "./types";
 
 // 가이드 스텝 데이터
 const guideSteps: GuideStepData[] = [
   {
     step: 1,
-    icon: '/assets/step1.svg',
-    title: '프로젝트 등록',
+    icon: "/assets/step1.svg",
+    title: "프로젝트 등록",
     description:
-      '아이디어와 함께 제작할 팀원을\n찾는 프로젝트를 등록하거나\n조건에 맞는 프로젝트를 찾아보세요',
+      "아이디어와 함께 제작할 팀원을\n찾는 프로젝트를 등록하거나\n조건에 맞는 프로젝트를 찾아보세요",
   },
   {
     step: 2,
-    icon: '/assets/step2.svg',
-    title: '팀원 모집',
-    description: '해당 아이디어에 관심있는\n사용자들이 프로젝트에 지원합니다',
+    icon: "/assets/step2.svg",
+    title: "팀원 모집",
+    description: "해당 아이디어에 관심있는\n사용자들이 프로젝트에 지원합니다",
   },
   {
     step: 3,
-    icon: '/assets/step3.svg',
-    title: '프로젝트 진행',
-    description: '팀 구성을 완료하고\n함께 프로젝트를 진행하세요',
+    icon: "/assets/step3.svg",
+    title: "프로젝트 진행",
+    description: "팀 구성을 완료하고\n함께 프로젝트를 진행하세요",
   },
-]
+];
 
 export default function GuideSection() {
   return (
@@ -75,13 +75,13 @@ export default function GuideSection() {
               </h3>
               <p className="text-center text-[length:var(--text-6)] text-[color:var(--color-deep)] leading-relaxed break-keep">
                 {(() => {
-                  const lines = step.description.split('\n')
+                  const lines = step.description.split("\n");
                   return lines.map((line, index) => (
                     <span key={index}>
                       {line}
                       {index < lines.length - 1 && <br />}
                     </span>
-                  ))
+                  ));
                 })()}
               </p>
             </article>
@@ -89,5 +89,5 @@ export default function GuideSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

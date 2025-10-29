@@ -31,7 +31,7 @@ const ResetPasswordForm = () => {
       }
     };
     void checkUser();
-  }, [router]);
+  }, [router, showToast]);
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;

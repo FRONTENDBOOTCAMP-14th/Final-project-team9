@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import Image from 'next/image'
+import Image from "next/image";
 
 export default function GoTopButton() {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth',
-    })
-  }
+      behavior: "smooth",
+    });
+  };
 
   return (
     <button
@@ -25,5 +25,5 @@ export default function GoTopButton() {
         className="w-14.5 h-12.5"
       />
     </button>
-  )
+  );
 }
