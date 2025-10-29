@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import useScrollLock from "@/hooks/useScrollLock";
 import ProfileEditModal from "./ProfileModal";
+import { useToastStore } from "@/store/toast-store";
 
 // SVG 아이콘 컴포넌트들
 const SettingsIcon = () => (
@@ -70,6 +71,7 @@ export default function UserProfileCard(props: UserProfileCardProps) {
     ...props,
   });
   const blobUrlsRef = useRef<Set<string>>(new Set());
+  const showToast = useToastStore((state) => state.showToast);
 
   // props.projectCounts가 변경될 때마다 업데이트
   useEffect(() => {
@@ -91,7 +93,7 @@ export default function UserProfileCard(props: UserProfileCardProps) {
     updatedUser: Omit<UserProfileCardProps, "projectCounts">
   ) => {
     // 실제 애플리케이션에서는 여기서 API 호출 등을 통해 서버에 데이터를 저장합니다.
-    console.log("저장될 데이터:", updatedUser);
+    showToast("프로필이 성공적으로 저장되었습니다.", "success");
     setUserData((prev) => ({ ...prev, ...updatedUser }));
     setIsModalOpen(false);
     // 새로운 blob URL이라면 추적 목록에 추가

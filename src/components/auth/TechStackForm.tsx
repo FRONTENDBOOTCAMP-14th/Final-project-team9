@@ -8,6 +8,7 @@ import TagList from "@/components/common/tag/TagList";
 import { useFetchStacks } from "@/hooks/useFetchStacks";
 import { supabase } from "@/lib/supabase";
 import { sanitizeHTML, normalizeWhitespace } from "@/utils/sanitize";
+import { useToastStore } from "@/store/toast-store";
 
 const MAX_STACK_COUNT = 3;
 
@@ -17,6 +18,7 @@ interface TechStackSelectProps {
 
 const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
   const router = useRouter();
+  const showToast = useToastStore((state) => state.showToast);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredStacks, setFilteredStacks] = useState<string[]>([]);
   const [selectedStacks, setSelectedStacks] = useState<string[]>([]);
@@ -29,7 +31,7 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
       const filtered = allStacksFromDB.filter(
         (stack) =>
           stack.toLowerCase().includes(searchTerm.toLowerCase()) &&
-          !selectedStacks.includes(stack),
+          !selectedStacks.includes(stack)
       );
       setFilteredStacks(filtered);
     } else {
@@ -50,7 +52,7 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
 
   const handleRemoveStack = (stackToRemove: string) => {
     setSelectedStacks(
-      selectedStacks.filter((stack) => stack !== stackToRemove),
+      selectedStacks.filter((stack) => stack !== stackToRemove)
     );
   };
 
@@ -62,7 +64,7 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setActiveIndex(
-        (prev) => (prev - 1 + filteredStacks.length) % filteredStacks.length,
+        (prev) => (prev - 1 + filteredStacks.length) % filteredStacks.length
       );
     } else if (e.key === "Enter" && activeIndex >= 0) {
       e.preventDefault();
@@ -104,12 +106,14 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
         if (insertError) throw new Error("스택 저장 실패");
       }
 
-      console.log("최종 선택된 스택 저장 완료:", selectedStacks);
+      showToast("기술 스택이 저장되었습니다.", "success");
 
       router.push("/onboarding/complete");
     } catch (error: unknown) {
-      console.error(error);
-      alert(error instanceof Error ? error.message : "알 수 없는 오류 발생");
+      const errorMessage =
+        error instanceof Error ? error.message : "알 수 없는 오류 발생";
+
+      showToast(errorMessage, "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -141,7 +145,7 @@ const TechStackSelect = ({ nickname }: TechStackSelectProps) => {
               value={searchTerm}
               onChange={(e) => {
                 const sanitized = normalizeWhitespace(
-                  sanitizeHTML(e.target.value),
+                  sanitizeHTML(e.target.value)
                 );
                 setSearchTerm(sanitized);
               }}

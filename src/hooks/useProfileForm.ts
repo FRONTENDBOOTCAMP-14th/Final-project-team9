@@ -6,6 +6,7 @@ import {
   sanitizeDescription,
   normalizeWhitespace,
 } from "@/utils/sanitize";
+import { useToastStore } from "@/store/toast-store";
 
 const MAX_SKILLS = 3;
 const MAX_INTRODUCTION_LENGTH = 100;
@@ -41,6 +42,7 @@ export function useProfileForm(
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const { updateProfile } = useProfileStore();
+  const showToast = useToastStore((state) => state.showToast);
 
   // 이미지 Object URL 클린업
   useEffect(() => {
@@ -56,11 +58,11 @@ export function useProfileForm(
     const file = e.target.files?.[0];
     if (file) {
       if (!file.type.startsWith("image/")) {
-        alert("이미지 파일만 업로드 가능합니다.");
+        showToast("이미지 파일만 업로드 가능합니다.", "error");
         return;
       }
       if (file.size > 10 * 1024 * 1024) {
-        alert("파일 크기는 10MB 이하여야 합니다.");
+        showToast("파일 크기는 10MB 이하여야 합니다.", "error");
         return;
       }
       setProfileImageFile(file);
@@ -80,7 +82,7 @@ export function useProfileForm(
       ? formData.tech_stacks
       : [];
     if (currentSkills.length >= MAX_SKILLS) {
-      alert(`최대 ${MAX_SKILLS}개까지만 추가할 수 있습니다.`);
+      showToast(`최대 ${MAX_SKILLS}개까지만 추가할 수 있습니다.`, "error");
       return;
     }
     if (
@@ -88,7 +90,7 @@ export function useProfileForm(
         .map((s) => s.toLowerCase())
         .includes(trimmedSkill.toLowerCase())
     ) {
-      alert("이미 추가된 기술 스택입니다.");
+      showToast("이미 추가된 기술 스택입니다.", "error");
       return;
     }
     setFormData((prev) => ({
@@ -145,10 +147,22 @@ export function useProfileForm(
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    // 스토어의 액션을 호출하는 깔끔한 코드
-    await updateProfile(formData, profileImageFile);
+    try {
+      // 1. 스토어의 액션을 호출합니다. (이제 이 함수는 에러만 던집니다)
+      await updateProfile(formData, profileImageFile);
 
-    onSave(formData);
+      // 2. 로직이 여기까지 오면 성공한 것입니다. 성공 토스트를 띄웁니다.
+      showToast("프로필이 성공적으로 저장되었습니다.", "success");
+
+      // 3. 부모 컴포넌트(Profile.tsx)에 저장 완료를 알립니다.
+      onSave(formData);
+    } catch (error) {
+      // 4. updateProfile이 에러를 던지면 여기서 잡습니다. 에러 토스트를 띄웁니다.
+      console.error("프로필 저장 실패:", error); // (개발자를 위해 console.error는 남겨둡니다)
+      const errorMessage =
+        error instanceof Error ? error.message : "프로필 저장에 실패했습니다.";
+      showToast(errorMessage, "error");
+    }
   };
 
   return {

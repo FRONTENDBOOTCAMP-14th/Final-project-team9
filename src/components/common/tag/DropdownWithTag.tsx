@@ -2,6 +2,7 @@
 
 import { useDropdownStore } from "@/store/dropdown-store";
 import { useSearchFilterStore } from "@/store/search-filter-store";
+import { useToastStore } from "@/store/toast-store";
 import Tag from "./Tag";
 
 export default function DropdownWithTag() {
@@ -10,9 +11,10 @@ export default function DropdownWithTag() {
   const setDuration = useSearchFilterStore((state) => state.setDuration);
   const setField = useSearchFilterStore((state) => state.setField);
   const setDomain = useSearchFilterStore((state) => state.setDomain);
+  const showToast = useToastStore((state) => state.showToast);
 
   const handleRemove = (key: string) => {
-    console.log("태그 제거 전 selectedValues:", selectedValues);
+    const removedValue = selectedValues[key];
     setSelected(key, "");
     switch (key) {
       case "직무":
@@ -28,10 +30,9 @@ export default function DropdownWithTag() {
         setDomain("");
         break;
     }
-    console.log(
-      `태그 제거 후 ${key} 초기화`,
-      useSearchFilterStore.getState().filters,
-    );
+    if (removedValue) {
+      showToast(`'${removedValue}' 필터가 제거되었습니다.`, "success");
+    }
   };
 
   return (

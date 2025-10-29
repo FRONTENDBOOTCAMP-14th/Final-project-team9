@@ -32,6 +32,11 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
   setInitialState: (initialData) => set({ userData: initialData }),
 
   // 프로필 정보를 업데이트하는 함수
+  // src/store/profile-store.tsx
+
+  // ... (다른 코드) ...
+
+  // 프로필 정보를 업데이트하는 함수
   updateProfile: async (updatedData, imageFile) => {
     try {
       const {
@@ -69,8 +74,6 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
       if (metadataError) throw metadataError;
 
       // Auth metadata 업데이트가 성공하면 클라이언트 상태는 우선 갱신합니다.
-      // users 테이블 업데이트는 환경에 따라 실패할 수 있으므로(스키마 불일치 등)
-      // UI 반영을 위해 먼저 상태를 업데이트합니다.
       set((state) => ({
         userData: state.userData
           ? {
@@ -97,15 +100,14 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
           updateData.nickname = updatedData.nickname;
         }
 
-        const { data: updateResult, error: tableError } = await supabase
+        const { error: tableError } = await supabase
           .from("users")
           .update(updateData)
           .eq("id", user.id)
           .select();
 
         if (tableError) {
-          console.error("users 테이블 업데이트 실패:", tableError);
-          alert(`프로필 업데이트 실패: ${tableError.message}`);
+          throw tableError; // alert() 삭제, 에러 던지기
         }
 
         // user_metadata에 positions와 careers 저장 (드롭다운 값 그대로 유지)
@@ -118,7 +120,7 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
           });
 
           if (metadataError) {
-            console.error("user_metadata 업데이트 실패:", metadataError);
+            console.warn("user_metadata 업데이트 실패:", metadataError); // console.error 대신 warn 사용
           }
 
           // careers 값을 users 테이블의 career_id로 변환하여 저장
@@ -161,7 +163,7 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
                 .eq("id", user.id);
 
               if (careerUpdateError) {
-                console.error("career_id 업데이트 실패:", careerUpdateError);
+                console.warn("career_id 업데이트 실패:", careerUpdateError);
               }
             }
           }
@@ -182,10 +184,7 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
                 .eq("id", user.id);
 
               if (positionUpdateError) {
-                console.error(
-                  "position_id 업데이트 실패:",
-                  positionUpdateError
-                );
+                console.warn("position_id 업데이트 실패:", positionUpdateError);
               }
             }
           }
@@ -194,10 +193,14 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
         // 기술스택 업데이트
         if (updatedData.tech_stacks && updatedData.tech_stacks.length > 0) {
           // 1. 기존 기술스택 삭제
-          await supabase
+          const { error: deleteError } = await supabase
             .from("user_tech_stacks")
             .delete()
             .eq("user_id", user.id);
+
+          if (deleteError) {
+            console.warn("기존 기술스택 삭제 실패:", deleteError);
+          }
 
           // 2. 각 기술스택마다 개별적으로 검색
           const stackIds: Array<{ id: number; name: string }> = [];
@@ -224,19 +227,17 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
               .insert(stacksToInsert);
 
             if (insertError) {
-              console.error("기술스택 삽입 실패:", insertError);
+              console.warn("기술스택 삽입 실패:", insertError);
             }
+          } else {
+            console.warn("기술스택 ID를 찾을 수 없습니다!");
           }
         }
       } catch (e) {
-        console.error("users 테이블 업데이트 중 예외 발생:", e);
-        alert("프로필 업데이트 중 오류가 발생했습니다.");
+        throw e; // alert() 삭제, 에러 던지기
       }
-
-      // 3. (이미 위에서 상태를 업데이트했으므로 추가 작업은 없습니다.)
     } catch (error) {
-      console.error("프로필 업데이트 실패:", error);
-      alert("프로필 업데이트에 실패했습니다.");
+      throw error; // alert() 삭제, 에러 던지기
     }
   },
   // 모달을 여는 함수

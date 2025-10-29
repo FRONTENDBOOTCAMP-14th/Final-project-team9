@@ -8,6 +8,7 @@ import Taps from "@/components/mypage/Taps";
 import { supabase } from "@/lib/supabase";
 import { useFavoriteStore } from "@/store/favorite-store";
 import type { UserData } from "@/types/project";
+import { useToastStore } from "@/store/toast-store";
 
 type ExtendedUserData = UserData & {
   tech_stacks?: string[];
@@ -25,6 +26,7 @@ export default function MyPageForm() {
     completedProjects: 0,
   });
   const { loadFavorites } = useFavoriteStore();
+  const showToast = useToastStore((state) => state.showToast);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -49,22 +51,10 @@ export default function MyPageForm() {
         .select("tech_stacks(name)")
         .eq("user_id", user.id);
 
-      console.log("MyPageForm - userInfo:", userInfo);
-      console.log("MyPageForm - user.id:", user.id);
-      console.log("MyPageForm - userTechStacksData:", userTechStacksData);
-      console.log("MyPageForm - techStackError:", techStackError);
-
-      // user_tech_stacks 테이블에 데이터가 있는지 직접 확인
-      const { data: rawUserTechStacks, error: rawError } = await supabase
-        .from("user_tech_stacks")
-        .select("*")
-        .eq("user_id", user.id);
-
-      console.log(
-        "MyPageForm - user_tech_stacks 원본 데이터:",
-        rawUserTechStacks,
-      );
-      console.log("MyPageForm - rawError:", rawError);
+      if (techStackError) {
+        console.error("기술 스택 로딩 실패:", techStackError);
+        showToast("기술 스택을 불러오는 데 실패했습니다.", "error");
+      }
 
       // tech_stacks 추출
       const techStacks =
@@ -77,8 +67,6 @@ export default function MyPageForm() {
               .map((item) => item.tech_stacks?.name)
               .filter((name): name is string => !!name)
           : [];
-
-      console.log("MyPageForm - 추출된 techStacks:", techStacks);
 
       // Supabase Auth의 user.user_metadata에 저장된 값과 users 테이블의 값을 병합합니다.
       // 프로필 이미지와 bio는 users 테이블 값을 우선 사용 (Storage URL이므로)
@@ -107,9 +95,6 @@ export default function MyPageForm() {
         tech_stacks: techStacks,
       } as ExtendedUserData;
 
-      console.log("MyPageForm - merged 데이터:", merged);
-      console.log("MyPageForm - merged.tech_stacks:", merged.tech_stacks);
-
       setUserData(merged);
       setLoading(false);
 
@@ -118,7 +103,7 @@ export default function MyPageForm() {
     };
 
     void fetchUser();
-  }, [router, loadFavorites]);
+  }, [router, loadFavorites, showToast]);
 
   if (loading) return <Loading />;
   if (!userData) return null;
