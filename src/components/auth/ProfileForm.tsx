@@ -19,13 +19,21 @@ const ProfileForm = () => {
   const [introduction, setIntroduction] = useState("");
   const { selectedValues } = useDropdownStore();
   const [profileImage, setProfileImage] = useState<string>(
-    "/assets/no-profile.svg",
+    "/assets/no-profile.svg"
   );
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 드롭다운에 표시될 옵션들
-  const positionOptions = ["프론트엔드", "백엔드", "기획자", "디자이너"];
+  const positionOptions = [
+    "프론트엔드",
+    "백엔드",
+    "기획자",
+    "디자이너",
+    "풀스택",
+    "PM",
+    "기타",
+  ];
   const experienceOptions = [
     "신입(1년 미만)",
     "주니어(1~3년)",

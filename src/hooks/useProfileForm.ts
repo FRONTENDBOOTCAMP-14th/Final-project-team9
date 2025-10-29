@@ -12,7 +12,7 @@ const MAX_INTRODUCTION_LENGTH = 100;
 
 export function useProfileForm(
   initialUser: Omit<UserProfileCardProps, "projectCounts">,
-  onSave: (updatedUser: Omit<UserProfileCardProps, "projectCounts">) => void,
+  onSave: (updatedUser: Omit<UserProfileCardProps, "projectCounts">) => void
 ) {
   // 기본값을 명시하여 런타임에 일부 필드가 없을 때 발생하는 에러를 방지
   const defaultInitial = {
@@ -35,11 +35,6 @@ export function useProfileForm(
         ? [...initialUser.tech_stacks]
         : [],
     };
-    console.log("useProfileForm 초기화:", {
-      initialUser,
-      merged,
-      tech_stacks: merged.tech_stacks,
-    });
     return merged as Omit<UserProfileCardProps, "projectCounts">;
   });
   const [skillInput, setSkillInput] = useState("");
@@ -117,7 +112,7 @@ export function useProfileForm(
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     // 살균처리 적용

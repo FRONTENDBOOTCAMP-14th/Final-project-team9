@@ -15,7 +15,7 @@ interface ProfileActions {
   setInitialState: (initialData: UserProfileCardProps) => void;
   updateProfile: (
     updatedData: EditableProfileData,
-    imageFile: File | null,
+    imageFile: File | null
   ) => Promise<void>;
   openModal: () => void;
   closeModal: () => void;
@@ -82,14 +82,6 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
       }));
 
       try {
-        console.log("users 테이블 업데이트 시도:", {
-          user_id: user.id,
-          bio: updatedData.bio,
-          profile_image: finalImageUrl,
-          positions: updatedData.positions,
-          careers: updatedData.careers,
-        });
-
         // 업데이트할 데이터 준비
         const updateData: {
           bio: string;
@@ -105,24 +97,15 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
           updateData.nickname = updatedData.nickname;
         }
 
-        console.log("최종 업데이트 데이터:", updateData);
-
         const { data: updateResult, error: tableError } = await supabase
           .from("users")
           .update(updateData)
           .eq("id", user.id)
           .select();
 
-        console.log("users 테이블 업데이트 결과:", {
-          updateResult,
-          tableError,
-        });
-
         if (tableError) {
           console.error("users 테이블 업데이트 실패:", tableError);
           alert(`프로필 업데이트 실패: ${tableError.message}`);
-        } else {
-          console.log("users 테이블 업데이트 성공!");
         }
 
         // user_metadata에 positions와 careers 저장 (드롭다운 값 그대로 유지)
@@ -136,37 +119,87 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
 
           if (metadataError) {
             console.error("user_metadata 업데이트 실패:", metadataError);
-          } else {
-            console.log("user_metadata 업데이트 성공!");
+          }
+
+          // careers 값을 users 테이블의 career_id로 변환하여 저장
+          if (updatedData.careers) {
+            // 드롭다운 값을 DB 값으로 매핑
+            const careerMapping: Record<string, string> = {
+              "신입(1년 미만)": "1년 미만",
+              "주니어(1~3년)": "1년",
+              "미들(3~5년)": "3년",
+              "시니어(5년 이상)": "5년 이상",
+              "10년 이상": "10년 이상",
+            };
+
+            const dbCareerName =
+              careerMapping[updatedData.careers] || updatedData.careers;
+
+            // 모든 경력 정보를 가져와서 매칭
+            const { data: allCareers } = await supabase
+              .from("careers")
+              .select("id, name");
+
+            let careerData = null;
+            if (allCareers) {
+              // 매핑된 값으로 정확히 일치하는 것을 찾기
+              careerData = allCareers.find((c) => c.name === dbCareerName);
+
+              // 정확히 일치하지 않으면 유사한 것 찾기 (공백 제거 후 비교)
+              if (!careerData) {
+                const normalizedCareer = dbCareerName.replace(/\s/g, "");
+                careerData = allCareers.find(
+                  (c) => c.name.replace(/\s/g, "") === normalizedCareer
+                );
+              }
+            }
+
+            if (careerData) {
+              const { error: careerUpdateError } = await supabase
+                .from("users")
+                .update({ career_id: careerData.id })
+                .eq("id", user.id);
+
+              if (careerUpdateError) {
+                console.error("career_id 업데이트 실패:", careerUpdateError);
+              }
+            }
+          }
+
+          // positions 값을 users 테이블의 position_id로 변환하여 저장
+          if (updatedData.positions) {
+            // positions 테이블에서 해당 포지션 찾기
+            const { data: positionData } = await supabase
+              .from("positions")
+              .select("id, name")
+              .eq("name", updatedData.positions)
+              .single();
+
+            if (positionData) {
+              const { error: positionUpdateError } = await supabase
+                .from("users")
+                .update({ position_id: positionData.id })
+                .eq("id", user.id);
+
+              if (positionUpdateError) {
+                console.error(
+                  "position_id 업데이트 실패:",
+                  positionUpdateError
+                );
+              }
+            }
           }
         }
 
         // 기술스택 업데이트
         if (updatedData.tech_stacks && updatedData.tech_stacks.length > 0) {
-          console.log("기술스택 업데이트 시작:", updatedData.tech_stacks);
-
           // 1. 기존 기술스택 삭제
-          const { error: deleteError } = await supabase
+          await supabase
             .from("user_tech_stacks")
             .delete()
             .eq("user_id", user.id);
 
-          if (deleteError) {
-            console.error("기존 기술스택 삭제 실패:", deleteError);
-          } else {
-            console.log("기존 기술스택 삭제 성공");
-          }
-
-          // 2. 기술스택 이름으로 ID 조회 (대소문자 구분 없이)
-          const { data: stacksData, error: stacksError } = await supabase
-            .from("tech_stacks")
-            .select("id, name")
-            .ilike("name", updatedData.tech_stacks.join("|"));
-
-          console.log("기술스택 ID 조회 결과:", { stacksData, stacksError });
-          console.log("검색한 기술스택 이름들:", updatedData.tech_stacks);
-
-          // 각 기술스택마다 개별적으로 검색
+          // 2. 각 기술스택마다 개별적으로 검색
           const stackIds: Array<{ id: number; name: string }> = [];
           for (const stackName of updatedData.tech_stacks) {
             const { data: foundStacks } = await supabase
@@ -174,14 +207,10 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
               .select("id, name")
               .ilike("name", stackName);
 
-            console.log(`"${stackName}" 검색 결과:`, foundStacks);
-
             if (foundStacks && foundStacks.length > 0) {
               stackIds.push(foundStacks[0]);
             }
           }
-
-          console.log("최종 찾은 기술스택 ID들:", stackIds);
 
           if (stackIds.length > 0) {
             // 3. 새로운 기술스택 삽입
@@ -190,19 +219,13 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
               tech_stack_id: stack.id,
             }));
 
-            console.log("삽입할 기술스택:", stacksToInsert);
-
             const { error: insertError } = await supabase
               .from("user_tech_stacks")
               .insert(stacksToInsert);
 
             if (insertError) {
               console.error("기술스택 삽입 실패:", insertError);
-            } else {
-              console.log("기술스택 삽입 성공!");
             }
-          } else {
-            console.error("기술스택 ID를 찾을 수 없습니다!");
           }
         }
       } catch (e) {

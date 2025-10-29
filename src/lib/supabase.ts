@@ -7,4 +7,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error("Supabase environment variables are not set");
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  global: {
+    fetch: (url, options = {}) => {
+      return fetch(url, {
+        ...options,
+        cache: "no-store",
+      });
+    },
+  },
+});

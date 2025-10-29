@@ -76,7 +76,7 @@ export default function SearchFilterSection({
           <Dropdown
             options={options.positions}
             onChange={(value) => setPosition(value)}
-            placeholder="직무"
+            placeholder="포지션"
             width="250px"
           />
           <Dropdown

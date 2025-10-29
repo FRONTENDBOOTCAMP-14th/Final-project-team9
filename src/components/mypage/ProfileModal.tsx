@@ -29,7 +29,15 @@ const CloseIcon = () => (
 // 상수 분리
 const MAX_SKILLS = 3;
 const MAX_INTRODUCTION_LENGTH = 100;
-const FIELD_OPTIONS = ["프론트엔드", "백엔드", "기획자", "디자이너"];
+const FIELD_OPTIONS = [
+  "프론트엔드",
+  "백엔드",
+  "기획자",
+  "디자이너",
+  "풀스택",
+  "PM",
+  "기타",
+];
 const EXPERIENCE_OPTIONS = [
   "신입(1년 미만)",
   "주니어(1~3년)",
@@ -75,13 +83,13 @@ export default function ProfileEditModal({
 
   // Dropdown 초기값 설정
   useEffect(() => {
-    setSelected("분야", user.positions);
+    setSelected("포지션", user.positions);
     setSelected("경력", user.careers);
   }, [user.positions, user.careers, setSelected]);
 
   // Dropdown 값이 변경될 때 formData 업데이트
   useEffect(() => {
-    const field = selectedValues["분야"];
+    const field = selectedValues["포지션"];
     const careers = selectedValues["경력"];
 
     if (field && field !== formData.positions) {
@@ -103,8 +111,8 @@ export default function ProfileEditModal({
         allStacksFromDB.filter(
           (stack) =>
             stack.toLowerCase().includes(searchTerm.toLowerCase()) &&
-            !formData.tech_stacks.includes(stack),
-        ),
+            !formData.tech_stacks.includes(stack)
+        )
       );
     } else {
       setFilteredStacks([]);
@@ -120,7 +128,7 @@ export default function ProfileEditModal({
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setActiveIndex(
-        (prev) => (prev - 1 + filteredStacks.length) % filteredStacks.length,
+        (prev) => (prev - 1 + filteredStacks.length) % filteredStacks.length
       );
     } else if (e.key === "Enter" && activeIndex >= 0) {
       e.preventDefault();
@@ -249,17 +257,17 @@ export default function ProfileEditModal({
               <p className="text-red-500 text-sm mt-1">{errors.bio}</p>
             )}
           </div>
-          {/* 분야 */}
+          {/* 포지션 */}
           <div>
             <label
               htmlFor="positions"
               className="block text-sm font-medium text-gray mb-0.5"
             >
-              분야
+              포지션
             </label>
             <Dropdown
               options={FIELD_OPTIONS}
-              placeholder="분야"
+              placeholder="포지션"
               width="100%"
               height="40px"
               className="!border-0 !text-sm !text-gray"
