@@ -35,11 +35,6 @@ export function useProfileForm(
         ? [...initialUser.tech_stacks]
         : [],
     };
-    console.log("useProfileForm 초기화:", {
-      initialUser,
-      merged,
-      tech_stacks: merged.tech_stacks,
-    });
     return merged as Omit<UserProfileCardProps, "projectCounts">;
   });
   const [skillInput, setSkillInput] = useState("");

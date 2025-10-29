@@ -165,6 +165,30 @@ const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
               }
             }
           }
+
+          // positions 값을 users 테이블의 position_id로 변환하여 저장
+          if (updatedData.positions) {
+            // positions 테이블에서 해당 포지션 찾기
+            const { data: positionData } = await supabase
+              .from("positions")
+              .select("id, name")
+              .eq("name", updatedData.positions)
+              .single();
+
+            if (positionData) {
+              const { error: positionUpdateError } = await supabase
+                .from("users")
+                .update({ position_id: positionData.id })
+                .eq("id", user.id);
+
+              if (positionUpdateError) {
+                console.error(
+                  "position_id 업데이트 실패:",
+                  positionUpdateError
+                );
+              }
+            }
+          }
         }
 
         // 기술스택 업데이트
