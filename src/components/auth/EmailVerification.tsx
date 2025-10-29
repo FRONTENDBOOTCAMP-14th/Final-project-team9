@@ -4,6 +4,7 @@ import { useState } from "react";
 import Button from "@/components/common/Button";
 import LabeledInput from "@/components/common/LabeledInput";
 import { supabase } from "@/lib/supabase";
+import { useToastStore } from "@/store/toast-store";
 import { sanitizeHTML, normalizeWhitespace } from "@/utils/sanitize";
 import type { User, Session } from "@supabase/supabase-js";
 // 'VerifyOtpResponse' 대신 User와 Session을 직접 import 합니다.
@@ -49,11 +50,12 @@ const EmailVerification = ({
   const [isAuthCodeSent, setIsAuthCodeSent] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const showToast = useToastStore((state) => state.showToast);
 
   // --- 1. 인증 코드 전송 ---
   const sendAuthCode = async () => {
     if (!email) {
-      alert("이메일을 입력해주세요!");
+      showToast("이메일을 입력해주세요!", "error");
       return;
     }
 
@@ -84,18 +86,21 @@ const EmailVerification = ({
 
     setIsSending(false);
     if (error) {
-      alert("인증코드 전송 실패: " + error.message);
+      showToast("인증코드 전송 실패: " + error.message, "error");
       return;
     }
 
-    alert("인증코드를 메일로 보냈습니다. 이메일을 확인해주세요!");
+    showToast(
+      "인증코드를 메일로 보냈습니다. 이메일을 확인해주세요!",
+      "success",
+    );
     setIsAuthCodeSent(true);
   };
 
   // --- 2. 인증 코드 검증 ---
   const verifyAuthCode = async () => {
     if (!authCode) {
-      alert("인증코드를 입력해주세요!");
+      showToast("인증코드를 입력해주세요!", "error");
       return;
     }
 
@@ -114,11 +119,11 @@ const EmailVerification = ({
     setIsVerifying(false);
 
     if (error) {
-      alert("인증 실패: " + error.message);
+      showToast("인증 실패: " + error.message, "error");
       return;
     }
 
-    alert("인증 완료!");
+    showToast("인증 완료!", "success");
     setIsVerified(true);
 
     // (핵심) 인증 성공 시, 부모가 넘겨준 onVerifySuccess 함수를 실행
