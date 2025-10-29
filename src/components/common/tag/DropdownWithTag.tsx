@@ -17,7 +17,7 @@ export default function DropdownWithTag() {
     const removedValue = selectedValues[key];
     setSelected(key, "");
     switch (key) {
-      case "직무":
+      case "포지션":
         setPosition("");
         break;
       case "기간":
